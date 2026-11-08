@@ -17,15 +17,14 @@ while i < len(linie) and linie[i].lstrip().startswith(('<title', '<meta', '<link
 glowa = linie[:i]
 tresc = '\n'.join(linie[i:])
 opis = next((l.split('content="')[1].split('"')[0] for l in glowa if 'name="description"' in l), '')
-ikona = ("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E"
-         "%3Crect width='32' height='32' rx='4' fill='%23c8102e'/%3E"
-         "%3Cpath d='M0 5L5 0L32 27L27 32Z' fill='%23fff'/%3E%3C/svg%3E")   # flaga nurkowa
 meta = [
     '<meta charset="utf-8">',
     '<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">',
     *glowa,
     '<link rel="canonical" href="%s">' % ADRES,
-    '<link rel="icon" href="%s">' % ikona,
+    '<link rel="icon" href="ikona.svg" type="image/svg+xml">',   # zbiornik jako flaga nurkowa
+    '<link rel="icon" href="ikona-32.png" type="image/png" sizes="32x32">',
+    '<link rel="apple-touch-icon" href="ikona-180.png">',
     '<meta property="og:type" content="website">',
     '<meta property="og:url" content="%s">' % ADRES,
     '<meta property="og:title" content="%s">' % TYTUL,
