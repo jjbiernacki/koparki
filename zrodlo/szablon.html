@@ -1,0 +1,701 @@
+<title>Koparki · mapa nurkowa</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<meta name="description" content="Interaktywna mapa nurkowa zalanego wyrobiska Koparki: atrakcje, trasy z azymutami magnetycznymi, plan do druku.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Saira+Condensed:wght@600;700&family=Source+Sans+3:wght@400;600;700&family=IBM+Plex+Mono:wght@500;600&display=swap">
+<style>/*LEAFLET_CSS*/</style>
+<style>
+/* Layout: full-bleed aerial map; one instrument-style panel (left rail on desktop, bottom sheet on phones); compass top-right. */
+:root {
+  --bg: #e9efee;
+  --surface: #fbfcfb;
+  --surface-2: #f1f5f4;
+  --ink: #13222a;
+  --muted: #56686d;
+  --line: #d2dcdb;
+  --accent: #b01a20;
+  --accent-ink: #ffffff;
+  --accent-soft: #f6e3e3;
+  --link: #0d6b78;
+  --water: #15282e;
+  --pin: #b01a20;
+  --pin-ink: #ffffff;
+  --shadow: 0 10px 30px rgba(10, 30, 36, .22), 0 1px 3px rgba(10, 30, 36, .18);
+  --f-display: "Saira Condensed", "Arial Narrow", "Roboto Condensed", sans-serif;
+  --f-body: "Source Sans 3", "Segoe UI", system-ui, -apple-system, sans-serif;
+  --f-data: "IBM Plex Mono", ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  --r: 14px;
+  --peek: 148px;
+  --sheet-h: 0px;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0d171b; --surface: #12212a; --surface-2: #182b33; --ink: #e3ecec; --muted: #94a8ac;
+    --line: #263c44; --accent: #e5535a; --accent-ink: #ffffff; --accent-soft: #3a1e22; --link: #6cc6d2;
+    --shadow: 0 10px 30px rgba(0,0,0,.5), 0 1px 3px rgba(0,0,0,.4);
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0d171b; --surface: #12212a; --surface-2: #182b33; --ink: #e3ecec; --muted: #94a8ac;
+  --line: #263c44; --accent: #e5535a; --accent-ink: #ffffff; --accent-soft: #3a1e22; --link: #6cc6d2;
+  --shadow: 0 10px 30px rgba(0,0,0,.5), 0 1px 3px rgba(0,0,0,.4);
+  color-scheme: dark;
+}
+html, body { height: 100%; }
+body { background: var(--water); color: var(--ink); font-family: var(--f-body); font-size: 15px; line-height: 1.45; overflow: hidden; }
+#app { position: relative; height: 100%; }
+#map { position: absolute; inset: 0; background: var(--water); }
+button { font: inherit; color: inherit; }
+:focus-visible { outline: 3px solid var(--link); outline-offset: 2px; }
+
+/* ---------- panel ---------- */
+#panel {
+  position: absolute; z-index: 800; top: 16px; left: max(16px, env(safe-area-inset-left, 0px)); bottom: 16px; width: 372px;
+  background: var(--surface); border-radius: var(--r); box-shadow: var(--shadow);
+  display: flex; flex-direction: column; overflow: hidden;
+}
+.handle { display: none; }
+.head { padding: 18px 18px 12px; border-bottom: 1px solid var(--line); display: grid; gap: 12px; }
+.brand { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
+.brand h1 { margin: 0; font-family: var(--f-display); font-weight: 700; font-size: 34px; line-height: .95; letter-spacing: .01em; text-transform: uppercase; }
+.brand p { margin: 4px 0 0; color: var(--muted); font-size: 14px; }
+.lang { display: inline-flex; border: 1px solid var(--line); border-radius: 999px; padding: 2px; background: var(--surface-2); flex: none; }
+.lang button { border: 0; background: none; padding: 4px 10px; border-radius: 999px; font-family: var(--f-data); font-size: 12px; font-weight: 600; letter-spacing: .06em; cursor: pointer; color: var(--muted); }
+.lang button[aria-pressed="true"] { background: var(--ink); color: var(--surface); }
+.actions { display: grid; grid-template-columns: 1fr auto; gap: 8px; }
+.btn-pdf {
+  display: flex; align-items: center; gap: 10px; text-align: left; border: 0; cursor: pointer;
+  background: var(--accent); color: var(--accent-ink); border-radius: 10px; padding: 8px 12px; min-width: 0;
+}
+.btn-pdf svg { flex: none; }
+.btn-pdf b { display: block; font-weight: 700; font-size: 15px; line-height: 1.15; }
+.btn-pdf small { display: block; font-size: 12px; opacity: .88; line-height: 1.2; }
+.btn-pdf[aria-busy="true"] { opacity: .7; cursor: progress; }
+.btn-ig {
+  display: flex; align-items: center; justify-content: center; gap: 6px; border: 1px solid var(--line); background: var(--surface-2);
+  border-radius: 10px; padding: 8px 12px; cursor: pointer; font-weight: 600; font-size: 14px;
+}
+.tabs { display: flex; gap: 4px; }
+.tabs button {
+  flex: 1; border: 0; background: none; padding: 7px 6px; border-radius: 8px; cursor: pointer;
+  font-family: var(--f-display); font-weight: 600; font-size: 16px; letter-spacing: .04em; text-transform: uppercase; color: var(--muted);
+}
+.tabs button[aria-selected="true"] { background: var(--surface-2); color: var(--ink); box-shadow: inset 0 -2px 0 var(--accent); }
+.note { margin: 0; font-size: 13px; color: var(--muted); }
+#status { font-size: 13px; color: var(--muted); min-height: 0; }
+#status:empty { display: none; }
+#status a { color: var(--link); font-weight: 600; }
+
+.body { flex: 1; overflow-y: auto; overscroll-behavior: contain; -webkit-overflow-scrolling: touch; }
+.view { padding: 8px 10px 18px; }
+.view-pad { padding: 16px 18px 22px; display: grid; gap: 14px; }
+
+/* list */
+.list { list-style: none; margin: 0; padding: 0; }
+.list button {
+  width: 100%; display: grid; grid-template-columns: 34px 1fr; gap: 10px; align-items: center; text-align: left;
+  border: 0; background: none; padding: 8px 8px; border-radius: 10px; cursor: pointer;
+}
+.list button:hover { background: var(--surface-2); }
+.list .t { font-weight: 600; font-size: 15px; line-height: 1.2; display: block; }
+.list .s { display: block; color: var(--muted); font-size: 13px; line-height: 1.3; }
+.list li.sub button { padding-left: 22px; grid-template-columns: 26px 1fr; }
+.list-cap { margin: 6px 8px 8px; font-size: 13px; color: var(--muted); }
+.badge {
+  display: inline-grid; place-items: center; width: 30px; height: 30px; border-radius: 50%;
+  background: var(--pin); color: var(--pin-ink); font-family: var(--f-display); font-weight: 700; font-size: 16px; line-height: 1;
+  box-shadow: 0 0 0 2px var(--surface);
+}
+.badge.small { width: 24px; height: 24px; font-size: 13px; }
+
+/* detail */
+.back svg { width: 16px; height: 16px; }
+.back { border: 0; background: none; color: var(--link); font-weight: 600; cursor: pointer; padding: 4px 0; justify-self: start; display: inline-flex; gap: 6px; align-items: center; }
+.d-title { display: grid; grid-template-columns: auto 1fr; gap: 12px; align-items: center; }
+.d-title .badge { width: 46px; height: 46px; font-size: 24px; }
+.d-title h2 { margin: 0; font-family: var(--f-display); font-weight: 700; font-size: 28px; line-height: 1; text-wrap: balance; }
+.d-title .alt { display: block; color: var(--muted); font-size: 13px; margin-top: 3px; }
+.d-desc { margin: 0; font-size: 16px; }
+.facts { display: grid; gap: 10px; margin: 0; }
+.facts div { display: grid; gap: 2px; }
+.facts dt { font-family: var(--f-data); font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+.facts dd { margin: 0; font-size: 14px; }
+.coord { font-family: var(--f-data); font-size: 13px; display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.coord span { user-select: all; }
+.mini { border: 1px solid var(--line); background: var(--surface-2); border-radius: 6px; padding: 2px 8px; font-size: 12px; cursor: pointer; font-family: var(--f-body); }
+.sect { font-family: var(--f-display); font-weight: 600; font-size: 17px; letter-spacing: .05em; text-transform: uppercase; margin: 6px 0 0; }
+.routes { list-style: none; margin: 0; padding: 0; border-top: 1px solid var(--line); }
+.routes li { border-bottom: 1px solid var(--line); }
+.routes button {
+  width: 100%; border: 0; background: none; cursor: pointer; text-align: left;
+  display: grid; grid-template-columns: 22px 58px 58px 1fr; gap: 8px; align-items: center; padding: 9px 4px;
+}
+.routes button:hover { background: var(--surface-2); }
+.routes .ar { width: 18px; height: 18px; color: var(--accent); }
+.routes .az { font-family: var(--f-data); font-weight: 600; font-size: 16px; color: var(--accent); font-variant-numeric: tabular-nums; }
+.routes .m { font-family: var(--f-data); font-size: 14px; font-variant-numeric: tabular-nums; }
+.routes .to { display: flex; gap: 8px; align-items: center; min-width: 0; font-size: 14px; }
+.routes .to span:last-child { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+/* info / contact */
+.prose { display: grid; gap: 12px; }
+.prose h2 { margin: 0; font-family: var(--f-display); font-weight: 700; font-size: 26px; line-height: 1.05; }
+.prose p { margin: 0; max-width: 62ch; }
+.prose ul { margin: 0; padding-left: 18px; display: grid; gap: 8px; }
+.kv { display: grid; grid-template-columns: auto 1fr; gap: 4px 14px; font-size: 14px; margin: 0; }
+.kv dt { color: var(--muted); }
+.kv dd { margin: 0; font-family: var(--f-data); font-size: 13px; font-variant-numeric: tabular-nums; }
+.ig-card { display: grid; gap: 10px; padding: 14px; border-radius: 12px; background: var(--surface-2); border: 1px solid var(--line); }
+.ig-link {
+  display: inline-flex; align-items: center; gap: 10px; justify-self: start; text-decoration: none;
+  background: var(--ink); color: var(--surface); padding: 10px 14px; border-radius: 10px; font-weight: 700;
+}
+.ig-handle { font-family: var(--f-data); font-size: 14px; user-select: all; }
+
+/* ---------- map furniture ---------- */
+.ctrl { position: absolute; z-index: 700; }
+#compass { top: 16px; right: max(16px, env(safe-area-inset-right, 0px)); display: grid; justify-items: end; gap: 8px; }
+.rose {
+  width: 84px; height: 84px; border-radius: 50%; border: 0; cursor: pointer; padding: 0;
+  background: var(--surface); box-shadow: var(--shadow); display: grid; place-items: center; position: relative;
+}
+.rose svg { width: 76px; height: 76px; }
+.rose-cap { position: absolute; bottom: -8px; left: 50%; transform: translateX(-50%); background: var(--ink); color: var(--surface); font-family: var(--f-data); font-size: 10px; letter-spacing: .06em; padding: 1px 6px; border-radius: 6px; white-space: nowrap; }
+.shore { background: var(--surface); border-radius: 12px; box-shadow: var(--shadow); padding: 10px 12px 12px; width: 200px; }
+.shore h3 { margin: 0 0 6px; font-family: var(--f-display); font-size: 15px; letter-spacing: .08em; text-transform: uppercase; color: var(--accent); text-align: center; }
+.shore-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; grid-template-rows: auto auto auto; align-items: center; justify-items: center; gap: 2px; }
+.shore-grid .c { width: 34px; height: 34px; color: var(--ink); }
+.shore-grid .v { text-align: center; line-height: 1.1; }
+.shore-grid .v b { display: block; font-family: var(--f-data); font-size: 15px; color: var(--accent); }
+.shore-grid .v small { font-size: 11px; color: var(--muted); }
+.shore p { margin: 8px 0 0; font-size: 12px; color: var(--muted); text-align: center; }
+
+#zoom { right: max(16px, env(safe-area-inset-right, 0px)); bottom: calc(16px + env(safe-area-inset-bottom, 0px)); display: grid; gap: 6px; }
+#zoom button {
+  width: 42px; height: 42px; border: 0; border-radius: 10px; background: var(--surface); box-shadow: var(--shadow);
+  cursor: pointer; display: grid; place-items: center; color: var(--ink);
+}
+#scale { left: 404px; bottom: calc(18px + env(safe-area-inset-bottom, 0px)); color: #fff; font-family: var(--f-data); font-size: 12px; text-shadow: 0 1px 2px rgba(0,0,0,.9); pointer-events: none; }
+#scale .bar { height: 6px; border: 2px solid #fff; border-top: 0; box-shadow: 0 1px 2px rgba(0,0,0,.7); margin-top: 2px; }
+
+/* markers + labels (sit on the photo, so fixed colors) */
+.pin {
+  width: 100%; height: 100%; border-radius: 50%; background: var(--pin); color: var(--pin-ink);
+  display: grid; place-items: center; font-family: var(--f-display); font-weight: 700; font-size: 16px; line-height: 1;
+  border: 2.5px solid #fff; box-shadow: 0 1px 4px rgba(0,0,0,.55); box-sizing: border-box; cursor: pointer;
+  transition: transform .15s ease;
+}
+.pin.small { font-size: 12px; border-width: 2px; }
+.leaflet-marker-icon.on .pin { transform: scale(1.35); box-shadow: 0 0 0 5px rgba(255,255,255,.55), 0 2px 8px rgba(0,0,0,.6); }
+.leaflet-marker-icon.dim .pin { opacity: .55; }
+.z-lo .pin { transform: scale(.72); }
+.z-lo .leaflet-marker-icon.on .pin { transform: scale(1.1); }
+.dist {
+  display: none; transform: translate(-50%, -50%); width: max-content;
+  background: rgba(255,255,255,.93); color: #13222a; border: 1.5px solid #13222a; border-radius: 6px;
+  font-family: var(--f-data); font-size: 12px; font-weight: 600; padding: 0 5px; line-height: 18px; white-space: nowrap;
+}
+.show-dist .dist { display: block; }
+.dist.on { display: block; border-color: #b01a20; color: #b01a20; }
+.azl { position: absolute; left: 0; top: 0; pointer-events: none; }
+.azl span {
+  position: absolute; transform: translate(-50%, -50%); display: inline-flex; gap: 3px; align-items: center; white-space: nowrap;
+  background: #fff; color: #b01a20; border: 1.5px solid #b01a20; border-radius: 6px; padding: 1px 5px 1px 3px;
+  font-family: var(--f-data); font-size: 13px; font-weight: 600; box-shadow: 0 1px 4px rgba(0,0,0,.4);
+}
+.azl svg { width: 13px; height: 13px; }
+.leaflet-container { font-family: var(--f-body); background: var(--water); -webkit-tap-highlight-color: transparent; }
+.leaflet-popup-content-wrapper, .leaflet-popup-tip { background: var(--surface); color: var(--ink); box-shadow: var(--shadow); }
+.leaflet-popup-content { margin: 10px 14px; font-size: 14px; line-height: 1.4; }
+.leaflet-popup-content b { font-weight: 700; }
+.leaflet-popup-content .pz { font-family: var(--f-data); font-size: 13px; color: var(--accent); display: block; margin-top: 4px; }
+.leaflet-container a.leaflet-popup-close-button { color: var(--muted); }
+.toast {
+  position: absolute; z-index: 900; left: 50%; transform: translateX(-50%); top: 16px;
+  background: var(--ink); color: var(--surface); padding: 8px 14px; border-radius: 10px; font-size: 14px; box-shadow: var(--shadow);
+}
+
+/* ---------- phones: bottom sheet ---------- */
+@media (max-width: 760px) {
+  #panel {
+    top: auto; left: 0; right: 0; bottom: 0; width: auto; border-radius: 18px 18px 0 0;
+    height: var(--sheet-h); transition: height .25s ease;
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+  .handle { display: grid; place-items: center; border: 0; background: none; padding: 8px 0 2px; cursor: pointer; width: 100%; }
+  .handle span { width: 44px; height: 5px; border-radius: 3px; background: var(--line); }
+  .head { padding: 2px max(16px, env(safe-area-inset-right, 0px)) 10px max(16px, env(safe-area-inset-left, 0px)); gap: 10px; }
+  .brand h1 { font-size: 26px; }
+  .brand p { display: none; }
+  #scale { display: none; }
+  .btn-pdf { padding: 7px 10px; }
+  .btn-pdf small { display: none; }
+  .view { padding-left: max(8px, env(safe-area-inset-left, 0px)); padding-right: max(8px, env(safe-area-inset-right, 0px)); }
+  .view-pad { padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+  #zoom { bottom: calc(var(--sheet-h) + 12px); transition: bottom .25s ease; }
+  #zoom .zi, #zoom .zo { display: none; }
+  #scale { left: max(16px, env(safe-area-inset-left, 0px)); bottom: calc(var(--sheet-h) + 16px); transition: bottom .25s ease; }
+  #compass { top: 12px; }
+  .rose { width: 66px; height: 66px; }
+  .rose svg { width: 60px; height: 60px; }
+  .shore { width: 184px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  #panel, #zoom, #scale, .pin { transition: none; }
+}
+</style>
+
+<div id="app">
+  <div id="map" role="region" aria-label="Mapa"></div>
+
+  <div class="ctrl" id="compass">
+    <button class="rose" id="roseBtn" aria-expanded="false" aria-controls="shore">
+      <svg viewBox="-40 -40 80 80" aria-hidden="true">
+        <circle r="37" fill="none" stroke="currentColor" stroke-opacity=".25" stroke-width="1"/>
+        <g id="needle">
+          <polygon points="0,-31 6,0 -6,0" fill="#b01a20"/>
+          <polygon points="0,31 6,0 -6,0" fill="currentColor" fill-opacity=".55"/>
+          <circle r="3" fill="currentColor"/>
+          <text x="0" y="-21" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="9" font-weight="600" fill="#fff" transform="rotate(0)">N</text>
+        </g>
+      </svg>
+      <span class="rose-cap" id="roseCap">N mag.</span>
+    </button>
+    <div class="shore" id="shore" hidden>
+      <h3 id="shoreH">Do brzegu</h3>
+      <div class="shore-grid" id="shoreGrid"></div>
+      <p id="shoreP"></p>
+    </div>
+  </div>
+
+  <div class="ctrl" id="zoom">
+    <button class="zi" id="zIn" aria-label="Przybliż"><svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true"><path d="M9 3v12M3 9h12" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg></button>
+    <button class="zo" id="zOut" aria-label="Oddal"><svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true"><path d="M3 9h12" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg></button>
+    <button id="zFit" aria-label="Cała mapa"><svg width="20" height="20" viewBox="0 0 20 20" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7V3h4M13 3h4v4M17 13v4h-4M7 17H3v-4"/></svg></button>
+  </div>
+  <div class="ctrl" id="scale"><span id="scaleTxt"></span><div class="bar" id="scaleBar"></div></div>
+
+  <aside id="panel" aria-label="Panel">
+    <button class="handle" id="handle" aria-label="Rozwiń panel"><span></span></button>
+    <div class="head">
+      <div class="brand">
+        <div>
+          <h1>Koparki</h1>
+          <p id="sub"></p>
+        </div>
+        <div class="lang" role="group" aria-label="Język / Language">
+          <button id="lPL" aria-pressed="true">PL</button>
+          <button id="lEN" aria-pressed="false">EN</button>
+        </div>
+      </div>
+      <div class="actions">
+        <button class="btn-pdf" id="pdfBtn">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12M7 10l5 5 5-5M4 19h16"/></svg>
+          <span><b id="pdfT"></b><small id="pdfS"></small></span>
+        </button>
+        <button class="btn-ig" id="igBtn">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor"/></svg>
+          <span id="igT"></span>
+        </button>
+      </div>
+      <div id="status" role="status" aria-live="polite"></div>
+      <div class="tabs" role="tablist">
+        <button role="tab" id="tList" aria-selected="true"></button>
+        <button role="tab" id="tInfo" aria-selected="false"></button>
+        <button role="tab" id="tContact" aria-selected="false"></button>
+      </div>
+    </div>
+    <div class="body" id="body"></div>
+  </aside>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+const D = /*DANE*/;
+const IG = 'https://www.instagram.com/deeperbluediving';
+const PDF = { pl: { src: 'plan_PL.pdf', name: 'Koparki_plan_nurkowy.pdf' }, en: { src: 'plan_EN.pdf', name: 'Koparki_dive_plan.pdf' } };
+
+const T = {
+  pl: {
+    sub: 'Mapa nurkowa zalanego wyrobiska',
+    pdfT: 'Plan do druku', pdfS: 'PDF · A4 · po polsku',
+    pdfBusy: 'Przygotowuję plik…', pdfSaved: 'Plan zapisany.', pdfDeclined: 'Pobieranie anulowane.',
+    pdfFail: 'Nie udało się zapisać pliku tutaj.', pdfOpen: 'Otwórz PDF',
+    ig: 'Kontakt',
+    tList: 'Atrakcje', tInfo: 'O mapie', tContact: 'Kontakt',
+    listCap: 'Dotknij punktu na liście albo na mapie, żeby zobaczyć trasy i azymuty.',
+    back: 'Wszystkie atrakcje',
+    alt: 'Nazwa w bazie', coords: 'Współrzędne WGS84', copy: 'Kopiuj', copied: 'Skopiowano',
+    routes: 'Trasy z tego punktu', routesHint: 'Azymut magnetyczny, czyli tak, jak pokazuje kompas nurka. Dotknij trasy, żeby przejść do celu.',
+    noRoutes: 'Ten punkt nie ma własnych tras na planie.',
+    depthNote: '* głębokość i nazwa ze starego planu bazy. Głębokość zależy od poziomu wody.',
+    rose: 'N mag.', shoreH: 'Do brzegu', shoreP: 'Kursy na brzeg z całego zbiornika, ±5°.', base: 'baza',
+    zIn: 'Przybliż', zOut: 'Oddal', zFit: 'Cała mapa', handle: 'Rozwiń panel', map: 'Mapa',
+    edge: 'trasa',
+    info: `
+      <h2>O mapie</h2>
+      <p>Podkład to ortofotomapa z drona z 13.09.2026. Punkty, trasy i azymuty są takie same jak na planie do druku.</p>
+      <ul>
+        <li><b>Azymuty są magnetyczne</b>, tak jak na kompasie nurka. Deklinacja +6,3°E: azymut rzeczywisty = magnetyczny + 6°.</li>
+        <li>Azymut zależy od kierunku: z A do B to inna liczba niż z B do A. Na mapie widać go przy punkcie, z którego płyniesz. Azymut jest kierunkiem, a nie celownikiem.</li>
+        <li>Pozycje atrakcji wyznaczone na podstawie boi mogą być odrobinę przesunięte, bo boja pływa na linie.</li>
+        <li>Głębokości (z gwiazdką) i nazwy atrakcji pochodzą ze starego planu bazy. Głębokość zależy od poziomu wody.</li>
+        <li>Wilhelm: 7 to przypięcie poręczówki z Głębokiej koparki (9), 7b to dziób. Kadłub ok. 16,5 × 3,5 m, kurs rufa→dziób 90°.</li>
+        <li>Platformy szkoleniowe (17, 18) leżą przy trasach 5–19 i 16–19 i nie mają własnych tras.</li>
+        <li>Kompas w prawym górnym rogu pokazuje północ magnetyczną. Dotknij go, żeby zobaczyć kursy do brzegu.</li>
+      </ul>`,
+    contact: `
+      <h2>Coś się nie zgadza?</h2>
+      <p>Mapę robię sam, ze zdjęć z drona i z pomiarów pod wodą. Jeśli widzisz błąd, brakuje jakiejś atrakcji albo azymut nie zgadza się z Twoim kompasem, napisz do mnie na Instagramie.</p>
+      <p>Najbardziej przydaje się numer punktu, co jest nie tak i skąd to wiesz, na przykład azymut i odległość zmierzone pod wodą.</p>`,
+    igBtn: 'Napisz na Instagramie'
+  },
+  en: {
+    sub: 'Dive map of a flooded quarry',
+    pdfT: 'Print plan', pdfS: 'PDF · A4 · in English',
+    pdfBusy: 'Preparing the file…', pdfSaved: 'Plan saved.', pdfDeclined: 'Download cancelled.',
+    pdfFail: 'Could not save the file here.', pdfOpen: 'Open the PDF',
+    ig: 'Contact',
+    tList: 'Sites', tInfo: 'About', tContact: 'Contact',
+    listCap: 'Tap a site in the list or on the map to see its routes and bearings.',
+    back: 'All sites',
+    alt: 'Local name', coords: 'WGS84 coordinates', copy: 'Copy', copied: 'Copied',
+    routes: 'Routes from here', routesHint: 'Magnetic bearing, as your dive compass shows it. Tap a route to go to its end.',
+    noRoutes: 'This point has no routes of its own on the plan.',
+    depthNote: '* depth and name from the old dive-base plan. Depth depends on the water level.',
+    rose: 'mag. N', shoreH: 'To shore', shoreP: 'Courses to shore from anywhere in the lake, ±5°.', base: 'base',
+    zIn: 'Zoom in', zOut: 'Zoom out', zFit: 'Whole map', handle: 'Expand panel', map: 'Map',
+    edge: 'route',
+    info: `
+      <h2>About this map</h2>
+      <p>The base layer is a drone orthophoto from 13 Sep 2026. Points, routes and bearings are the same as on the print plan.</p>
+      <ul>
+        <li><b>Bearings are magnetic</b>, as on a dive compass. Declination +6.3°E: true bearing = magnetic + 6°.</li>
+        <li>A bearing depends on direction: A to B is a different number from B to A. The map shows it at the point you swim from. A bearing gives direction, not a precise aim.</li>
+        <li>Positions of sites taken from buoys may be slightly off, because a buoy moves on its line.</li>
+        <li>Depths (with an asterisk) and site names come from the old dive-base plan. Depth depends on the water level.</li>
+        <li>Wilhelm: 7 is where the guideline from the Deep excavator (9) is tied, 7b is the bow. Hull about 16.5 × 3.5 m, stern→bow 90°.</li>
+        <li>Training platforms (17, 18) lie by routes 5–19 and 16–19 and have no routes of their own.</li>
+        <li>The compass in the top right shows magnetic north. Tap it for courses to shore.</li>
+      </ul>`,
+    contact: `
+      <h2>Something wrong?</h2>
+      <p>I make this map myself, from drone photos and measurements taken underwater. If you spot a mistake, a missing site, or a bearing that does not match your compass, message me on Instagram.</p>
+      <p>Most useful: the point number, what is wrong, and how you know, for example a bearing and distance measured underwater.</p>`,
+    igBtn: 'Message me on Instagram'
+  }
+};
+
+let lang = 'pl';
+try { const s = localStorage.getItem('koparki-lang'); if (s === 'en' || s === 'pl') lang = s; } catch (e) {}
+const t = () => T[lang];
+function n(v) { return Number(v).toLocaleString(lang === 'pl' ? 'pl-PL' : 'en-GB', { maximumFractionDigits: 1 }); }
+function esc(s) { return String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c])); }
+
+// ------------------------------------------------------------ data
+const P = {}; D.punkty.forEach(p => P[p.id] = p);
+const byNr = {}; D.punkty.forEach(p => byNr[p.nr] = p);
+const name = p => lang === 'pl' ? p.pl : p.en;
+const desc = p => lang === 'pl' ? p.opis_pl : p.opis_en;
+const order = D.punkty.slice().sort((a, b) => (parseInt(a.nr) - parseInt(b.nr)) || a.nr.localeCompare(b.nr));
+function routesOf(id) {
+  return D.krawedzie.filter(k => k.a === id || k.b === id).map(k => {
+    const from = k.a === id, o = P[from ? k.b : k.a];
+    return { k, other: o, az: from ? k.ab : k.ba, m: k.m, dx: o.x - P[id].x, dy: o.y - P[id].y };
+  }).sort((u, v) => u.m - v.m);
+}
+const az = v => (Math.floor(v + 0.5) % 360) + '°';   // same rounding as the print plan
+const dm = v => Math.round(v) + ' m';
+const arrow = (dx, dy, cls) => `<svg class="${cls || ''}" viewBox="0 0 16 16" style="transform:rotate(${Math.atan2(dy, dx) * 180 / Math.PI}deg)" aria-hidden="true"><path d="M2 8h10M8.5 4l4 4-4 4" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+
+// ------------------------------------------------------------ map
+const ZN = D.zmax;
+const map = L.map('map', {
+  crs: L.CRS.Simple, zoomControl: false, attributionControl: false,
+  zoomSnap: 0.25, zoomDelta: 0.5, wheelPxPerZoomLevel: 90, maxZoom: ZN + 2, minZoom: -3,
+  bounceAtZoomLimits: false
+});
+const LL = (x, y) => map.unproject([x, y], ZN);
+const imgB = L.latLngBounds(LL(0, D.wys), LL(D.szer, 0));
+L.tileLayer('kafle/{z}/{x}_{y}.jpg', {
+  tileSize: D.kafel, minNativeZoom: 0, maxNativeZoom: ZN, minZoom: -3, maxZoom: ZN + 2,
+  bounds: imgB, noWrap: true, keepBuffer: 3, updateWhenIdle: false
+}).addTo(map);
+// generous vertical slack: the lake is a wide strip, and on a phone in portrait the
+// panel covers half the screen, so a tight box would pin the view to the middle
+map.setMaxBounds(L.latLngBounds(LL(-D.szer * 0.25, D.wys * 2.5), LL(D.szer * 1.25, -D.wys * 1.5)));
+
+// Wilhelm hull outline
+D.obrysy.forEach(o => {
+  L.polygon(o.px.map(([x, y]) => LL(x, y)), { color: '#fff', weight: 2.5, opacity: .95, fillColor: '#fff', fillOpacity: .18, dashArray: '6 4', interactive: false }).addTo(map);
+});
+
+// routes
+const lines = [];
+D.krawedzie.forEach(k => {
+  const a = P[k.a], b = P[k.b], ll = [LL(a.x, a.y), LL(b.x, b.y)];
+  const casing = L.polyline(ll, { color: '#fff', weight: 5, opacity: .8, interactive: false }).addTo(map);
+  const core = L.polyline(ll, { color: '#13222a', weight: 2.2, opacity: .95, interactive: false }).addTo(map);
+  const hit = L.polyline(ll, { color: '#000', weight: 18, opacity: 0, bubblingMouseEvents: false }).addTo(map);
+  hit.on('click', e => edgePopup(k, e.latlng));
+  const lbl = L.marker(LL((a.x + b.x) / 2, (a.y + b.y) / 2), {
+    interactive: false, keyboard: false,
+    icon: L.divIcon({ className: '', html: `<div class="dist">${dm(k.m)}</div>`, iconSize: [0, 0] })
+  }).addTo(map);
+  lines.push({ k, casing, core, lbl });
+});
+function edgePopup(k, at) {
+  const a = P[k.a], b = P[k.b];
+  L.popup({ maxWidth: 260 }).setLatLng(at).setContent(
+    `<b>${esc(a.nr)} ${esc(name(a))} ↔ ${esc(b.nr)} ${esc(name(b))}</b><br>${dm(k.m)}` +
+    `<span class="pz">${esc(a.nr)} → ${esc(b.nr)}: ${az(k.ab)}<br>${esc(b.nr)} → ${esc(a.nr)}: ${az(k.ba)}</span>`
+  ).openOn(map);
+}
+
+// points
+const marks = {};
+D.punkty.forEach(p => {
+  const small = p.maly || p.nr === '7b', s = small ? 22 : 30;
+  const m = L.marker(LL(p.x, p.y), {
+    title: `${p.nr} ${name(p)}`, riseOnHover: true,
+    icon: L.divIcon({ className: '', html: `<div class="pin${small ? ' small' : ''}">${esc(p.nr)}</div>`, iconSize: [s, s], iconAnchor: [s / 2, s / 2] })
+  }).addTo(map);
+  m.on('click', () => select(p.id, { move: map.getZoom() < 2 ? 'fit' : 'reveal' }));
+  marks[p.id] = m;
+});
+const azLayer = L.layerGroup().addTo(map);
+
+// ------------------------------------------------------------ panel
+const $ = id => document.getElementById(id);
+const mq = window.matchMedia('(max-width: 760px)');
+let view = 'list', sel = null, sheet = 'peek';
+
+function setSheet(s) {
+  sheet = s;
+  const H = $('app').clientHeight;
+  const h = !mq.matches ? 0 : s === 'peek' ? peekH() : s === 'half' ? Math.round(H * 0.5) : Math.round(H - 70);
+  document.documentElement.style.setProperty('--sheet-h', h + 'px');
+  $('handle').setAttribute('aria-expanded', s !== 'peek');
+}
+function peekH() { return $('handle').offsetHeight + document.querySelector('.head').offsetHeight + 4; }
+$('handle').onclick = () => setSheet(sheet === 'peek' ? 'half' : sheet === 'half' ? 'full' : 'peek');
+mq.addEventListener ? mq.addEventListener('change', () => setSheet(sheet)) : mq.addListener(() => setSheet(sheet));
+window.addEventListener('resize', () => setSheet(sheet));
+
+function tabs(v) {
+  [['tList', 'list'], ['tInfo', 'info'], ['tContact', 'contact']].forEach(([id, key]) =>
+    $(id).setAttribute('aria-selected', String(v === key || (v === 'detail' && key === 'list'))));
+}
+function render() {
+  const b = $('body'), L_ = t();
+  tabs(view);
+  if (view === 'list') {
+    b.innerHTML = `<div class="view"><p class="list-cap">${L_.listCap}</p><ul class="list">` +
+      order.map(p => {
+        const sub = p.nr === '7b';
+        return `<li class="${sub ? 'sub' : ''}"><button data-id="${esc(p.id)}"><span class="badge${sub || p.maly ? ' small' : ''}">${esc(p.nr)}</span>` +
+          `<span><span class="t">${esc(name(p))}</span>${desc(p) ? `<span class="s">${esc(desc(p))}</span>` : ''}</span></button></li>`;
+      }).join('') + `</ul></div>`;
+    b.querySelectorAll('.list button').forEach(x => x.onclick = () => select(x.dataset.id, { move: 'fit' }));
+  } else if (view === 'detail' && sel) {
+    const p = P[sel], R = routesOf(sel);
+    const altName = lang === 'en' && p.pl !== p.en ? `<span class="alt">${L_.alt}: ${esc(p.pl)}</span>` : '';
+    const star = /\*/.test(desc(p));
+    b.innerHTML = `<div class="view-pad">
+      <button class="back" id="back">${arrow(-1, 0)} ${L_.back}</button>
+      <div class="d-title"><span class="badge">${esc(p.nr)}</span><div><h2>${esc(name(p))}</h2>${altName}</div></div>
+      ${desc(p) ? `<p class="d-desc">${esc(desc(p))}</p>` : ''}
+      <h3 class="sect">${L_.routes}</h3>
+      ${R.length ? `<p class="note">${L_.routesHint}</p><ul class="routes">` + R.map(r =>
+        `<li><button data-id="${esc(r.other.id)}">${arrow(r.dx, r.dy, 'ar')}<span class="az">${az(r.az)}</span><span class="m">${dm(r.m)}</span>` +
+        `<span class="to"><span class="badge small">${esc(r.other.nr)}</span><span>${esc(name(r.other))}</span></span></button></li>`).join('') + `</ul>`
+        : `<p class="note">${L_.noRoutes}</p>`}
+      <dl class="facts">
+        <div><dt>${L_.coords}</dt><dd class="coord"><span id="cc">${p.lat.toFixed(6)}, ${p.lon.toFixed(6)}</span><button class="mini" id="cpy">${L_.copy}</button></dd></div>
+      </dl>
+      ${star ? `<p class="note">${L_.depthNote}</p>` : ''}
+    </div>`;
+    $('back').onclick = () => { deselect(); };
+    b.querySelectorAll('.routes button').forEach(x => x.onclick = () => select(x.dataset.id, { move: 'fit' }));
+    $('cpy').onclick = () => {
+      const txt = $('cc').textContent;
+      const ok = () => { $('cpy').textContent = t().copied; };
+      try {
+        navigator.clipboard.writeText(txt).then(ok, () => selectText($('cc')));
+      } catch (e) { selectText($('cc')); }
+    };
+  } else if (view === 'info') {
+    b.innerHTML = `<div class="view-pad prose">${L_.info}</div>`;
+  } else if (view === 'contact') {
+    b.innerHTML = `<div class="view-pad prose">${L_.contact}
+      <div class="ig-card">
+        <a class="ig-link" href="${IG}" target="_blank" rel="noopener">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor"/></svg>
+          ${L_.igBtn}</a>
+        <span class="ig-handle">instagram.com/deeperbluediving</span>
+      </div></div>`;
+  }
+  b.scrollTop = 0;
+}
+function selectText(el) { const r = document.createRange(); r.selectNodeContents(el); const s = getSelection(); s.removeAllRanges(); s.addRange(r); }
+
+function chrome() {
+  const L_ = t();
+  document.documentElement.lang = lang;
+  $('sub').textContent = L_.sub;
+  $('pdfT').textContent = L_.pdfT; $('pdfS').textContent = L_.pdfS;
+  $('igT').textContent = L_.ig;
+  $('tList').textContent = L_.tList; $('tInfo').textContent = L_.tInfo; $('tContact').textContent = L_.tContact;
+  $('lPL').setAttribute('aria-pressed', String(lang === 'pl')); $('lEN').setAttribute('aria-pressed', String(lang === 'en'));
+  $('roseCap').textContent = L_.rose; $('shoreH').textContent = L_.shoreH; $('shoreP').textContent = L_.shoreP;
+  $('zIn').setAttribute('aria-label', L_.zIn); $('zOut').setAttribute('aria-label', L_.zOut); $('zFit').setAttribute('aria-label', L_.zFit);
+  $('handle').setAttribute('aria-label', L_.handle); $('map').setAttribute('aria-label', L_.map);
+  $('status').innerHTML = '';
+  // to-shore grid: up / left / right / down as on the print plan
+  const B = {}; D.brzegi.forEach(x => B[x.ekran] = x);
+  const cell = x => `<div class="v"><b>${x.az}°</b><small>${x.kier}${x.kier === 'NE' ? ' · ' + L_.base : ''}</small></div>`;
+  $('shoreGrid').innerHTML =
+    `<span></span>${cell(B.g)}<span></span>` +
+    `${cell(B.l)}<svg class="c" viewBox="-17 -17 34 34" aria-hidden="true"><g stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" fill="none"><path d="M0 -4V-14M-4 -10L0 -14L4 -10"/><path d="M0 4V14M-4 10L0 14L4 10"/><path d="M-4 0H-14M-10 -4L-14 0L-10 4"/><path d="M4 0H14M10 -4L14 0L10 4"/></g></svg>${cell(B.p)}` +
+    `<span></span>${cell(B.d)}<span></span>`;
+  D.punkty.forEach(p => { const el = marks[p.id].getElement(); if (el) el.title = `${p.nr} ${name(p)}`; });
+  map.closePopup();
+}
+function setLang(l) {
+  lang = l; try { localStorage.setItem('koparki-lang', l); } catch (e) {}
+  chrome(); render(); if (sel) drawSel();
+  requestAnimationFrame(() => setSheet(sheet));
+}
+$('lPL').onclick = () => setLang('pl');
+$('lEN').onclick = () => setLang('en');
+$('tList').onclick = () => { view = sel ? 'detail' : 'list'; render(); if (sheet === 'peek') setSheet('half'); };
+$('tInfo').onclick = () => { view = 'info'; render(); if (sheet === 'peek') setSheet('half'); };
+$('tContact').onclick = () => { view = 'contact'; render(); if (sheet === 'peek') setSheet('half'); };
+$('igBtn').onclick = () => { view = 'contact'; render(); if (sheet === 'peek') setSheet('half'); };
+
+// ------------------------------------------------------------ selection
+function panelPad() {
+  if (mq.matches) return { tl: [24, 90], br: [24, parseInt(getComputedStyle(document.documentElement).getPropertyValue('--sheet-h')) + 24] };
+  return { tl: [372 + 16 + 30, 30], br: [30 + 70, 30] };
+}
+function drawSel() {
+  azLayer.clearLayers();
+  Object.entries(marks).forEach(([id, m]) => {
+    const el = m.getElement(); if (!el) return;
+    el.classList.toggle('on', id === sel);
+  });
+  const near = new Set();
+  lines.forEach(l => {
+    const on = sel && (l.k.a === sel || l.k.b === sel);
+    l.core.setStyle(on ? { color: '#b01a20', weight: 3.4 } : { color: '#13222a', weight: 2.2, opacity: sel ? .6 : .95 });
+    l.casing.setStyle({ opacity: sel && !on ? .45 : .8 });
+    const d = l.lbl.getElement() && l.lbl.getElement().querySelector('.dist');
+    if (d) d.classList.toggle('on', !!on);
+    if (on) { near.add(l.k.a); near.add(l.k.b); }
+  });
+  if (!sel) return;
+  const p = P[sel];
+  const placed = [];
+  const html = routesOf(sel).map(r => {
+    const len = Math.hypot(r.dx, r.dy), ux = r.dx / len, uy = r.dy / len;
+    let off = 48, x, y;
+    for (let i = 0; i < 7; i++, off += 26) {
+      x = ux * off; y = uy * off;
+      if (!placed.some(q => Math.abs(q[0] - x) < 60 && Math.abs(q[1] - y) < 22)) break;
+    }
+    placed.push([x, y]);
+    return `<span style="left:${x.toFixed(1)}px;top:${y.toFixed(1)}px">${arrow(r.dx, r.dy)}${az(r.az)}</span>`;
+  }).join('');
+  L.marker(LL(p.x, p.y), { interactive: false, keyboard: false, zIndexOffset: 2000,
+    icon: L.divIcon({ className: '', html: `<div class="azl">${html}</div>`, iconSize: [0, 0] }) }).addTo(azLayer);
+}
+function select(id, opt) {
+  sel = id; view = 'detail';
+  render(); drawSel();
+  try { history.replaceState(null, '', '#p' + P[id].nr); } catch (e) {}
+  if (mq.matches && sheet === 'peek') setSheet('half');
+  const p = P[id], ll = LL(p.x, p.y), pad = panelPad();
+  if (opt && opt.move === 'fit') {
+    const pts = [ll].concat(routesOf(id).map(r => LL(r.other.x, r.other.y)));
+    map.flyToBounds(L.latLngBounds(pts), { paddingTopLeft: pad.tl, paddingBottomRight: pad.br, maxZoom: ZN - 1, duration: .6 });
+  } else {
+    // keep the map where it is, but bring the point out from under the panel
+    setTimeout(() => {
+      const c = map.latLngToContainerPoint(ll), s = map.getSize();
+      const minX = pad.tl[0], maxX = s.x - pad.br[0], minY = pad.tl[1], maxY = s.y - pad.br[1];
+      const dx = c.x < minX ? c.x - minX - 20 : c.x > maxX ? c.x - maxX + 20 : 0;
+      const dy = c.y < minY ? c.y - minY - 20 : c.y > maxY ? c.y - maxY + 20 : 0;
+      if (dx || dy) map.panBy([dx, dy]);
+    }, 280);
+  }
+}
+function deselect() {
+  sel = null; view = 'list'; render(); drawSel(); map.closePopup();
+  try { history.replaceState(null, '', location.pathname + location.search); } catch (e) {}
+}
+
+// ------------------------------------------------------------ furniture
+function zoomCls() {
+  const z = map.getZoom(), c = map.getContainer();
+  c.classList.toggle('show-dist', z >= 2.25);
+  c.classList.toggle('z-lo', z < 1.25);
+  const mpp = D.gsd * Math.pow(2, ZN - z), target = mpp * 110;
+  const nice = [1, 2, 5, 10, 20, 25, 50, 100, 200, 500].find(v => v >= target) || 500;
+  const best = [1, 2, 5, 10, 20, 25, 50, 100, 200, 500].filter(v => v <= target).pop() || nice;
+  $('scaleBar').style.width = (best / mpp).toFixed(0) + 'px';
+  $('scaleTxt').textContent = best + ' m';
+}
+map.on('zoomend', zoomCls);
+$('needle').setAttribute('transform', `rotate(${D.polnoc_mag})`);
+$('roseBtn').onclick = () => { const h = $('shore'); h.hidden = !h.hidden; $('roseBtn').setAttribute('aria-expanded', String(!h.hidden)); };
+$('zIn').onclick = () => map.zoomIn(0.75);
+$('zOut').onclick = () => map.zoomOut(0.75);
+function fitAll(animate) {
+  const ptsB = L.latLngBounds(D.punkty.map(p => LL(p.x, p.y))).pad(0.06), pad = panelPad();
+  map.fitBounds(ptsB, { paddingTopLeft: pad.tl, paddingBottomRight: pad.br, animate: !!animate });
+}
+$('zFit').onclick = () => fitAll(true);
+
+// ------------------------------------------------------------ PDF
+let busy = false;
+async function savePdf() {
+  if (busy) return; busy = true;
+  const L_ = t(), f = PDF[lang], btn = $('pdfBtn'), st = $('status');
+  btn.setAttribute('aria-busy', 'true'); st.textContent = L_.pdfBusy;
+  const fallback = () => { st.innerHTML = `${L_.pdfFail} <a href="${f.src}" target="_blank" rel="noopener">${L_.pdfOpen}</a>`; };
+  try {
+    const dl = window.claude && window.claude.use ? await window.claude.use('downloads') : undefined;
+    if (dl === undefined) {
+      // page hosted outside claude.ai: an ordinary download link works
+      const a = document.createElement('a'); a.href = f.src; a.download = f.name; document.body.appendChild(a); a.click(); a.remove();
+      st.textContent = '';
+    } else if (dl === null) {
+      fallback();
+    } else {
+      const blob = await (await fetch(f.src)).blob();
+      try { await dl.save({ filename: f.name, data: blob }); st.textContent = L_.pdfSaved; }
+      catch (e) { if (e && e.code === 'declined') st.textContent = L_.pdfDeclined; else fallback(); }
+    }
+  } catch (e) { fallback(); }
+  btn.removeAttribute('aria-busy'); busy = false;
+}
+$('pdfBtn').onclick = savePdf;
+
+// ------------------------------------------------------------ start
+chrome(); render(); setSheet('peek');
+requestAnimationFrame(() => {
+  setSheet('peek');
+  map.invalidateSize();
+  fitAll(false);
+  map.setMinZoom(Math.min(map.getZoom() - 0.75, 0));
+  zoomCls();
+  const h = (location.hash.match(/^#p(\w+)$/) || [])[1];
+  if (h && byNr[h]) select(byNr[h].id, { move: 'fit' });
+});
+window.addEventListener('hashchange', () => {
+  const h = (location.hash.match(/^#p(\w+)$/) || [])[1];
+  if (h && byNr[h] && byNr[h].id !== sel) select(byNr[h].id, { move: 'fit' });
+});
+</script>
