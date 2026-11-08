@@ -1,41 +1,38 @@
 # Koparki — mapa nurkowa
 
-Interaktywna mapa nurkowa zalanego wyrobiska Koparki (okolice Trzebini i Jaworzna):
-atrakcje pod wodą, trasy z azymutami magnetycznymi i odległościami, kursy do brzegu,
-plan do druku w PDF. Strona po polsku i angielsku.
+Interaktywna mapa nurkowa zalanego wyrobiska Koparki w okolicach Trzebini i Jaworzna.
 
-**Strona:** https://jjbiernacki.github.io/koparki/
+**Strona: https://jjbiernacki.github.io/koparki/**
 
-*Interactive dive map of the flooded Koparki quarry near Trzebinia, Poland.
-Polish and English.*
+Mapę można przesuwać i przybliżać. Na niej zaznaczono miejsca do nurkowania
+(pomosty, wraki, platformy, boje), trasy między nimi z azymutami magnetycznymi
+i odległościami oraz kierunki do brzegu. Do każdego miejsca jest krótki opis.
+Plan można pobrać jako PDF do druku (A4 poziomo). Strona jest po polsku
+i po angielsku.
 
-## Skąd dane
+*Interactive dive map of the flooded Koparki quarry near Trzebinia, Poland,
+with dive sites, routes with magnetic bearings and distances, and a printable
+plan. Polish and English.*
 
-Podkład to ortofotomapa złożona ze zdjęć z drona z 13.09.2026 (3,92 cm/px).
-Pozycje punktów liczone z dwóch nalotów (13.09 i 20.09.2026). Azymuty są
-magnetyczne, tak jak pokazuje kompas nurka (deklinacja +6,3°E).
-Głębokości pochodzą ze starego planu bazy i zależą od poziomu wody.
+## O danych
 
-## Co jest w repozytorium
+- Podkład to ortofotomapa złożona ze zdjęć z drona, wykonanych we wrześniu 2026.
+- Azymuty są magnetyczne, tak jak pokazuje kompas nurka.
+- Pozycje obiektów i głębokości są przybliżone, głębokości zależą od poziomu wody.
+- Mapa ma charakter informacyjny i nie zastępuje szkolenia ani zasad obowiązujących na miejscu.
+
+## Zawartość repozytorium
 
 | Plik | Co to |
 |---|---|
-| `index.html` | strona (zbudowana, nie edytować ręcznie) |
-| `dane.json` | punkty, połączenia z azymutami, obrys wraku Wilhelm |
-| `kafle/{z}/{x}_{y}.jpg` | kafle mapy 512 px, poziomy 0–5, poziom 5 = 3,92 cm/px |
-| `plan_PL.pdf`, `plan_EN.pdf` | plan do druku, A4 poziomo |
-| `podglad.jpg` | obrazek podglądu linku (1200 × 630) |
-| `zrodlo/` | źródło strony: `szablon.html`, `zbuduj.py`, CSS Leafleta |
+| `index.html` | strona |
+| `dane.json` | punkty, trasy i opisy po polsku i angielsku |
+| `kafle/` | kafle mapy |
+| `plan_PL.pdf`, `plan_EN.pdf` | plan do druku |
+| `podglad.jpg` | obrazek podglądu linku |
+| `zrodlo/` | źródło strony |
 
-## Jak zaktualizować
+## Licencja i kontakt
 
-1. Po zmianie planu w projekcie Koparki: `python3 skrypty/90_strona_dane.py`
-   (nadpisuje `dane.json`, `kafle/` i PDF-y).
-2. Po zmianie wyglądu albo tekstów: edycja `zrodlo/szablon.html`.
-3. `python3 zrodlo/zbuduj.py` składa `index.html`.
-4. Commit i push na gałąź `main`. GitHub Pages publikuje w ciągu 1–2 minut.
-
-`python3 zrodlo/zbuduj.py --artefakt` robi wersję do publikacji jako artefakt
-Claude (`artefakt.html`, poza repozytorium).
-
-Kontakt: [@deeperbluediving](https://www.instagram.com/deeperbluediving)
+Licencja MIT, zobacz plik `LICENSE`.
+Kontakt: [@deeperbluediving](https://www.instagram.com/deeperbluediving) na Instagramie.

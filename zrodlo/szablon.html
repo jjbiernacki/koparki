@@ -1,5 +1,4 @@
 <title>Koparki · mapa nurkowa</title>
-<meta name="claude:viewport-fit-sides" content="cover">
 <meta name="description" content="Interaktywna mapa nurkowa zalanego wyrobiska Koparki: atrakcje, trasy z azymutami magnetycznymi, plan do druku.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -982,18 +981,8 @@ async function savePdf() {
   btn.setAttribute('aria-busy', 'true'); st.textContent = L_.pdfBusy;
   const fallback = () => { st.innerHTML = `${L_.pdfFail} <a href="${f.src}" target="_blank" rel="noopener">${L_.pdfOpen}</a>`; };
   try {
-    const dl = window.claude && window.claude.use ? await window.claude.use('downloads') : undefined;
-    if (dl === undefined) {
-      // page hosted outside claude.ai: an ordinary download link works
-      const a = document.createElement('a'); a.href = f.src; a.download = f.name; document.body.appendChild(a); a.click(); a.remove();
-      st.textContent = '';
-    } else if (dl === null) {
-      fallback();
-    } else {
-      const blob = await (await fetch(f.src)).blob();
-      try { await dl.save({ filename: f.name, data: blob }); st.textContent = L_.pdfSaved; }
-      catch (e) { if (e && e.code === 'declined') st.textContent = L_.pdfDeclined; else fallback(); }
-    }
+    const a = document.createElement('a'); a.href = f.src; a.download = f.name; document.body.appendChild(a); a.click(); a.remove();
+    st.textContent = '';
   } catch (e) { fallback(); }
   btn.removeAttribute('aria-busy'); busy = false;
 }
