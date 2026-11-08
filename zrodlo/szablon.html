@@ -125,6 +125,11 @@ button { font: inherit; color: inherit; }
 .coord { font-family: var(--f-data); font-size: 13px; display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
 .coord span { user-select: all; }
 .mini { border: 1px solid var(--line); background: var(--surface-2); border-radius: 6px; padding: 2px 8px; font-size: 12px; cursor: pointer; font-family: var(--f-body); }
+.sect-row { display: flex; align-items: center; gap: 8px; margin-top: 6px; }
+.sect-row .sect { margin: 0; }
+.tip { width: 22px; height: 22px; border-radius: 50%; border: 1.5px solid var(--muted); background: none; color: var(--muted); font-family: var(--f-data); font-size: 12px; font-weight: 600; cursor: pointer; display: grid; place-items: center; padding: 0; }
+.tip[aria-expanded="true"] { background: var(--ink); color: var(--surface); border-color: var(--ink); }
+.tip-pop { margin: 0; padding: 10px 12px; border-radius: 10px; background: var(--surface-2); border: 1px solid var(--line); font-size: 13px; color: var(--ink); }
 .sect { font-family: var(--f-display); font-weight: 600; font-size: 17px; letter-spacing: .05em; text-transform: uppercase; margin: 6px 0 0; }
 .routes { list-style: none; margin: 0; padding: 0; border-top: 1px solid var(--line); }
 .routes li { border-bottom: 1px solid var(--line); }
@@ -177,6 +182,17 @@ button { font: inherit; color: inherit; }
   width: 42px; height: 42px; border: 0; border-radius: 10px; background: var(--surface); box-shadow: var(--shadow);
   cursor: pointer; display: grid; place-items: center; color: var(--ink);
 }
+#layers { top: 16px; left: 404px; display: grid; gap: 6px; justify-items: start; }
+.lay { display: inline-flex; gap: 2px; padding: 3px; border-radius: 10px; background: var(--surface); box-shadow: var(--shadow); }
+.lay button {
+  display: inline-flex; align-items: center; gap: 6px; border: 0; background: none; cursor: pointer;
+  padding: 6px 10px; border-radius: 8px; font-size: 13px; font-weight: 600; color: var(--muted);
+}
+.lay button .dot { width: 14px; height: 14px; border-radius: 4px; border: 1.5px solid currentColor; display: grid; place-items: center; }
+.lay button[aria-pressed="true"] { color: var(--ink); background: var(--surface-2); }
+.lay button[aria-pressed="true"] .dot { background: var(--accent); border-color: var(--accent); }
+.lay button[aria-pressed="true"] .dot::after { content: ""; width: 6px; height: 3px; border: 2px solid #fff; border-top: 0; border-right: 0; transform: rotate(-45deg) translate(1px, -1px); }
+.lay-hint { max-width: min(240px, calc(100vw - 140px)); font-size: 12px; color: #fff; text-shadow: 0 1px 2px rgba(0,0,0,.9); padding-left: 4px; }
 #scale { left: 404px; bottom: calc(18px + env(safe-area-inset-bottom, 0px)); color: #fff; font-family: var(--f-data); font-size: 12px; text-shadow: 0 1px 2px rgba(0,0,0,.9); pointer-events: none; }
 #scale .bar { height: 6px; border: 2px solid #fff; border-top: 0; box-shadow: 0 1px 2px rgba(0,0,0,.7); margin-top: 2px; }
 
@@ -192,20 +208,25 @@ button { font: inherit; color: inherit; }
 .leaflet-marker-icon.dim .pin { opacity: .55; }
 .z-lo .pin { transform: scale(.72); }
 .z-lo .leaflet-marker-icon.on .pin { transform: scale(1.1); }
-.dist {
-  display: none; transform: translate(-50%, -50%); width: max-content;
-  background: rgba(255,255,255,.93); color: #13222a; border: 1.5px solid #13222a; border-radius: 6px;
-  font-family: var(--f-data); font-size: 12px; font-weight: 600; padding: 0 5px; line-height: 18px; white-space: nowrap;
+/* whole lake on a phone: smaller pins, helper points (7b, training platforms) hidden unless selected */
+.z-xlo .pin { transform: scale(.6); }
+.z-xlo .pin.small { display: none; }
+.z-xlo .leaflet-marker-icon.on .pin.small { display: grid; }
+/* route labels: always centred ON their own line (see layoutLabels) */
+.lbl {
+  position: absolute; left: 0; top: 0; transform: translate(-50%, -50%);
+  display: inline-flex; align-items: center; gap: 3px; white-space: nowrap; box-sizing: border-box;
+  height: 21px; padding: 0 6px; border-radius: 6px; background: rgba(255,255,255,.95);
+  border: 1.5px solid #13222a; color: #13222a; box-shadow: 0 1px 3px rgba(0,0,0,.35);
+  font-family: var(--f-data); font-size: 12px; font-weight: 600; line-height: 1; pointer-events: none;
 }
-.show-dist .dist { display: block; }
-.dist.on { display: block; border-color: #b01a20; color: #b01a20; }
-.azl { position: absolute; left: 0; top: 0; pointer-events: none; }
-.azl span {
-  position: absolute; transform: translate(-50%, -50%); display: inline-flex; gap: 3px; align-items: center; white-space: nowrap;
-  background: #fff; color: #b01a20; border: 1.5px solid #b01a20; border-radius: 6px; padding: 1px 5px 1px 3px;
-  font-family: var(--f-data); font-size: 13px; font-weight: 600; box-shadow: 0 1px 4px rgba(0,0,0,.4);
-}
-.azl svg { width: 13px; height: 13px; }
+.lbl.on, .lbl.az { color: #b01a20; border-color: #b01a20; }
+.lbl.az.on { background:#b01a20; color:#fff; }
+.lbl svg { width: 12px; height: 12px; flex: none; }
+.lv-mid .lbl { height: 19px; padding: 0 5px; font-size: 11px; }
+.lv-mid .lbl svg { width: 11px; height: 11px; }
+.lv-far .lbl { height: 17px; padding: 0 4px; font-size: 10px; border-width: 1.2px; border-radius: 5px; }
+.lv-far .lbl svg { width: 10px; height: 10px; }
 .leaflet-container { font-family: var(--f-body); background: var(--water); -webkit-tap-highlight-color: transparent; }
 .leaflet-popup-content-wrapper, .leaflet-popup-tip { background: var(--surface); color: var(--ink); box-shadow: var(--shadow); }
 .leaflet-popup-content { margin: 10px 14px; font-size: 14px; line-height: 1.4; }
@@ -238,6 +259,8 @@ button { font: inherit; color: inherit; }
   #zoom .zi, #zoom .zo { display: none; }
   #scale { left: max(16px, env(safe-area-inset-left, 0px)); bottom: calc(var(--sheet-h) + 16px); transition: bottom .25s ease; }
   #compass { top: 12px; }
+  #layers { top: 12px; left: max(16px, env(safe-area-inset-left, 0px)); }
+  .lay button { padding: 6px 8px; }
   .rose { width: 66px; height: 66px; }
   .rose svg { width: 60px; height: 60px; }
   .shore { width: 184px; }
@@ -274,6 +297,13 @@ button { font: inherit; color: inherit; }
     <button class="zi" id="zIn" aria-label="Przybliż"><svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true"><path d="M9 3v12M3 9h12" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg></button>
     <button class="zo" id="zOut" aria-label="Oddal"><svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true"><path d="M3 9h12" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg></button>
     <button id="zFit" aria-label="Cała mapa"><svg width="20" height="20" viewBox="0 0 20 20" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7V3h4M13 3h4v4M17 13v4h-4M7 17H3v-4"/></svg></button>
+  </div>
+  <div class="ctrl" id="layers" role="group">
+    <div class="lay">
+      <button id="lyAz" aria-pressed="true"><span class="dot"></span><span id="lyAzT"></span></button>
+      <button id="lyDist" aria-pressed="true"><span class="dot"></span><span id="lyDistT"></span></button>
+    </div>
+    <span class="lay-hint" id="lyHint" hidden></span>
   </div>
   <div class="ctrl" id="scale"><span id="scaleTxt"></span><div class="bar" id="scaleBar"></div></div>
 
@@ -315,42 +345,47 @@ button { font: inherit; color: inherit; }
 <script>
 const D = /*DANE*/;
 const IG = 'https://www.instagram.com/deeperbluediving';
+const FB = 'https://www.facebook.com/jjbiernacki';
 const PDF = { pl: { src: 'plan_PL.pdf', name: 'Koparki_plan_nurkowy.pdf' }, en: { src: 'plan_EN.pdf', name: 'Koparki_dive_plan.pdf' } };
 
+// point numbers by id: a new point shifts the numbering, the texts follow
+const N = id => (D.punkty.find(p => p.id === id) || {}).nr;
 const T = {
   pl: {
     sub: 'Mapa nurkowa zalanego wyrobiska',
     pdfT: 'Plan do druku', pdfS: 'PDF · A4 · po polsku',
-    pdfBusy: 'Przygotowuję plik…', pdfSaved: 'Plan zapisany.', pdfDeclined: 'Pobieranie anulowane.',
-    pdfFail: 'Nie udało się zapisać pliku tutaj.', pdfOpen: 'Otwórz PDF',
+    pdfBusy: 'Przygotowywanie pliku…', pdfSaved: 'Plan zapisany.', pdfDeclined: 'Pobieranie anulowane.',
+    pdfFail: 'Nie udało się zapisać pliku.', pdfOpen: 'Otwórz PDF',
     ig: 'Kontakt',
     tList: 'Atrakcje', tInfo: 'O mapie', tContact: 'Kontakt',
-    listCap: 'Dotknij punktu na liście albo na mapie, żeby zobaczyć trasy i azymuty.',
+    listCap: 'Wybierz punkt na liście lub na mapie, aby wyświetlić trasy i azymuty.',
     back: 'Wszystkie atrakcje',
     alt: 'Nazwa w bazie', coords: 'Współrzędne WGS84', copy: 'Kopiuj', copied: 'Skopiowano',
-    routes: 'Trasy z tego punktu', routesHint: 'Azymut magnetyczny, czyli tak, jak pokazuje kompas nurka. Dotknij trasy, żeby przejść do celu.',
-    noRoutes: 'Ten punkt nie ma własnych tras na planie.',
-    depthNote: '* głębokość i nazwa ze starego planu bazy. Głębokość zależy od poziomu wody.',
-    rose: 'N mag.', shoreH: 'Do brzegu', shoreP: 'Kursy na brzeg z całego zbiornika, ±5°.', base: 'baza',
+    routes: 'Trasy z tego punktu', tip: 'Objaśnienie', routesHint: 'Azymuty magnetyczne, zgodne ze wskazaniem kompasu nurkowego, liczone od tego punktu. Wybranie trasy przenosi do punktu docelowego.',
+    noRoutes: 'Punkt nie ma własnych tras na planie.',
+    depthNote: '* Głębokość zależy od poziomu wody.',
+    lyAz: 'Azymuty', lyDist: 'Odległości', lyHint: 'Pozostałe azymuty widoczne po przybliżeniu.', layers: 'Etykiety na mapie',
+    rose: 'N mag.', shoreH: 'Do brzegu', shoreP: 'Kursy na brzeg z dowolnego miejsca zbiornika, ±5°.', base: 'baza',
     zIn: 'Przybliż', zOut: 'Oddal', zFit: 'Cała mapa', handle: 'Rozwiń panel', map: 'Mapa',
     edge: 'trasa',
     info: `
       <h2>O mapie</h2>
-      <p>Podkład to ortofotomapa z drona z 13.09.2026. Punkty, trasy i azymuty są takie same jak na planie do druku.</p>
+      <p>Podkład stanowi ortofotomapa z drona z 13.09.2026. Punkty, trasy i azymuty są zgodne z planem do druku.</p>
       <ul>
-        <li><b>Azymuty są magnetyczne</b>, tak jak na kompasie nurka. Deklinacja +6,3°E: azymut rzeczywisty = magnetyczny + 6°.</li>
-        <li>Azymut zależy od kierunku: z A do B to inna liczba niż z B do A. Na mapie widać go przy punkcie, z którego płyniesz. Azymut jest kierunkiem, a nie celownikiem.</li>
-        <li>Pozycje atrakcji wyznaczone na podstawie boi mogą być odrobinę przesunięte, bo boja pływa na linie.</li>
-        <li>Głębokości (z gwiazdką) i nazwy atrakcji pochodzą ze starego planu bazy. Głębokość zależy od poziomu wody.</li>
-        <li>Wilhelm: 7 to przypięcie poręczówki z Głębokiej koparki (9), 7b to dziób. Kadłub ok. 16,5 × 3,5 m, kurs rufa→dziób 90°.</li>
-        <li>Platformy szkoleniowe (17, 18) leżą przy trasach 5–19 i 16–19 i nie mają własnych tras.</li>
-        <li>Kompas w prawym górnym rogu pokazuje północ magnetyczną. Dotknij go, żeby zobaczyć kursy do brzegu.</li>
+        <li><b>Azymuty są magnetyczne</b> i odpowiadają wskazaniom kompasu nurkowego. Deklinacja wynosi +6,3°E: azymut rzeczywisty = magnetyczny + 6°.</li>
+        <li>Azymut zależy od kierunku: wartość z A do B różni się od wartości z B do A. Na mapie azymut podano przy punkcie początkowym trasy. Azymut wskazuje kierunek, a nie dokładny cel.</li>
+        <li>Pozycje atrakcji wyznaczone na podstawie położenia boi mogą być nieznacznie przesunięte.</li>
+        <li>Głębokości oznaczone gwiazdką zależą od poziomu wody.</li>
+        <li>Wilhelm: punkt ${N('lina')} to miejsce przypięcia poręczówki z Głębokiej koparki (${N('9')}), punkt ${N('dz')} to dziób. Kadłub ma ok. 16,5 × 3,5 m, kurs rufa→dziób 90°.</li>
+        <li>Platformy szkoleniowe (${N('16')}, ${N('17')}) znajdują się na głębokości 5 m, przy trasach ${N('5')}–${N('15')} i ${N('14')}–${N('15')}, i nie mają własnych tras. Kolejna platforma szkoleniowa znajduje się pod Pomostem II (${N('3')}).</li>
+        <li>Deco bar (${N('deco')}): rurki PCV na różnych głębokościach do ćwiczenia pływalności, obok Pomostu II.</li>
+        <li>Kompas w prawym górnym rogu wskazuje północ magnetyczną. Po jego wybraniu wyświetlają się kursy na brzeg.</li>
       </ul>`,
     contact: `
-      <h2>Coś się nie zgadza?</h2>
-      <p>Mapę robię sam, ze zdjęć z drona i z pomiarów pod wodą. Jeśli widzisz błąd, brakuje jakiejś atrakcji albo azymut nie zgadza się z Twoim kompasem, napisz do mnie na Instagramie.</p>
-      <p>Najbardziej przydaje się numer punktu, co jest nie tak i skąd to wiesz, na przykład azymut i odległość zmierzone pod wodą.</p>`,
-    igBtn: 'Napisz na Instagramie'
+      <h2>Uwagi i poprawki</h2>
+      <p>Mapa powstała na podstawie zdjęć z drona i pomiarów pod wodą. Uwagi, poprawki oraz propozycje nowych punktów proszę przesyłać przez Instagram lub Facebook.</p>
+      <p>Najbardziej pomocne są: numer punktu, opis problemu oraz źródło informacji, na przykład azymut i odległość zmierzone pod wodą.</p>`,
+    igBtn: 'Wyślij wiadomość na Instagramie', fbBtn: 'Wyślij wiadomość na Facebooku'
   },
   en: {
     sub: 'Dive map of a flooded quarry',
@@ -359,32 +394,34 @@ const T = {
     pdfFail: 'Could not save the file here.', pdfOpen: 'Open the PDF',
     ig: 'Contact',
     tList: 'Sites', tInfo: 'About', tContact: 'Contact',
-    listCap: 'Tap a site in the list or on the map to see its routes and bearings.',
+    listCap: 'Select a site in the list or on the map to show its routes and bearings.',
     back: 'All sites',
     alt: 'Local name', coords: 'WGS84 coordinates', copy: 'Copy', copied: 'Copied',
-    routes: 'Routes from here', routesHint: 'Magnetic bearing, as your dive compass shows it. Tap a route to go to its end.',
+    routes: 'Routes from here', tip: 'Explanation', routesHint: 'Magnetic bearings from this point, as shown by a dive compass. Selecting a route moves to its destination.',
     noRoutes: 'This point has no routes of its own on the plan.',
-    depthNote: '* depth and name from the old dive-base plan. Depth depends on the water level.',
+    depthNote: '* Depth depends on the water level.',
+    lyAz: 'Bearings', lyDist: 'Distances', lyHint: 'More bearings show when zoomed in.', layers: 'Map labels',
     rose: 'mag. N', shoreH: 'To shore', shoreP: 'Courses to shore from anywhere in the lake, ±5°.', base: 'base',
     zIn: 'Zoom in', zOut: 'Zoom out', zFit: 'Whole map', handle: 'Expand panel', map: 'Map',
     edge: 'route',
     info: `
       <h2>About this map</h2>
-      <p>The base layer is a drone orthophoto from 13 Sep 2026. Points, routes and bearings are the same as on the print plan.</p>
+      <p>The base layer is a drone orthophoto from 13 Sep 2026. Points, routes and bearings match the print plan.</p>
       <ul>
-        <li><b>Bearings are magnetic</b>, as on a dive compass. Declination +6.3°E: true bearing = magnetic + 6°.</li>
-        <li>A bearing depends on direction: A to B is a different number from B to A. The map shows it at the point you swim from. A bearing gives direction, not a precise aim.</li>
-        <li>Positions of sites taken from buoys may be slightly off, because a buoy moves on its line.</li>
-        <li>Depths (with an asterisk) and site names come from the old dive-base plan. Depth depends on the water level.</li>
-        <li>Wilhelm: 7 is where the guideline from the Deep excavator (9) is tied, 7b is the bow. Hull about 16.5 × 3.5 m, stern→bow 90°.</li>
-        <li>Training platforms (17, 18) lie by routes 5–19 and 16–19 and have no routes of their own.</li>
-        <li>The compass in the top right shows magnetic north. Tap it for courses to shore.</li>
+        <li><b>Bearings are magnetic</b> and correspond to a dive compass reading. Declination is +6.3°E: true bearing = magnetic + 6°.</li>
+        <li>A bearing depends on direction: the value from A to B differs from the value from B to A. On the map, the bearing is shown at the starting point of the route. A bearing gives direction, not a precise aim.</li>
+        <li>Positions of sites determined from buoy locations may be slightly offset.</li>
+        <li>Depths marked with an asterisk depend on the water level.</li>
+        <li>Wilhelm: point ${N('lina')} is where the guideline from the Deep excavator (${N('9')}) is tied, point ${N('dz')} is the bow. The hull is about 16.5 × 3.5 m, stern→bow 90°.</li>
+        <li>Training platforms (${N('16')}, ${N('17')}) are at a depth of 5 m, by routes ${N('5')}–${N('15')} and ${N('14')}–${N('15')}, and have no routes of their own. Another training platform is under Jetty II (${N('3')}).</li>
+        <li>Deco bar (${N('deco')}): PVC pipes at different depths for buoyancy practice, next to Jetty II.</li>
+        <li>The compass in the top right corner shows magnetic north. Selecting it displays courses to shore.</li>
       </ul>`,
     contact: `
-      <h2>Something wrong?</h2>
-      <p>I make this map myself, from drone photos and measurements taken underwater. If you spot a mistake, a missing site, or a bearing that does not match your compass, message me on Instagram.</p>
-      <p>Most useful: the point number, what is wrong, and how you know, for example a bearing and distance measured underwater.</p>`,
-    igBtn: 'Message me on Instagram'
+      <h2>Feedback and corrections</h2>
+      <p>The map is based on drone photographs and underwater measurements. Please send comments, corrections and suggestions for new points via Instagram or Facebook.</p>
+      <p>Most helpful: the point number, a description of the issue and its source, for example a bearing and distance measured underwater.</p>`,
+    igBtn: 'Send a message on Instagram', fbBtn: 'Send a message on Facebook'
   }
 };
 
@@ -442,9 +479,9 @@ D.krawedzie.forEach(k => {
   hit.on('click', e => edgePopup(k, e.latlng));
   const lbl = L.marker(LL((a.x + b.x) / 2, (a.y + b.y) / 2), {
     interactive: false, keyboard: false,
-    icon: L.divIcon({ className: '', html: `<div class="dist">${dm(k.m)}</div>`, iconSize: [0, 0] })
+    icon: L.divIcon({ className: '', html: `<div class="lbl">${dm(k.m)}</div>`, iconSize: [0, 0] })
   }).addTo(map);
-  lines.push({ k, casing, core, lbl });
+  lines.push({ k, casing, core, lbl, txt: dm(k.m) });
 });
 function edgePopup(k, at) {
   const a = P[k.a], b = P[k.b];
@@ -465,7 +502,16 @@ D.punkty.forEach(p => {
   m.on('click', () => select(p.id, { move: map.getZoom() < 2 ? 'fit' : 'reveal' }));
   marks[p.id] = m;
 });
-const azLayer = L.layerGroup().addTo(map);
+const leaders = L.layerGroup().addTo(map);
+const genAz = [];
+D.krawedzie.forEach(k => [[k.a, k.b, k.ab], [k.b, k.a, k.ba]].forEach(([f, t_, a]) => {
+  const dx = P[t_].x - P[f].x, dy = P[t_].y - P[f].y;
+  const mk = L.marker(LL(P[f].x, P[f].y), { interactive: false, keyboard: false, zIndexOffset: 900,
+    icon: L.divIcon({ className: '', html: `<div class="lbl az">${arrow(dx, dy)}${az(a)}</div>`, iconSize: [0, 0] }) }).addTo(map);
+  genAz.push({ mk, from: f, to: t_, txt: az(a) });
+}));
+let showAz = true, showDist = true;
+try { const v = JSON.parse(localStorage.getItem('koparki-labels') || '{}'); if (v.az === false) showAz = false; if (v.dist === false) showDist = false; } catch (e) {}
 
 // ------------------------------------------------------------ panel
 const $ = id => document.getElementById(id);
@@ -507,8 +553,8 @@ function render() {
       <button class="back" id="back">${arrow(-1, 0)} ${L_.back}</button>
       <div class="d-title"><span class="badge">${esc(p.nr)}</span><div><h2>${esc(name(p))}</h2>${altName}</div></div>
       ${desc(p) ? `<p class="d-desc">${esc(desc(p))}</p>` : ''}
-      <h3 class="sect">${L_.routes}</h3>
-      ${R.length ? `<p class="note">${L_.routesHint}</p><ul class="routes">` + R.map(r =>
+      <div class="sect-row"><h3 class="sect">${L_.routes}</h3>${R.length ? `<button class="tip" id="tip" aria-expanded="false" aria-controls="tipPop" aria-label="${L_.tip}" title="${esc(L_.routesHint)}">i</button>` : ''}</div>
+      ${R.length ? `<p class="tip-pop" id="tipPop" hidden>${L_.routesHint}</p><ul class="routes">` + R.map(r =>
         `<li><button data-id="${esc(r.other.id)}">${arrow(r.dx, r.dy, 'ar')}<span class="az">${az(r.az)}</span><span class="m">${dm(r.m)}</span>` +
         `<span class="to"><span class="badge small">${esc(r.other.nr)}</span><span>${esc(name(r.other))}</span></span></button></li>`).join('') + `</ul>`
         : `<p class="note">${L_.noRoutes}</p>`}
@@ -518,6 +564,7 @@ function render() {
       ${star ? `<p class="note">${L_.depthNote}</p>` : ''}
     </div>`;
     $('back').onclick = () => { deselect(); };
+    if ($('tip')) $('tip').onclick = () => { const pp = $('tipPop'); pp.hidden = !pp.hidden; $('tip').setAttribute('aria-expanded', String(!pp.hidden)); };
     b.querySelectorAll('.routes button').forEach(x => x.onclick = () => select(x.dataset.id, { move: 'fit' }));
     $('cpy').onclick = () => {
       const txt = $('cc').textContent;
@@ -535,6 +582,12 @@ function render() {
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor"/></svg>
           ${L_.igBtn}</a>
         <span class="ig-handle">instagram.com/deeperbluediving</span>
+      </div>
+      <div class="ig-card">
+        <a class="ig-link" href="${FB}" target="_blank" rel="noopener">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 3h-2.5A3.5 3.5 0 0 0 9 6.5V10H7v3.5h2V21h3.5v-7.5H15l.5-3.5h-3V7a1 1 0 0 1 1-1H15z"/></svg>
+          ${L_.fbBtn}</a>
+        <span class="ig-handle">facebook.com/jjbiernacki</span>
       </div></div>`;
   }
   b.scrollTop = 0;
@@ -549,6 +602,7 @@ function chrome() {
   $('igT').textContent = L_.ig;
   $('tList').textContent = L_.tList; $('tInfo').textContent = L_.tInfo; $('tContact').textContent = L_.tContact;
   $('lPL').setAttribute('aria-pressed', String(lang === 'pl')); $('lEN').setAttribute('aria-pressed', String(lang === 'en'));
+  $('lyAzT').textContent = L_.lyAz; $('lyDistT').textContent = L_.lyDist; $('lyHint').textContent = L_.lyHint; $('layers').setAttribute('aria-label', L_.layers);
   $('roseCap').textContent = L_.rose; $('shoreH').textContent = L_.shoreH; $('shoreP').textContent = L_.shoreP;
   $('zIn').setAttribute('aria-label', L_.zIn); $('zOut').setAttribute('aria-label', L_.zOut); $('zFit').setAttribute('aria-label', L_.zFit);
   $('handle').setAttribute('aria-label', L_.handle); $('map').setAttribute('aria-label', L_.map);
@@ -581,35 +635,116 @@ function panelPad() {
   return { tl: [372 + 16 + 30, 30], br: [30 + 70, 30] };
 }
 function drawSel() {
-  azLayer.clearLayers();
   Object.entries(marks).forEach(([id, m]) => {
     const el = m.getElement(); if (!el) return;
     el.classList.toggle('on', id === sel);
   });
-  const near = new Set();
   lines.forEach(l => {
     const on = sel && (l.k.a === sel || l.k.b === sel);
     l.core.setStyle(on ? { color: '#b01a20', weight: 3.4 } : { color: '#13222a', weight: 2.2, opacity: sel ? .6 : .95 });
     l.casing.setStyle({ opacity: sel && !on ? .45 : .8 });
-    const d = l.lbl.getElement() && l.lbl.getElement().querySelector('.dist');
+    const d = l.lbl.getElement() && l.lbl.getElement().querySelector('.lbl');
     if (d) d.classList.toggle('on', !!on);
-    if (on) { near.add(l.k.a); near.add(l.k.b); }
+    l.on = !!on;
   });
-  if (!sel) return;
-  const p = P[sel];
-  const placed = [];
-  const html = routesOf(sel).map(r => {
-    const len = Math.hypot(r.dx, r.dy), ux = r.dx / len, uy = r.dy / len;
-    let off = 48, x, y;
-    for (let i = 0; i < 7; i++, off += 26) {
-      x = ux * off; y = uy * off;
-      if (!placed.some(q => Math.abs(q[0] - x) < 60 && Math.abs(q[1] - y) < 22)) break;
+  genAz.forEach(m => { const d = m.mk.getElement() && m.mk.getElement().querySelector('.lbl'); if (d) d.classList.toggle('on', m.from === sel); });
+  layoutLabels();
+}
+
+// ------------------------------------------------------------ label layout
+// Each label sits centred ON its own route line, so it is always clear which
+// route it belongs to. It slides along that line (never off it) until it touches
+// neither a point marker nor another label. Bearings of the selected point go
+// first and start next to that point; distances go next, short routes before long
+// ones. When a label of the selected point has no room on its line (zoomed out,
+// short route), it moves beside the line and a dashed leader joins it to its
+// anchor. Other distances with no free slot are hidden until zooming in makes room.
+const cv = document.createElement('canvas').getContext('2d');
+// Level of detail by zoom: far = whole lake, mid = part of it, near = close-up.
+// far: only the bearings of the selected point, small labels;
+// mid: distances too, medium labels; near: everything at full size.
+function lod() {
+  const z = map.getZoom();
+  if (z < 1.75) return { cls: 'lv-far', fs: 10, h: 17, pad: 4, ic: 10, dist: false };
+  if (z < 3)    return { cls: 'lv-mid', fs: 11, h: 19, pad: 5, ic: 11, dist: true };
+  return               { cls: 'lv-near', fs: 12, h: 21, pad: 6, ic: 12, dist: true };
+}
+function lblW(txt, arrowed, v) {
+  cv.font = `600 ${v.fs}px "IBM Plex Mono", ui-monospace, Menlo, Consolas, monospace`;
+  return Math.ceil(cv.measureText(txt).width) + 2 * v.pad + 4 + (arrowed ? v.ic + 3 : 0);
+}
+function pinR(id) {
+  const p = P[id], small = p.maly || p.nr === '7b', base = small ? 11 : 15, z = map.getZoom(), lo = z < 1.25;
+  if (z < 0.75) return small ? 0 : base * 0.6 + 2;
+  return base * (lo ? 0.72 : 1) + 2;
+}
+function vis(mk, on) { const el = mk.getElement(); if (el) el.style.display = on ? '' : 'none'; }
+function layoutLabels() {
+  if (!map._loaded) return;   // before the first fitBounds there is no view yet
+  const v = lod(), H = v.h, GAP = 3, c = map.getContainer();
+  ['lv-far', 'lv-mid', 'lv-near'].forEach(k => c.classList.toggle(k, k === v.cls));
+  const lp = {}; Object.keys(P).forEach(id => lp[id] = map.latLngToLayerPoint(LL(P[id].x, P[id].y)));
+  const boxes = Object.keys(P).map(id => { const c = lp[id], r = pinR(id); return [c.x - r, c.y - r, c.x + r, c.y + r]; });
+  const free = b => !boxes.some(q => b[0] < q[2] + GAP && q[0] < b[2] + GAP && b[1] < q[3] + GAP && q[1] < b[3] + GAP);
+  leaders.clearLayers();
+  const show = (mk, x, y, b) => { boxes.push(b); mk.setLatLng(map.layerPointToLatLng([x, y])); vis(mk, true); };
+  const geom = (aId, bId, w) => {
+    const A = lp[aId], B = lp[bId], dx = B.x - A.x, dy = B.y - A.y, len = Math.hypot(dx, dy) || 1;
+    const ux = dx / len, uy = dy / len, e = w / 2 * Math.abs(ux) + H / 2 * Math.abs(uy);
+    return { A, len, ux, uy, smin: pinR(aId) + e + GAP, smax: len - pinR(bId) - e - GAP };
+  };
+  const box = (x, y, w) => [x - w / 2, y - H / 2, x + w / 2, y + H / 2];
+  // 1) on the line: slide along A->B, from the start or outwards from the middle
+  function onLine(mk, aId, bId, w, prefer) {
+    const g = geom(aId, bId, w);
+    if (g.smin > g.smax) return false;
+    const ss = [];
+    if (prefer === 'start') for (let s = g.smin; s <= g.smax; s += 5) ss.push(s);
+    else { const mid = (g.smin + g.smax) / 2; for (let d = 0; d <= (g.smax - g.smin) / 2 + 0.1; d += 5) { ss.push(mid - d); if (d) ss.push(mid + d); } }
+    for (const s of ss) {
+      const x = g.A.x + g.ux * s, y = g.A.y + g.uy * s, b = box(x, y, w);
+      if (free(b)) { show(mk, x, y, b); return true; }
     }
-    placed.push([x, y]);
-    return `<span style="left:${x.toFixed(1)}px;top:${y.toFixed(1)}px">${arrow(r.dx, r.dy)}${az(r.az)}</span>`;
-  }).join('');
-  L.marker(LL(p.x, p.y), { interactive: false, keyboard: false, zIndexOffset: 2000,
-    icon: L.divIcon({ className: '', html: `<div class="azl">${html}</div>`, iconSize: [0, 0] }) }).addTo(azLayer);
+    return false;
+  }
+  // 2) no room on the line: the label moves to the nearest free spot beside it
+  //    and a thin leader joins it to its anchor on the line
+  function callout(mk, aId, bId, w, prefer, color) {
+    const g = geom(aId, bId, w);
+    const s0 = prefer === 'start' ? Math.min(pinR(aId) + 10, g.len / 2) : g.len / 2;
+    const ax = g.A.x + g.ux * s0, ay = g.A.y + g.uy * s0, base = Math.atan2(g.uy, g.ux);
+    const turns = [90, -90, 60, -60, 120, -120, 30, -30, 150, -150, 0, 180];
+    for (const r of [30, 44, 60, 78, 98, 120, 145]) for (const t of turns) {
+      const an = base + t * Math.PI / 180, x = ax + Math.cos(an) * (r + w / 4), y = ay + Math.sin(an) * r, b = box(x, y, w);
+      if (free(b)) {
+        show(mk, x, y, b);
+        L.polyline([map.layerPointToLatLng([ax, ay]), map.layerPointToLatLng([x, y])],
+          { color, weight: 1.6, dashArray: '3 3', opacity: .95, interactive: false }).addTo(leaders);
+        L.circleMarker(map.layerPointToLatLng([ax, ay]), { radius: 2.5, color, weight: 0, fillColor: color, fillOpacity: 1, interactive: false }).addTo(leaders);
+        return true;
+      }
+    }
+    return false;
+  }
+  const scr = (a, b) => Math.hypot(lp[a].x - lp[b].x, lp[a].y - lp[b].y);
+  // ONE layout for the current zoom, independent of the checkboxes and of the
+  // selection: all bearings first, then all distances. The checkboxes and the
+  // selection only decide what is shown, so nothing moves or vanishes by itself.
+  const ok = new Map();
+  genAz.slice().sort((u, w) => scr(u.from, u.to) - scr(w.from, w.to))
+    .forEach(m => ok.set(m, onLine(m.mk, m.from, m.to, lblW(m.txt, true, v), 'start')));
+  if (v.dist) lines.slice().sort((u, w) => scr(u.k.a, u.k.b) - scr(w.k.a, w.k.b))
+    .forEach(l => ok.set(l, onLine(l.lbl, l.k.a, l.k.b, lblW(l.txt, false, v), 'mid')));
+  // labels of the selected point that found no room get a callout with a leader
+  if (sel) {
+    genAz.filter(m => m.from === sel && !ok.get(m))
+      .forEach(m => ok.set(m, callout(m.mk, m.from, m.to, lblW(m.txt, true, v), 'start', '#b01a20')));
+    lines.filter(l => l.on && !ok.get(l))
+      .forEach(l => ok.set(l, callout(l.lbl, l.k.a, l.k.b, lblW(l.txt, false, v), 'mid', '#b01a20')));
+  }
+  genAz.forEach(m => vis(m.mk, !!ok.get(m) && showAz));
+  lines.forEach(l => vis(l.lbl, !!ok.get(l) && showDist));
+  $('lyHint').hidden = !(showAz && genAz.some(m => !ok.get(m)));
 }
 function select(id, opt) {
   sel = id; view = 'detail';
@@ -639,15 +774,25 @@ function deselect() {
 // ------------------------------------------------------------ furniture
 function zoomCls() {
   const z = map.getZoom(), c = map.getContainer();
-  c.classList.toggle('show-dist', z >= 2.25);
   c.classList.toggle('z-lo', z < 1.25);
+  c.classList.toggle('z-xlo', z < 0.75);
+  lines.forEach(l => l.casing.setStyle({ weight: z < 1 ? 3.5 : 5 }));
   const mpp = D.gsd * Math.pow(2, ZN - z), target = mpp * 110;
   const nice = [1, 2, 5, 10, 20, 25, 50, 100, 200, 500].find(v => v >= target) || 500;
   const best = [1, 2, 5, 10, 20, 25, 50, 100, 200, 500].filter(v => v <= target).pop() || nice;
   $('scaleBar').style.width = (best / mpp).toFixed(0) + 'px';
   $('scaleTxt').textContent = best + ' m';
 }
-map.on('zoomend', zoomCls);
+map.on('zoomend', () => { zoomCls(); layoutLabels(); });
+function syncLayers() {
+  $('lyAz').setAttribute('aria-pressed', String(showAz)); $('lyDist').setAttribute('aria-pressed', String(showDist));
+  try { localStorage.setItem('koparki-labels', JSON.stringify({ az: showAz, dist: showDist })); } catch (e) {}
+  layoutLabels();
+}
+$('lyAz').onclick = () => { showAz = !showAz; syncLayers(); };
+$('lyDist').onclick = () => { showDist = !showDist; syncLayers(); };
+$('lyAz').setAttribute('aria-pressed', String(showAz)); $('lyDist').setAttribute('aria-pressed', String(showDist));
+if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => layoutLabels());
 $('needle').setAttribute('transform', `rotate(${D.polnoc_mag})`);
 $('roseBtn').onclick = () => { const h = $('shore'); h.hidden = !h.hidden; $('roseBtn').setAttribute('aria-expanded', String(!h.hidden)); };
 $('zIn').onclick = () => map.zoomIn(0.75);
@@ -690,7 +835,7 @@ requestAnimationFrame(() => {
   map.invalidateSize();
   fitAll(false);
   map.setMinZoom(Math.min(map.getZoom() - 0.75, 0));
-  zoomCls();
+  zoomCls(); layoutLabels();
   const h = (location.hash.match(/^#p(\w+)$/) || [])[1];
   if (h && byNr[h]) select(byNr[h].id, { move: 'fit' });
 });
