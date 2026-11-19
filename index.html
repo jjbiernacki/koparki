@@ -87,7 +87,7 @@ button { font: inherit; color: inherit; }
 .lang { display: inline-flex; border: 1px solid var(--line); border-radius: 999px; padding: 2px; background: var(--surface-2); flex: none; }
 .lang button { border: 0; background: none; padding: 4px 10px; border-radius: 999px; font-family: var(--f-data); font-size: 12px; font-weight: 600; letter-spacing: .06em; cursor: pointer; color: var(--muted); }
 .lang button[aria-pressed="true"] { background: var(--ink); color: var(--surface); }
-.actions { display: grid; grid-template-columns: 1fr auto; gap: 8px; }
+.actions { display: grid; grid-template-columns: 1fr; gap: 8px; }
 .btn-pdf {
   display: flex; align-items: center; gap: 10px; text-align: left; border: 0; cursor: pointer;
   background: var(--accent); color: var(--accent-ink); border-radius: 10px; padding: 8px 12px; min-width: 0;
@@ -261,6 +261,70 @@ button { font: inherit; color: inherit; }
   background: var(--ink); color: var(--surface); padding: 8px 14px; border-radius: 10px; font-size: 14px; box-shadow: var(--shadow);
 }
 
+/* ---------- route planning mode ---------- */
+.mode { display: inline-flex; gap: 2px; padding: 3px; border-radius: 10px; background: var(--surface); box-shadow: var(--shadow); }
+.mode button {
+  display: inline-flex; align-items: center; gap: 6px; border: 0; background: none; cursor: pointer;
+  padding: 6px 10px; border-radius: 8px; font-size: 13px; font-weight: 600; color: var(--muted);
+}
+.mode button svg { width: 15px; height: 15px; flex: none; }
+.mode button[aria-pressed="true"] { background: var(--ink); color: var(--surface); }
+#app.plan .lay, #app.plan .lay-hint { display: none; }
+.plan-hint {
+  top: 16px; left: calc(50% + 194px); transform: translateX(-50%); max-width: min(420px, calc(100vw - 520px));
+  padding: 7px 14px; border-radius: 999px; background: rgba(19, 34, 42, .55); color: #fff; font-size: 13px; line-height: 1.3;
+  text-align: center; pointer-events: none; box-shadow: 0 2px 10px rgba(0,0,0,.3); backdrop-filter: blur(4px);
+}
+#mapClear {
+  left: calc(50% + 194px); bottom: calc(16px + env(safe-area-inset-bottom, 0px)); transform: translateX(-50%);
+  display: inline-flex; align-items: center; gap: 8px; border: 0; border-radius: 999px; padding: 9px 16px;
+  background: var(--surface); color: var(--ink); box-shadow: var(--shadow); font-weight: 600; font-size: 14px; cursor: pointer; white-space: nowrap;
+}
+#mapClear svg { width: 16px; height: 16px; flex: none; }
+#mapClear.warn { background: var(--accent); color: var(--accent-ink); }
+#ptoast { top: 58px; left: calc(50% + 194px); max-width: min(420px, calc(100vw - 520px)); text-align: center; font-size: 13px; pointer-events: none; }
+@keyframes pinPulse {
+  0% { box-shadow: 0 0 0 0 rgba(255,255,255,.75), 0 1px 4px rgba(0,0,0,.55); }
+  70% { box-shadow: 0 0 0 10px rgba(255,255,255,0), 0 1px 4px rgba(0,0,0,.55); }
+  100% { box-shadow: 0 0 0 0 rgba(255,255,255,0), 0 1px 4px rgba(0,0,0,.55); }
+}
+#app.plan.empty .pin { animation: pinPulse 2.4s ease-out infinite; }
+.leaflet-marker-icon.inr .pin { box-shadow: 0 0 0 3px #ffcf33, 0 1px 5px rgba(0,0,0,.6); }
+.leaflet-marker-icon.cur .pin { transform: scale(1.3); }
+.z-lo .leaflet-marker-icon.cur .pin { transform: scale(1.05); }
+.z-xlo .leaflet-marker-icon.inr .pin.small { display: grid; }
+.plan-intro { margin: 0; font-size: 15px; }
+.plan-tips { margin: 0; padding-left: 18px; display: grid; gap: 8px; font-size: 14px; color: var(--muted); }
+.plan-sum { display: grid; grid-template-columns: 1.15fr .85fr 1fr; gap: 8px; margin: 0; }
+.plan-sum div { background: var(--surface-2); border: 1px solid var(--line); border-radius: 10px; padding: 7px 10px; min-width: 0; }
+.plan-sum dt { font-family: var(--f-data); font-size: 10.5px; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); white-space: nowrap; }
+.plan-sum dd { margin: 2px 0 0; font-family: var(--f-data); font-size: 18px; font-weight: 600; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.stops { list-style: none; margin: 0; padding: 0; }
+.stops li { position: relative; }
+/* timeline: a vertical rail under the badges */
+.stops li::before { content: ""; position: absolute; left: 18px; top: 0; bottom: 0; width: 2px; background: var(--line); }
+.stops li.pt:first-child::before { top: 50%; }
+.stops li.pt:last-child::before { bottom: 50%; }
+.stops li.pt:only-child::before { display: none; }
+.stops button {
+  position: relative; width: 100%; border: 0; background: none; cursor: pointer; text-align: left; border-radius: 10px;
+  display: grid; align-items: center; gap: 10px;
+}
+.stops button:hover, .stops button.hl { background: var(--surface-2); }
+.stops .pt button { grid-template-columns: 30px 1fr auto; padding: 5px 6px 5px 4px; }
+.stops .pt .t { font-weight: 600; font-size: 15px; line-height: 1.2; display: block; }
+.stops .pt .s { display: block; color: var(--muted); font-size: 12px; font-family: var(--f-data); letter-spacing: .06em; text-transform: uppercase; }
+.stops .pt .dp { font-family: var(--f-data); font-size: 13px; color: var(--muted); }
+.stops .leg button { grid-template-columns: 30px 20px 52px 1fr auto; padding: 1px 6px 1px 4px; min-height: 30px; }
+.stops .leg .ar { width: 16px; height: 16px; color: var(--accent); }
+.stops .leg .az { font-family: var(--f-data); font-weight: 600; font-size: 15px; color: var(--accent); font-variant-numeric: tabular-nums; }
+.stops .leg .m { font-family: var(--f-data); font-size: 13px; font-variant-numeric: tabular-nums; }
+.stops .leg .x2 { justify-self: end; font-family: var(--f-data); font-size: 11px; color: var(--muted); }
+.plan-act { display: flex; flex-wrap: wrap; gap: 8px; }
+.pbtn { border: 1px solid var(--line); background: var(--surface-2); border-radius: 8px; padding: 6px 12px; cursor: pointer; font-size: 14px; font-weight: 600; }
+.pbtn:disabled { opacity: .45; cursor: default; }
+.pbtn.warn { border-color: var(--accent); color: var(--accent); }
+
 /* ---------- phones: bottom sheet (portrait) / floating card (landscape) ---------- */
 /* the same query string is in JS (MQ) */
 @media (max-width: 760px), (max-height: 520px) and (orientation: landscape) {
@@ -316,6 +380,10 @@ button { font: inherit; color: inherit; }
   #compass { top: 12px; }
   #layers { top: 12px; left: calc(max(16px, env(safe-area-inset-left, 0px)) + 50px); }
   .lay button { padding: 6px 8px; }
+  .mode button { padding: 6px 9px; }
+  .plan-hint { top: 92px; left: 50%; max-width: calc(100vw - 40px); }
+  #mapClear { bottom: calc(var(--sheet-h) + 12px); left: 50%; transition: bottom .25s ease; }
+  #ptoast { top: auto; bottom: calc(var(--sheet-h) + 108px); left: 50%; max-width: calc(100vw - 40px); }
   .rose { width: 66px; height: 66px; }
   .rose svg { width: 60px; height: 60px; }
   .shore { width: 184px; }
@@ -373,6 +441,10 @@ button { font: inherit; color: inherit; }
     <button id="zFit" aria-label="Cała mapa"><svg width="20" height="20" viewBox="0 0 20 20" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7V3h4M13 3h4v4M17 13v4h-4M7 17H3v-4"/></svg></button>
   </div>
   <div class="ctrl" id="layers" role="group">
+    <div class="mode" role="group" id="modeGrp">
+      <button id="mView" aria-pressed="true"><svg viewBox="0 0 16 16" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><path d="M1.5 3.5l4-1.5 5 2 4-1.5v10l-4 1.5-5-2-4 1.5z"/><path d="M5.5 2v10M10.5 4v10"/></svg><span id="mViewT"></span></button>
+      <button id="mPlan" aria-pressed="false"><svg viewBox="0 0 16 16" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="3" cy="12.5" r="1.8"/><circle cx="13" cy="3.5" r="1.8"/><path d="M4.6 11.4L8 8.5 6.5 6.5l4.8-2"/></svg><span id="mPlanT"></span></button>
+    </div>
     <div class="lay">
       <button id="lyAz" aria-pressed="true"><span class="dot"></span><span id="lyAzT"></span></button>
       <button id="lyDist" aria-pressed="true"><span class="dot"></span><span id="lyDistT"></span></button>
@@ -383,6 +455,9 @@ button { font: inherit; color: inherit; }
     <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
   </button>
   <div id="menu" hidden></div>
+  <div class="ctrl plan-hint" id="planHint" role="status" hidden></div>
+  <div class="ctrl toast" id="ptoast" role="alert" hidden></div>
+  <button class="ctrl" id="mapClear" hidden><svg viewBox="0 0 16 16" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 4h11M6 4V2.5h4V4M4 4l.7 9.5h6.6L12 4M6.8 6.5v4.5M9.2 6.5v4.5"/></svg><span id="mapClearT"></span></button>
   <div class="ctrl" id="scale"><span id="scaleTxt"></span><div class="bar" id="scaleBar"></div></div>
 
   <aside id="panel" aria-label="Panel">
@@ -410,16 +485,11 @@ button { font: inherit; color: inherit; }
           <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12M7 10l5 5 5-5M4 19h16"/></svg>
           <span><b id="pdfT"></b><small id="pdfS"></small></span>
         </button>
-        <button class="btn-ig" id="igBtn">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor"/></svg>
-          <span id="igT"></span>
-        </button>
       </div>
       <div id="status" role="status" aria-live="polite"></div>
       <div class="tabs" role="tablist">
         <button role="tab" id="tList" aria-selected="true"></button>
         <button role="tab" id="tInfo" aria-selected="false"></button>
-        <button role="tab" id="tContact" aria-selected="false"></button>
       </div>
     </div>
     <div class="body" id="body"></div>
@@ -428,7 +498,7 @@ button { font: inherit; color: inherit; }
 
 <script src="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
-const D = {"szer":9328,"wys":3692,"kafel":512,"zmax":5,"gsd":0.03913,"tlo":"#15282e","polnoc":133.18,"polnoc_mag":139.45,"deklinacja":6.27,"brzegi":[{"az":221,"kier":"SW","ekran":"g"},{"az":41,"kier":"NE","ekran":"d"},{"az":131,"kier":"SE","ekran":"l"},{"az":311,"kier":"NW","ekran":"p"}],"punkty":[{"id":"1","nr":"1","x":1900.5,"y":2899.5,"pl":"Wejście do wody","en":"Water entry","opis_pl":"schody i drabinka przy bazie","opis_en":"steps and ladder by the base","maly":false,"legenda":true,"lat":50.228018,"lon":19.312684},{"id":"2","nr":"2","x":2621.5,"y":2791.0,"pl":"Pomost I","en":"Jetty I","opis_pl":"","opis_en":"","maly":false,"legenda":true,"lat":50.228177,"lon":19.31237},{"id":"3","nr":"3","x":3335.5,"y":2833.0,"pl":"Pomost II","en":"Jetty II","opis_pl":"pod pomostem platforma szkoleniowa","opis_en":"training platform under the jetty","maly":false,"legenda":true,"lat":50.228371,"lon":19.312118},{"id":"deco","nr":"3a","x":3525.7,"y":2841.5,"pl":"Deco bar","en":"Deco bar","opis_pl":"rurki PCV na różnych głębokościach do ćwiczenia pływalności","opis_en":"PVC pipes at different depths for buoyancy practice","maly":false,"legenda":true,"lat":50.228422,"lon":19.31205},{"id":"4","nr":"4","x":4513.0,"y":2784.0,"pl":"Pomost III","en":"Jetty III","opis_pl":"","opis_en":"","maly":false,"legenda":true,"lat":50.228662,"lon":19.311656},{"id":"5","nr":"5","x":6602.5,"y":2766.5,"pl":"Basen","en":"Pool","opis_pl":"pływająca platforma z basenem","opis_en":"floating platform with a pool","maly":false,"legenda":true,"lat":50.229194,"lon":19.310863},{"id":"6","nr":"6","x":593.2,"y":2104.9,"pl":"Star (ciężarówka)","en":"Star (truck)","opis_pl":"","opis_en":"","maly":false,"legenda":true,"lat":50.227491,"lon":19.312857},{"id":"lina","nr":"7","x":1383.0,"y":1021.1,"pl":"Wrak WILHELM","en":"WILHELM wreck","opis_pl":"15 m* · przypięcie poręczówki z 9; 7b dziób","opis_en":"15 m* · guideline from 9 tied here; 7b bow","maly":false,"legenda":true,"lat":50.227432,"lon":19.312126},{"id":"dz","nr":"7b","x":1089.8,"y":1219.9,"pl":"Wilhelm — dziób","en":"Wilhelm bow","opis_pl":"dziób wraku","opis_en":"bow of the wreck","maly":false,"legenda":false,"lat":50.227405,"lon":19.312316},{"id":"8","nr":"8","x":2474.7,"y":2498.7,"pl":"Transformator","en":"Transformer","opis_pl":"","opis_en":"","maly":false,"legenda":true,"lat":50.228069,"lon":19.312308},{"id":"9","nr":"9","x":3281.3,"y":1526.7,"pl":"Głęboka koparka","en":"Deep excavator","opis_pl":"15 m*","opis_en":"15 m*","maly":false,"legenda":true,"lat":50.228042,"lon":19.311615},{"id":"10","nr":"10","x":4062.9,"y":2409.9,"pl":"Łyżki","en":"Buckets","opis_pl":"","opis_en":"","maly":false,"legenda":true,"lat":50.228456,"lon":19.311675},{"id":"11","nr":"11","x":4371.7,"y":1093.5,"pl":"Cadillac","en":"Cadillac","opis_pl":"","opis_en":"","maly":false,"legenda":true,"lat":50.228218,"lon":19.311032},{"id":"12","nr":"12","x":5381.6,"y":593.0,"pl":"Mostek","en":"Bridge","opis_pl":"18,5 m*","opis_en":"18.5 m*","maly":false,"legenda":true,"lat":50.228357,"lon":19.310451},{"id":"13","nr":"13","x":5965.3,"y":1484.0,"pl":"Płytka koparka","en":"Shallow excavator","opis_pl":"12 m*","opis_en":"12 m*","maly":false,"legenda":true,"lat":50.228721,"lon":19.310589},{"id":"mag","nr":"14","x":6633.6,"y":1316.4,"pl":"Magazyn strzałowego","en":"Explosives store","opis_pl":"","opis_en":"","maly":false,"legenda":true,"lat":50.228853,"lon":19.310271},{"id":"prz","nr":"15","x":6710.0,"y":1020.0,"pl":"Przepompownia","en":"Pumping station","opis_pl":"","opis_en":"","maly":false,"legenda":true,"lat":50.228801,"lon":19.310123},{"id":"14","nr":"16","x":6917.0,"y":2471.5,"pl":"Most pontonowy","en":"Pontoon bridge","opis_pl":"","opis_en":"","maly":false,"legenda":true,"lat":50.229204,"lon":19.310627},{"id":"16","nr":"17","x":7226.5,"y":2836.5,"pl":"Platforma szkoleniowa I","en":"Training platform I","opis_pl":"5 m*","opis_en":"5 m*","maly":true,"legenda":true,"lat":50.229372,"lon":19.310657},{"id":"17","nr":"18","x":7415.0,"y":2752.5,"pl":"Platforma szkoleniowa II","en":"Training platform II","opis_pl":"5 m*","opis_en":"5 m*","maly":true,"legenda":true,"lat":50.2294,"lon":19.310552},{"id":"15","nr":"19","x":7894.5,"y":2926.0,"pl":"Korytarz","en":"Corridor","opis_pl":"zatopiony korytarz w kształcie L","opis_en":"sunken L-shaped corridor","maly":false,"legenda":true,"lat":50.229565,"lon":19.310441},{"id":"18","nr":"20","x":8448.0,"y":2587.0,"pl":"Lustra","en":"Mirrors","opis_pl":"na dnie, w płyciźnie od NW","opis_en":"on the bottom, in the shallows on the NW side","maly":false,"legenda":true,"lat":50.229625,"lon":19.310097}],"krawedzie":[{"a":"mag","b":"prz","m":12.0,"ab":235.02,"ba":55.02},{"a":"2","b":"8","m":12.8,"ab":193.95,"ba":13.95},{"a":"5","b":"14","m":16.9,"ab":267.51,"ba":87.51},{"a":"4","b":"10","m":23.0,"ab":170.34,"ba":350.34},{"a":"15","b":"18","m":25.4,"ab":278.94,"ba":98.94},{"a":"13","b":"mag","m":27.0,"ab":296.64,"ba":116.64},{"a":"1","b":"8","m":27.4,"ab":275.67,"ba":95.67},{"a":"3","b":"10","m":33.0,"ab":280.38,"ba":100.38},{"a":"dz","b":"6","m":39.8,"ab":69.81,"ba":249.81},{"a":"12","b":"13","m":41.7,"ab":7.4,"ba":187.4},{"a":"14","b":"15","m":42.3,"ab":335.44,"ba":155.44},{"a":"11","b":"12","m":44.2,"ab":284.18,"ba":104.18},{"a":"9","b":"11","m":46.0,"ab":288.93,"ba":108.93},{"a":"9","b":"10","m":46.2,"ab":359.04,"ba":179.04},{"a":"8","b":"9","m":49.5,"ab":260.25,"ba":80.25},{"a":"5","b":"15","m":51.1,"ab":317.61,"ba":137.61},{"a":"3","b":"9","m":51.3,"ab":218.17,"ba":38.17},{"a":"14","b":"13","m":53.8,"ab":176.62,"ba":356.62},{"a":"5","b":"13","m":56.1,"ab":194.12,"ba":14.11},{"a":"1","b":"6","m":59.9,"ab":161.84,"ba":341.84},{"a":"13","b":"11","m":64.3,"ab":144.26,"ba":324.26},{"a":"4","b":"11","m":66.5,"ab":215.77,"ba":35.77},{"a":"lina","b":"8","m":72.0,"ab":4.12,"ba":184.12},{"a":"9","b":"lina","m":77.0,"ab":145.48,"ba":325.48},{"a":"13","b":"9","m":105.2,"ab":129.62,"ba":309.62}],"obrysy":[{"nazwa":"Wilhelm","L":16.5,"B":3.5,"az":90.0,"px":[[1374.2,917.8],[1131.1,1125.8],[1109.0,1151.7],[1094.8,1180.4],[1089.7,1203.5],[1089.8,1219.9],[1089.8,1219.9],[1105.9,1222.5],[1129.6,1221.1],[1160.1,1211.4],[1189.2,1193.6],[1432.2,985.7],[1431.1,977.8],[1392.2,925.9],[1409.6,946.3],[1427.0,966.6],[1381.8,920.2]]}]};
+const D = {"szer":9328,"wys":3692,"kafel":512,"zmax":5,"gsd":0.03913,"tlo":"#15282e","polnoc":133.18,"polnoc_mag":139.45,"deklinacja":6.27,"brzegi":[{"az":221,"kier":"SW","ekran":"g"},{"az":41,"kier":"NE","ekran":"d"},{"az":131,"kier":"SE","ekran":"l"},{"az":311,"kier":"NW","ekran":"p"}],"punkty":[{"id":"1","nr":"1","x":1900.5,"y":2899.5,"pl":"Wejście do wody","en":"Water entry","opis_pl":"schody i drabinka przy bazie","opis_en":"steps and ladder by the base","maly":false,"legenda":true,"lat":50.228018,"lon":19.312684},{"id":"2","nr":"2","x":2621.5,"y":2791.0,"pl":"Pomost I","en":"Jetty I","opis_pl":"","opis_en":"","maly":false,"legenda":true,"lat":50.228177,"lon":19.31237},{"id":"3","nr":"3","x":3335.5,"y":2833.0,"pl":"Pomost II","en":"Jetty II","opis_pl":"pod pomostem platforma szkoleniowa","opis_en":"training platform under the jetty","maly":false,"legenda":true,"lat":50.228371,"lon":19.312118},{"id":"deco","nr":"3a","x":3525.7,"y":2841.5,"pl":"Deco bar","en":"Deco bar","opis_pl":"rurki PCV na różnych głębokościach do ćwiczenia pływalności","opis_en":"PVC pipes at different depths for buoyancy practice","maly":false,"legenda":true,"lat":50.228422,"lon":19.31205},{"id":"4","nr":"4","x":4513.0,"y":2784.0,"pl":"Pomost III","en":"Jetty III","opis_pl":"","opis_en":"","maly":false,"legenda":true,"lat":50.228662,"lon":19.311656},{"id":"5","nr":"5","x":6602.5,"y":2766.5,"pl":"Basen","en":"Pool","opis_pl":"pływająca platforma z basenem","opis_en":"floating platform with a pool","maly":false,"legenda":true,"lat":50.229194,"lon":19.310863},{"id":"6","nr":"6","x":593.2,"y":2104.9,"pl":"Star (ciężarówka)","en":"Star (truck)","opis_pl":"","opis_en":"","maly":false,"legenda":true,"lat":50.227491,"lon":19.312857},{"id":"lina","nr":"7","x":1383.0,"y":1021.1,"pl":"Wrak WILHELM","en":"WILHELM wreck","opis_pl":"15 m* · przypięcie poręczówki z 9; 7b dziób","opis_en":"15 m* · guideline from 9 tied here; 7b bow","maly":false,"legenda":true,"lat":50.227432,"lon":19.312126},{"id":"dz","nr":"7b","x":1089.8,"y":1219.9,"pl":"Wilhelm — dziób","en":"Wilhelm bow","opis_pl":"dziób wraku","opis_en":"bow of the wreck","maly":false,"legenda":false,"lat":50.227405,"lon":19.312316},{"id":"8","nr":"8","x":2474.7,"y":2498.7,"pl":"Transformator","en":"Transformer","opis_pl":"","opis_en":"","maly":false,"legenda":true,"lat":50.228069,"lon":19.312308},{"id":"9","nr":"9","x":3281.3,"y":1526.7,"pl":"Głęboka koparka","en":"Deep excavator","opis_pl":"15 m*","opis_en":"15 m*","maly":false,"legenda":true,"lat":50.228042,"lon":19.311615},{"id":"10","nr":"10","x":4062.9,"y":2409.9,"pl":"Łyżki","en":"Buckets","opis_pl":"","opis_en":"","maly":false,"legenda":true,"lat":50.228456,"lon":19.311675},{"id":"11","nr":"11","x":4371.7,"y":1093.5,"pl":"Ford Fairlane 500","en":"Ford Fairlane 500","opis_pl":"","opis_en":"","maly":false,"legenda":true,"lat":50.228218,"lon":19.311032},{"id":"12","nr":"12","x":5381.6,"y":593.0,"pl":"Mostek","en":"Bridge","opis_pl":"18,5 m*","opis_en":"18.5 m*","maly":false,"legenda":true,"lat":50.228357,"lon":19.310451},{"id":"13","nr":"13","x":5965.3,"y":1484.0,"pl":"Płytka koparka","en":"Shallow excavator","opis_pl":"12 m*","opis_en":"12 m*","maly":false,"legenda":true,"lat":50.228721,"lon":19.310589},{"id":"mag","nr":"14","x":6633.6,"y":1316.4,"pl":"Magazyn strzałowego","en":"Explosives store","opis_pl":"","opis_en":"","maly":false,"legenda":true,"lat":50.228853,"lon":19.310271},{"id":"prz","nr":"15","x":6710.0,"y":1020.0,"pl":"Przepompownia","en":"Pumping station","opis_pl":"","opis_en":"","maly":false,"legenda":true,"lat":50.228801,"lon":19.310123},{"id":"14","nr":"16","x":6917.0,"y":2471.5,"pl":"Most pontonowy","en":"Pontoon bridge","opis_pl":"","opis_en":"","maly":false,"legenda":true,"lat":50.229204,"lon":19.310627},{"id":"16","nr":"17","x":7226.5,"y":2836.5,"pl":"Platforma szkoleniowa I","en":"Training platform I","opis_pl":"5 m*","opis_en":"5 m*","maly":true,"legenda":true,"lat":50.229372,"lon":19.310657},{"id":"17","nr":"18","x":7415.0,"y":2752.5,"pl":"Platforma szkoleniowa II","en":"Training platform II","opis_pl":"5 m*","opis_en":"5 m*","maly":true,"legenda":true,"lat":50.2294,"lon":19.310552},{"id":"15","nr":"19","x":7894.5,"y":2926.0,"pl":"Korytarz","en":"Corridor","opis_pl":"zatopiony korytarz w kształcie L","opis_en":"sunken L-shaped corridor","maly":false,"legenda":true,"lat":50.229565,"lon":19.310441},{"id":"18","nr":"20","x":8448.0,"y":2587.0,"pl":"Lustra","en":"Mirrors","opis_pl":"na dnie, w płyciźnie od NW","opis_en":"on the bottom, in the shallows on the NW side","maly":false,"legenda":true,"lat":50.229625,"lon":19.310097}],"krawedzie":[{"a":"mag","b":"prz","m":12.0,"ab":235.02,"ba":55.02},{"a":"2","b":"8","m":12.8,"ab":193.95,"ba":13.95},{"a":"5","b":"14","m":16.9,"ab":267.51,"ba":87.51},{"a":"4","b":"10","m":23.0,"ab":170.34,"ba":350.34},{"a":"15","b":"18","m":25.4,"ab":278.94,"ba":98.94},{"a":"13","b":"mag","m":27.0,"ab":296.64,"ba":116.64},{"a":"1","b":"8","m":27.4,"ab":275.67,"ba":95.67},{"a":"3","b":"10","m":33.0,"ab":280.38,"ba":100.38},{"a":"dz","b":"6","m":39.8,"ab":69.81,"ba":249.81},{"a":"12","b":"13","m":41.7,"ab":7.4,"ba":187.4},{"a":"14","b":"15","m":42.3,"ab":335.44,"ba":155.44},{"a":"11","b":"12","m":44.2,"ab":284.18,"ba":104.18},{"a":"9","b":"11","m":46.0,"ab":288.93,"ba":108.93},{"a":"9","b":"10","m":46.2,"ab":359.04,"ba":179.04},{"a":"8","b":"9","m":49.5,"ab":260.25,"ba":80.25},{"a":"5","b":"15","m":51.1,"ab":317.61,"ba":137.61},{"a":"3","b":"9","m":51.3,"ab":218.17,"ba":38.17},{"a":"14","b":"13","m":53.8,"ab":176.62,"ba":356.62},{"a":"5","b":"13","m":56.1,"ab":194.12,"ba":14.11},{"a":"1","b":"6","m":59.9,"ab":161.84,"ba":341.84},{"a":"13","b":"11","m":64.3,"ab":144.26,"ba":324.26},{"a":"4","b":"11","m":66.5,"ab":215.77,"ba":35.77},{"a":"lina","b":"8","m":72.0,"ab":4.12,"ba":184.12},{"a":"9","b":"lina","m":77.0,"ab":145.48,"ba":325.48},{"a":"13","b":"9","m":105.2,"ab":129.62,"ba":309.62}],"obrysy":[{"nazwa":"Wilhelm","L":16.5,"B":3.5,"az":90.0,"px":[[1374.2,917.8],[1131.1,1125.8],[1109.0,1151.7],[1094.8,1180.4],[1089.7,1203.5],[1089.8,1219.9],[1089.8,1219.9],[1105.9,1222.5],[1129.6,1221.1],[1160.1,1211.4],[1189.2,1193.6],[1432.2,985.7],[1431.1,977.8],[1392.2,925.9],[1409.6,946.3],[1427.0,966.6],[1381.8,920.2]]}]};
 const IG = 'https://www.instagram.com/deeperbluediving';
 const FB = 'https://www.facebook.com/jjbiernacki';
 const PDF = { pl: { src: 'plan_PL.pdf', name: 'Koparki_plan_nurkowy.pdf' }, en: { src: 'plan_EN.pdf', name: 'Koparki_dive_plan.pdf' } };
@@ -454,17 +524,43 @@ const T = {
     zIn: 'Przybliż', zOut: 'Oddal', zFit: 'Cała mapa', handle: 'Rozwiń panel', map: 'Mapa',
     sbList: 'Wybierz punkt na mapie lub na liście', sbOpen: 'Rozwiń', sbFold: 'Zwiń', sbClose: 'Zamknij', menu: 'Menu',
     edge: 'trasa',
+    modeGrp: 'Tryb mapy', mView: 'Mapa', mPlan: 'Planuj trasę', tPlan: 'Trasa', planT: 'Plan trasy',
+    hintStart: 'Zacznij od wyboru punktu startowego na mapie.',
+    hintNext: 'Wybierz kolejny punkt, aby poprowadzić trasę.',
+    planIntro: 'Wybierz na mapie punkt startowy. Każdy kolejny wybrany punkt dołącza do trasy.',
+    planTips: [
+      'Trasa może prowadzić między dowolnymi punktami, także poza trasami planu. Azymuty i odległości są liczone automatycznie.',
+      'Trasa może mieć do 25 punktów. Do punktu można wracać, a tę samą linię można przepłynąć najwyżej trzy razy.',
+      'Strzałki na liniach pokazują kierunek płynięcia.'
+    ],
+    sumDist: 'Odległość', sumPts: 'Punkty', sumDepth: 'Maks. głęb.',
+    start: 'start', finish: 'koniec', twice: k => `${k}. raz`,
+    undo: 'Cofnij', clear: 'Wyczyść', clearSure: 'Wyczyścić trasę?', link: 'Kopiuj link', linkOk: 'Skopiowano link',
+    errMax: 'Trasa może mieć najwyżej 25 punktów.', errSame: 'Ten punkt jest już ostatnim punktem trasy.',
+    errTwice: 'Trasa przebiega już tą linią trzy razy.',
+    planNote: 'Azymuty magnetyczne liczone od punktu początkowego każdego odcinka, odległości w linii prostej.',
+    depthNone: '—',
+    depthKnown: (k, n_) => `Maksymalna głębokość dotyczy punktów trasy o znanej głębokości (${k} z ${n_}). Głębokość zależy od poziomu wody.`,
+    depthNoData: 'Żaden punkt trasy nie ma podanej głębokości.',
+    sbPlanEmpty: 'Wybierz punkt startowy na mapie',
+    sbPlanSum: (k, m, d) => `${k} pkt · ${m}${d ? ' · maks. ' + d : ''}`,
+    pdfRoute: 'PDF A4', pdfRouteBusy: 'Przygotowywanie…', pdfRouteErr: 'Nie udało się przygotować pliku PDF.',
+    pdfTitle: 'Plan trasy', pdfFile: 'Koparki_trasa',
+    colNo: 'Lp.', colPt: 'Punkt', colDepth: 'Głęb.', colAz: 'Azymut\ndalej', colLeg: 'Odcinek', colSum: 'Od\nstartu',
+    pdfFoot: 'Pozycje atrakcji wyznaczone na podstawie położenia boi mogą być nieznacznie przesunięte. Mapa ma charakter informacyjny i nie zastępuje szkolenia ani zasad obowiązujących na miejscu.',
+    pdfDate: 'Wydruk', mapScale: 'm',
     info: `
       <h2>O mapie</h2>
+      <p>Strona działa w dwóch trybach, przełączanych przyciskami nad mapą:</p>
+      <ul>
+        <li><b>Mapa</b>: atrakcje oraz trasy planu z azymutami magnetycznymi i odległościami. Wybranie punktu na mapie lub na liście pokazuje trasy z tego punktu.</li>
+        <li><b>Planowanie trasy</b> (przycisk „Planuj trasę”): własna trasa złożona z kolejno wybranych punktów, do 25 punktów, także poza trasami planu. Azymuty i odległości odcinków, łączna odległość i maksymalna głębokość są liczone automatycznie. Trasę można zapisać jako PDF A4 lub przekazać linkiem.</li>
+      </ul>
       <p>Podkład stanowi ortofotomapa z drona z 13.09.2026. Punkty, trasy i azymuty są zgodne z planem do druku.</p>
       <ul>
-        <li><b>Azymuty są magnetyczne</b> i odpowiadają wskazaniom kompasu nurkowego. Deklinacja wynosi +6,3°E: azymut rzeczywisty = magnetyczny + 6°.</li>
-        <li>Azymut zależy od kierunku: wartość z A do B różni się od wartości z B do A. Na mapie azymut podano przy punkcie początkowym trasy. Azymut wskazuje kierunek, a nie dokładny cel.</li>
+        <li><b>Azymuty są magnetyczne</b> i odpowiadają wskazaniom kompasu nurkowego.</li>
         <li>Pozycje atrakcji wyznaczone na podstawie położenia boi mogą być nieznacznie przesunięte.</li>
         <li>Głębokości oznaczone gwiazdką zależą od poziomu wody.</li>
-        <li>Wilhelm: punkt ${N('lina')} to miejsce przypięcia poręczówki z Głębokiej koparki (${N('9')}), punkt ${N('dz')} to dziób. Kadłub ma ok. 16,5 × 3,5 m, kurs rufa→dziób 90°.</li>
-        <li>Platformy szkoleniowe (${N('16')}, ${N('17')}) znajdują się na głębokości 5 m, przy trasach ${N('5')}–${N('15')} i ${N('14')}–${N('15')}, i nie mają własnych tras. Kolejna platforma szkoleniowa znajduje się pod Pomostem II (${N('3')}).</li>
-        <li>Deco bar (${N('deco')}): rurki PCV na różnych głębokościach do ćwiczenia pływalności, obok Pomostu II.</li>
         <li>Kompas w prawym górnym rogu wskazuje północ magnetyczną. Po jego wybraniu wyświetlają się kursy na brzeg.</li>
       </ul>`,
     contact: `
@@ -491,17 +587,43 @@ const T = {
     zIn: 'Zoom in', zOut: 'Zoom out', zFit: 'Whole map', handle: 'Expand panel', map: 'Map',
     sbList: 'Pick a site on the map or in the list', sbOpen: 'Expand', sbFold: 'Collapse', sbClose: 'Close', menu: 'Menu',
     edge: 'route',
+    modeGrp: 'Map mode', mView: 'Map', mPlan: 'Plan a dive', tPlan: 'Route', planT: 'Dive route',
+    hintStart: 'Start by choosing a starting point on the map.',
+    hintNext: 'Choose the next point to continue the route.',
+    planIntro: 'Choose a starting point on the map. Each point chosen next is added to the route.',
+    planTips: [
+      'The route can run between any points, not only along the routes of the plan. Bearings and distances are calculated automatically.',
+      'A route can have up to 25 points. Points can be revisited, and the same line can be swum at most three times.',
+      'Arrows on the lines show the direction of travel.'
+    ],
+    sumDist: 'Distance', sumPts: 'Points', sumDepth: 'Max depth',
+    start: 'start', finish: 'finish', twice: k => k === 2 ? '2nd time' : '3rd time',
+    undo: 'Undo', clear: 'Clear', clearSure: 'Clear the route?', link: 'Copy link', linkOk: 'Link copied',
+    errMax: 'A route can have at most 25 points.', errSame: 'This point is already the last point of the route.',
+    errTwice: 'The route already follows this line three times.',
+    planNote: 'Magnetic bearings from the starting point of each leg; straight-line distances.',
+    depthNone: '—',
+    depthKnown: (k, n_) => `The maximum depth covers route points with a known depth (${k} of ${n_}). Depth depends on the water level.`,
+    depthNoData: 'No point on this route has a stated depth.',
+    sbPlanEmpty: 'Choose a starting point on the map',
+    sbPlanSum: (k, m, d) => `${k} pts · ${m}${d ? ' · max ' + d : ''}`,
+    pdfRoute: 'PDF A4', pdfRouteBusy: 'Preparing…', pdfRouteErr: 'Could not prepare the PDF file.',
+    pdfTitle: 'Dive route', pdfFile: 'Koparki_route',
+    colNo: 'No.', colPt: 'Point', colDepth: 'Depth', colAz: 'Next\nbearing', colLeg: 'Leg', colSum: 'From\nstart',
+    pdfFoot: 'Positions of sites determined from buoy locations may be slightly offset. The map is for information only and does not replace training or the rules in force on site.',
+    pdfDate: 'Printed', mapScale: 'm',
     info: `
       <h2>About this map</h2>
+      <p>The site has two modes, switched with the buttons above the map:</p>
+      <ul>
+        <li><b>Map</b>: dive sites and the routes of the plan with magnetic bearings and distances. Selecting a point on the map or in the list shows the routes from that point.</li>
+        <li><b>Dive planning</b> (the “Plan a dive” button): your own route made of points chosen one after another, up to 25 points, also outside the routes of the plan. Leg bearings and distances, the total distance and the maximum depth are calculated automatically. The route can be saved as an A4 PDF or shared as a link.</li>
+      </ul>
       <p>The base layer is a drone orthophoto from 13 Sep 2026. Points, routes and bearings match the print plan.</p>
       <ul>
-        <li><b>Bearings are magnetic</b> and correspond to a dive compass reading. Declination is +6.3°E: true bearing = magnetic + 6°.</li>
-        <li>A bearing depends on direction: the value from A to B differs from the value from B to A. On the map, the bearing is shown at the starting point of the route. A bearing gives direction, not a precise aim.</li>
+        <li><b>Bearings are magnetic</b> and correspond to a dive compass reading.</li>
         <li>Positions of sites determined from buoy locations may be slightly offset.</li>
         <li>Depths marked with an asterisk depend on the water level.</li>
-        <li>Wilhelm: point ${N('lina')} is where the guideline from the Deep excavator (${N('9')}) is tied, point ${N('dz')} is the bow. The hull is about 16.5 × 3.5 m, stern→bow 90°.</li>
-        <li>Training platforms (${N('16')}, ${N('17')}) are at a depth of 5 m, by routes ${N('5')}–${N('15')} and ${N('14')}–${N('15')}, and have no routes of their own. Another training platform is under Jetty II (${N('3')}).</li>
-        <li>Deco bar (${N('deco')}): PVC pipes at different depths for buoyancy practice, next to Jetty II.</li>
         <li>The compass in the top right corner shows magnetic north. Selecting it displays courses to shore.</li>
       </ul>`,
     contact: `
@@ -539,7 +661,7 @@ const ZN = D.zmax;
 const map = L.map('map', {
   crs: L.CRS.Simple, zoomControl: false, attributionControl: false,
   zoomSnap: 0.25, zoomDelta: 0.5, wheelPxPerZoomLevel: 90, maxZoom: ZN + 2, minZoom: -3,
-  bounceAtZoomLimits: false
+  bounceAtZoomLimits: false, trackResize: false   // resizing is handled below (onResize)
 });
 const LL = (x, y) => map.unproject([x, y], ZN);
 const imgB = L.latLngBounds(LL(0, D.wys), LL(D.szer, 0));
@@ -547,27 +669,31 @@ L.tileLayer('kafle/{z}/{x}_{y}.jpg', {
   tileSize: D.kafel, minNativeZoom: 0, maxNativeZoom: ZN, minZoom: -3, maxZoom: ZN + 2,
   bounds: imgB, noWrap: true, keepBuffer: 3, updateWhenIdle: false
 }).addTo(map);
-// generous vertical slack: the lake is a wide strip, and on a phone in portrait the
-// panel covers half the screen, so a tight box would pin the view to the middle
-map.setMaxBounds(L.latLngBounds(LL(-D.szer * 0.25, D.wys * 2.5), LL(D.szer * 1.25, -D.wys * 1.5)));
+// generous slack: the lake is a wide strip, and on a phone in portrait the panel covers
+// half the screen; on a desktop the side panel covers ~420 px on the left, and with the
+// whole lake fitted in a narrow window that is more than a whole image width, so a tight
+// box pinned the left points under the panel
+map.setMaxBounds(L.latLngBounds(LL(-D.szer * 1.5, D.wys * 2.5), LL(D.szer * 2.5, -D.wys * 1.5)));
 
+// everything except the point markers: hidden in the route planning mode
+const viewG = L.layerGroup().addTo(map);
 // Wilhelm hull outline
 D.obrysy.forEach(o => {
-  L.polygon(o.px.map(([x, y]) => LL(x, y)), { color: '#fff', weight: 2.5, opacity: .95, fillColor: '#fff', fillOpacity: .18, dashArray: '6 4', interactive: false }).addTo(map);
+  L.polygon(o.px.map(([x, y]) => LL(x, y)), { color: '#fff', weight: 2.5, opacity: .95, fillColor: '#fff', fillOpacity: .18, dashArray: '6 4', interactive: false }).addTo(viewG);
 });
 
 // routes
 const lines = [];
 D.krawedzie.forEach(k => {
   const a = P[k.a], b = P[k.b], ll = [LL(a.x, a.y), LL(b.x, b.y)];
-  const casing = L.polyline(ll, { color: '#fff', weight: 5, opacity: .8, interactive: false }).addTo(map);
-  const core = L.polyline(ll, { color: '#13222a', weight: 2.2, opacity: .95, interactive: false }).addTo(map);
-  const hit = L.polyline(ll, { color: '#000', weight: 18, opacity: 0, bubblingMouseEvents: false }).addTo(map);
+  const casing = L.polyline(ll, { color: '#fff', weight: 5, opacity: .8, interactive: false }).addTo(viewG);
+  const core = L.polyline(ll, { color: '#13222a', weight: 2.2, opacity: .95, interactive: false }).addTo(viewG);
+  const hit = L.polyline(ll, { color: '#000', weight: 18, opacity: 0, bubblingMouseEvents: false }).addTo(viewG);
   hit.on('click', e => edgePopup(k, e.latlng));
   const lbl = L.marker(LL((a.x + b.x) / 2, (a.y + b.y) / 2), {
     interactive: false, keyboard: false,
     icon: L.divIcon({ className: '', html: `<div class="lbl">${dm(k.m)}</div>`, iconSize: [0, 0] })
-  }).addTo(map);
+  }).addTo(viewG);
   lines.push({ k, casing, core, lbl, txt: dm(k.m) });
 });
 function edgePopup(k, at) {
@@ -586,15 +712,17 @@ D.punkty.forEach(p => {
     title: `${p.nr} ${name(p)}`, riseOnHover: true,
     icon: L.divIcon({ className: '', html: `<div class="pin${small ? ' small' : ''}">${esc(p.nr)}</div>`, iconSize: [s, s], iconAnchor: [s / 2, s / 2] })
   }).addTo(map);
-  m.on('click', () => select(p.id, { move: map.getZoom() < 2 ? 'fit' : 'reveal' }));
+  m.on('click', () => mode === 'plan' ? addStop(p.id) : select(p.id, { move: map.getZoom() < 2 ? 'fit' : 'reveal' }));
   marks[p.id] = m;
 });
-const leaders = L.layerGroup().addTo(map);
+// leaders of bearing and of distance callouts are kept apart, so each set
+// is shown or hidden together with its own labels (checkboxes)
+const leaders = L.layerGroup().addTo(viewG), leadersAz = L.layerGroup(), leadersDist = L.layerGroup();
 const genAz = [];
 D.krawedzie.forEach(k => [[k.a, k.b, k.ab], [k.b, k.a, k.ba]].forEach(([f, t_, a]) => {
   const dx = P[t_].x - P[f].x, dy = P[t_].y - P[f].y;
   const mk = L.marker(LL(P[f].x, P[f].y), { interactive: false, keyboard: false, zIndexOffset: 900,
-    icon: L.divIcon({ className: '', html: `<div class="lbl az">${arrow(dx, dy)}${az(a)}</div>`, iconSize: [0, 0] }) }).addTo(map);
+    icon: L.divIcon({ className: '', html: `<div class="lbl az">${arrow(dx, dy)}${az(a)}</div>`, iconSize: [0, 0] }) }).addTo(viewG);
   genAz.push({ mk, from: f, to: t_, txt: az(a) });
 }));
 let showAz = true, showDist = true;
@@ -605,7 +733,7 @@ const $ = id => document.getElementById(id);
 const MQ = '(max-width: 760px), (max-height: 520px) and (orientation: landscape)';   // same as the CSS
 const mq = window.matchMedia(MQ);
 const mqSide = window.matchMedia('(max-height: 520px) and (orientation: landscape)');
-let view = 'list', sel = null, sheet = 'peek';
+let view = 'list', sel = null, sheet = 'peek', mode = 'view';
 
 // sheet heights: portrait = peek / half / full, landscape card = peek / full
 function snaps() {
@@ -668,7 +796,7 @@ $('handle').onclick = e => { if (noClick || e.detail) return; toggleSheet(); }; 
 $('sbTog').onclick = () => toggleSheet();
 $('sbClose').onclick = () => {
   if (view === 'detail') deselect();
-  else { view = sel ? 'detail' : 'list'; render(); }
+  else { view = mainView(); render(); }
 };
 
 // the panel head (title, language, print plan, tabs) lives in the menu on phones
@@ -693,7 +821,33 @@ function onMode() {
 }
 mq.addEventListener ? mq.addEventListener('change', onMode) : mq.addListener(onMode);
 mqSide.addEventListener ? mqSide.addEventListener('change', onMode) : mqSide.addListener(onMode);
-window.addEventListener('resize', () => setSheet(sheet));
+// Window resize. Leaflet's own handler keeps the centre of the whole window fixed,
+// but on a desktop the left part is covered by the panel, so a narrower window slid
+// the map under it. Here the centre of the free area (right of the panel / above the
+// sheet) stays put; a view nobody has moved since the last fit is fitted again.
+let fitted = true, anchor = null;
+function freeC() {
+  const pad = panelPad(), s = map.getSize();
+  return L.point((pad.tl[0] + s.x - pad.br[0]) / 2, (pad.tl[1] + s.y - pad.br[1]) / 2);
+}
+map.on('moveend', () => { if (map._loaded) anchor = map.containerPointToLatLng(freeC()); });
+map.on('dragstart', () => fitted = false);
+['wheel', 'dblclick', 'touchstart', 'keydown'].forEach(ev => map.getContainer().addEventListener(ev, e => {
+  if (ev !== 'touchstart' || e.touches.length > 1) fitted = false;
+}, { passive: true }));
+let rzT = 0;
+function onResize() {
+  setSheet(sheet);
+  if (!map._loaded) return;
+  const a = anchor;   // invalidateSize fires moveend, which would overwrite it
+  map.invalidateSize({ pan: false });
+  if (fitted && !sel) { refit(); return; }
+  if (a) {
+    const d = map.latLngToContainerPoint(a).subtract(freeC());
+    if (d.x || d.y) map.panBy(d, { animate: false });
+  }
+}
+window.addEventListener('resize', () => { cancelAnimationFrame(rzT); rzT = requestAnimationFrame(onResize); });
 
 function bar() {
   const L_ = t(); let h;
@@ -702,23 +856,29 @@ function bar() {
     const alt = lang === 'en' && p.pl !== p.en ? `<small>${L_.alt}: ${esc(p.pl)}</small>` : '';
     h = `<span class="badge">${esc(p.nr)}</span><div><h2>${esc(name(p))}</h2>${alt}</div>`;
   } else if (view === 'info') h = `<div><h2>${L_.tInfo}</h2></div>`;
-  else if (view === 'contact') h = `<div><h2>${L_.tContact}</h2></div>`;
+  else if (view === 'plan') {
+    const s = planStats();
+    h = `<div><h2>${L_.planT}</h2><small>${route.length ? L_.sbPlanSum(route.length, dm(s.m), s.depth) : L_.sbPlanEmpty}</small></div>`;
+  }
   else h = `<div><h2>${L_.tList}</h2><small>${L_.sbList}</small></div>`;
   $('sbT').innerHTML = h;
-  $('sbClose').hidden = view === 'list';
+  $('sbClose').hidden = view === 'list' || view === 'plan';
   $('sbClose').setAttribute('aria-label', L_.sbClose);
   const hb = $('sbar').offsetHeight;
   if (mq.matches && sheet === 'peek' && hb) setSheet('peek');   // bar height may change with the title
 }
 
 function tabs(v) {
-  [['tList', 'list'], ['tInfo', 'info'], ['tContact', 'contact']].forEach(([id, key]) =>
-    $(id).setAttribute('aria-selected', String(v === key || (v === 'detail' && key === 'list'))));
+  [['tList', 'list'], ['tInfo', 'info']].forEach(([id, key]) =>
+    $(id).setAttribute('aria-selected', String(v === key || ((v === 'detail' || v === 'plan') && key === 'list'))));
 }
+// the first tab is the main view of the current mode
+const mainView = () => mode === 'plan' ? 'plan' : sel ? 'detail' : 'list';
 function render() {
   const b = $('body'), L_ = t();
   tabs(view);
-  if (view === 'list') {
+  if (view === 'plan') renderPlan(b, L_);
+  else if (view === 'list') {
     b.innerHTML = `<div class="view"><p class="list-cap">${L_.listCap}</p><ul class="list">` +
       order.map(p => {
         const sub = p.nr === '7b';
@@ -755,9 +915,8 @@ function render() {
       } catch (e) { selectText($('cc')); }
     };
   } else if (view === 'info') {
-    b.innerHTML = `<div class="view-pad prose">${L_.info}</div>`;
-  } else if (view === 'contact') {
-    b.innerHTML = `<div class="view-pad prose">${L_.contact}
+    // "About" also holds the contact section (the separate Contact tab was removed 19.11)
+    b.innerHTML = `<div class="view-pad prose">${L_.info}<div id="kontakt" class="prose" style="margin-top:10px;padding-top:14px;border-top:1px solid var(--line);scroll-margin-top:8px">${L_.contact}
       <div class="ig-card">
         <a class="ig-link" href="${IG}" target="_blank" rel="noopener">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor"/></svg>
@@ -769,7 +928,7 @@ function render() {
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 3h-2.5A3.5 3.5 0 0 0 9 6.5V10H7v3.5h2V21h3.5v-7.5H15l.5-3.5h-3V7a1 1 0 0 1 1-1H15z"/></svg>
           ${L_.fbBtn}</a>
         <span class="ig-handle">facebook.com/jjbiernacki</span>
-      </div></div>`;
+      </div></div></div>`;
   }
   b.scrollTop = 0;
   bar();
@@ -781,14 +940,15 @@ function chrome() {
   document.documentElement.lang = lang;
   $('sub').textContent = L_.sub;
   $('pdfT').textContent = L_.pdfT; $('pdfS').textContent = L_.pdfS;
-  $('igT').textContent = L_.ig;
-  $('tList').textContent = L_.tList; $('tInfo').textContent = L_.tInfo; $('tContact').textContent = L_.tContact;
+  $('tList').textContent = mode === 'plan' ? L_.tPlan : L_.tList; $('tInfo').textContent = L_.tInfo;
   $('lPL').setAttribute('aria-pressed', String(lang === 'pl')); $('lEN').setAttribute('aria-pressed', String(lang === 'en'));
   $('lyAzT').textContent = L_.lyAz; $('lyDistT').textContent = L_.lyDist; $('lyHint').textContent = L_.lyHint; $('layers').setAttribute('aria-label', L_.layers);
   $('roseCap').textContent = L_.rose; $('shoreH').textContent = L_.shoreH; $('shoreP').textContent = L_.shoreP;
   $('zIn').setAttribute('aria-label', L_.zIn); $('zOut').setAttribute('aria-label', L_.zOut); $('zFit').setAttribute('aria-label', L_.zFit);
   $('handle').setAttribute('aria-label', L_.handle); $('map').setAttribute('aria-label', L_.map);
   $('menuBtn').setAttribute('aria-label', L_.menu);
+  $('mViewT').textContent = L_.mView; $('mPlanT').textContent = L_.mPlan; $('modeGrp').setAttribute('aria-label', L_.modeGrp);
+  planHint();
   $('status').innerHTML = '';
   // to-shore grid: up / left / right / down as on the print plan
   const B = {}; D.brzegi.forEach(x => B[x.ekran] = x);
@@ -802,16 +962,14 @@ function chrome() {
 }
 function setLang(l) {
   lang = l; try { localStorage.setItem('koparki-lang', l); } catch (e) {}
-  chrome(); render(); if (sel) drawSel();
+  chrome(); render(); if (sel && mode === 'view') drawSel();
   requestAnimationFrame(() => setSheet(sheet));
 }
 $('lPL').onclick = () => setLang('pl');
 $('lEN').onclick = () => setLang('en');
 function go(v) { view = v; render(); closeMenu(); openSheet(); }
-$('tList').onclick = () => go(sel ? 'detail' : 'list');
+$('tList').onclick = () => go(mainView());
 $('tInfo').onclick = () => go('info');
-$('tContact').onclick = () => go('contact');
-$('igBtn').onclick = () => go('contact');
 
 // ------------------------------------------------------------ selection
 function panelPad() {
@@ -868,13 +1026,13 @@ function pinR(id) {
 }
 function vis(mk, on) { const el = mk.getElement(); if (el) el.style.display = on ? '' : 'none'; }
 function layoutLabels() {
-  if (!map._loaded) return;   // before the first fitBounds there is no view yet
+  if (!map._loaded || mode === 'plan') return;   // before the first fitBounds there is no view yet
   const v = lod(), H = v.h, GAP = 3, c = map.getContainer();
   ['lv-far', 'lv-mid', 'lv-near'].forEach(k => c.classList.toggle(k, k === v.cls));
   const lp = {}; Object.keys(P).forEach(id => lp[id] = map.latLngToLayerPoint(LL(P[id].x, P[id].y)));
   const boxes = Object.keys(P).map(id => { const c = lp[id], r = pinR(id); return [c.x - r, c.y - r, c.x + r, c.y + r]; });
   const free = b => !boxes.some(q => b[0] < q[2] + GAP && q[0] < b[2] + GAP && b[1] < q[3] + GAP && q[1] < b[3] + GAP);
-  leaders.clearLayers();
+  leadersAz.clearLayers(); leadersDist.clearLayers();
   const show = (mk, x, y, b) => { boxes.push(b); mk.setLatLng(map.layerPointToLatLng([x, y])); vis(mk, true); };
   const geom = (aId, bId, w) => {
     const A = lp[aId], B = lp[bId], dx = B.x - A.x, dy = B.y - A.y, len = Math.hypot(dx, dy) || 1;
@@ -897,7 +1055,7 @@ function layoutLabels() {
   }
   // 2) no room on the line: the label moves to the nearest free spot beside it
   //    and a thin leader joins it to its anchor on the line
-  function callout(mk, aId, bId, w, prefer, color) {
+  function callout(mk, aId, bId, w, prefer, color, grp) {
     const g = geom(aId, bId, w);
     const s0 = prefer === 'start' ? Math.min(pinR(aId) + 10, g.len / 2) : g.len / 2;
     const ax = g.A.x + g.ux * s0, ay = g.A.y + g.uy * s0, base = Math.atan2(g.uy, g.ux);
@@ -907,8 +1065,8 @@ function layoutLabels() {
       if (free(b)) {
         show(mk, x, y, b);
         L.polyline([map.layerPointToLatLng([ax, ay]), map.layerPointToLatLng([x, y])],
-          { color, weight: 1.6, dashArray: '3 3', opacity: .95, interactive: false }).addTo(leaders);
-        L.circleMarker(map.layerPointToLatLng([ax, ay]), { radius: 2.5, color, weight: 0, fillColor: color, fillOpacity: 1, interactive: false }).addTo(leaders);
+          { color, weight: 1.6, dashArray: '3 3', opacity: .95, interactive: false }).addTo(grp);
+        L.circleMarker(map.layerPointToLatLng([ax, ay]), { radius: 2.5, color, weight: 0, fillColor: color, fillOpacity: 1, interactive: false }).addTo(grp);
         return true;
       }
     }
@@ -926,15 +1084,17 @@ function layoutLabels() {
   // labels of the selected point that found no room get a callout with a leader
   if (sel) {
     genAz.filter(m => m.from === sel && !ok.get(m))
-      .forEach(m => ok.set(m, callout(m.mk, m.from, m.to, lblW(m.txt, true, v), 'start', '#b01a20')));
+      .forEach(m => ok.set(m, callout(m.mk, m.from, m.to, lblW(m.txt, true, v), 'start', '#b01a20', leadersAz)));
     lines.filter(l => l.on && !ok.get(l))
-      .forEach(l => ok.set(l, callout(l.lbl, l.k.a, l.k.b, lblW(l.txt, false, v), 'mid', '#b01a20')));
+      .forEach(l => ok.set(l, callout(l.lbl, l.k.a, l.k.b, lblW(l.txt, false, v), 'mid', '#b01a20', leadersDist)));
   }
   genAz.forEach(m => vis(m.mk, !!ok.get(m) && showAz));
   lines.forEach(l => vis(l.lbl, !!ok.get(l) && showDist));
+  [[leadersAz, showAz], [leadersDist, showDist]].forEach(([g, on]) => { if (on) leaders.addLayer(g); else leaders.removeLayer(g); });
   $('lyHint').hidden = !(showAz && genAz.some(m => !ok.get(m)));
 }
 function select(id, opt) {
+  if (mode === 'plan') setMode('view');
   sel = id; view = 'detail';
   render(); drawSel();
   try { history.replaceState(null, '', '#p' + P[id].nr); } catch (e) {}
@@ -971,7 +1131,7 @@ function zoomCls() {
   $('scaleBar').style.width = (best / mpp).toFixed(0) + 'px';
   $('scaleTxt').textContent = best + ' m';
 }
-map.on('zoomend', () => { zoomCls(); layoutLabels(); });
+map.on('zoomend', () => { zoomCls(); layoutLabels(); drawPlan(); });
 map.on('click', () => { closeMenu(); if (mq.matches && sheet !== 'peek') setSheet('peek'); });
 function syncLayers() {
   $('lyAz').setAttribute('aria-pressed', String(showAz)); $('lyDist').setAttribute('aria-pressed', String(showDist));
@@ -984,11 +1144,12 @@ $('lyAz').setAttribute('aria-pressed', String(showAz)); $('lyDist').setAttribute
 if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => layoutLabels());
 $('needle').setAttribute('transform', `rotate(${D.polnoc_mag})`);
 $('roseBtn').onclick = () => { const h = $('shore'); h.hidden = !h.hidden; $('roseBtn').setAttribute('aria-expanded', String(!h.hidden)); };
-$('zIn').onclick = () => map.zoomIn(0.75);
-$('zOut').onclick = () => map.zoomOut(0.75);
+$('zIn').onclick = () => { fitted = false; map.zoomIn(0.75); };
+$('zOut').onclick = () => { fitted = false; map.zoomOut(0.75); };
 function fitAll(animate) {
   const ptsB = L.latLngBounds(D.punkty.map(p => LL(p.x, p.y))).pad(0.06), pad = panelPad();
   map.fitBounds(ptsB, { paddingTopLeft: pad.tl, paddingBottomRight: pad.br, animate: !!animate });
+  fitted = true;
 }
 $('zFit').onclick = () => fitAll(true);
 function refit() {
@@ -1011,6 +1172,432 @@ async function savePdf() {
 }
 $('pdfBtn').onclick = savePdf;
 
+// ------------------------------------------------------------ route planning
+// A separate mode: only the point markers stay on the map. Each point chosen is
+// appended to the route; bearings and distances of every leg are computed here
+// from the pixel positions (not taken from the plan's routes), so a leg may join
+// any two points. Magnetic bearing = screen direction of the leg measured clockwise
+// from the screen's magnetic north (D.polnoc_mag); distance = pixels × D.gsd.
+// Checked against the 25 routes of the plan: bearings within 0.17°, distances within 0.2 m.
+const MAXPTS = 25, MAXPASS = 3;
+let route = [];
+const planG = L.layerGroup();
+let legLines = [];
+const legAz = (a, b) => (((Math.atan2(b.x - a.x, -(b.y - a.y)) * 180 / Math.PI - D.polnoc_mag) % 360) + 360) % 360;
+const legM = (a, b) => Math.hypot(b.x - a.x, b.y - a.y) * D.gsd;
+// depth: the number with an asterisk in the Polish description ("15 m*"); null = unknown
+const depthOf = p => { const m = /(\d+(?:[.,]\d+)?)\s*m\*/.exec(p.opis_pl || ''); return m ? parseFloat(m[1].replace(',', '.')) : null; };
+const pairKey = (a, b) => a < b ? a + '|' + b : b + '|' + a;
+
+function planLegs() {
+  const cnt = {}, legs = [];
+  for (let i = 1; i < route.length; i++) {
+    const a = route[i - 1], b = route[i], k = pairKey(a, b);
+    legs.push({ i: i - 1, a, b, k, occ: cnt[k] || 0, az: legAz(P[a], P[b]), m: legM(P[a], P[b]) });
+    cnt[k] = (cnt[k] || 0) + 1;
+  }
+  legs.forEach(g => g.cnt = cnt[g.k]);
+  return legs;
+}
+function planStats() {
+  const legs = planLegs(), uniq = [...new Set(route)], ds = uniq.map(id => depthOf(P[id])).filter(v => v !== null);
+  const mx = ds.length ? Math.max(...ds) : null;
+  return { legs, m: legs.reduce((s, g) => s + g.m, 0), known: ds.length, total: uniq.length, max: mx, depth: mx === null ? '' : n(mx) + ' m*' };
+}
+function canAdd(id) {
+  if (route.length >= MAXPTS) return 'errMax';
+  if (!route.length) return null;
+  const last = route[route.length - 1];
+  if (last === id) return 'errSame';
+  const k = pairKey(last, id);
+  if (planLegs().filter(g => g.k === k).length >= MAXPASS) return 'errTwice';
+  return null;
+}
+function savePlan() {
+  try { localStorage.setItem('koparki-trasa', JSON.stringify(route)); } catch (e) {}
+  if (mode === 'plan') setHash();
+}
+function setHash() {
+  const h = mode === 'plan' ? '#trasa' + (route.length ? '=' + route.map(id => P[id].nr).join('.') : '') : '';
+  try { history.replaceState(null, '', h || location.pathname + location.search); } catch (e) {}
+}
+// route from the address (#trasa=1.9.7) or from the browser; invalid steps are dropped
+function parseRoute(list) {
+  route = [];
+  list.forEach(id => { if (P[id] && !canAdd(id)) route.push(id); });
+}
+// the hint at the top of the map goes away at the first click anywhere on the map
+let hintOff = false;
+document.getElementById('map').addEventListener('pointerdown', () => { if (mode === 'plan' && !hintOff) { hintOff = true; planHint(); } });
+let toastT = 0;
+function toast(msg) {
+  const el = $('ptoast'); el.textContent = msg; el.hidden = false;
+  clearTimeout(toastT); toastT = setTimeout(() => el.hidden = true, 2600);
+}
+function planHint() {
+  const h = $('planHint'), L_ = t();
+  h.hidden = mode !== 'plan' || route.length > 1 || hintOff;
+  $('mapClear').hidden = mode !== 'plan' || !route.length;
+  if (!clearAt) $('mapClearT').textContent = L_.clear;
+  h.textContent = route.length ? L_.hintNext : L_.hintStart;
+  $('app').classList.toggle('empty', mode === 'plan' && !route.length);
+}
+function planChanged() {
+  savePlan(); drawPlan(); planHint();
+  if (view === 'plan') render(); else bar();
+}
+function addStop(id) {
+  const err = canAdd(id);
+  if (err) { toast(t()[err]); return; }
+  $('ptoast').hidden = true;
+  route.push(id); planChanged();
+}
+function undoStop() { route.pop(); planChanged(); }
+// "Clear" (in the panel and at the bottom of the map) asks once: a second click
+// on either button within 3 s clears the route
+let clearAt = 0, clearT = 0;
+function clearLabels(on) {
+  const L_ = t();
+  if ($('pClear')) { $('pClear').textContent = on ? L_.clearSure : L_.clear; $('pClear').classList.toggle('warn', on); }
+  $('mapClearT').textContent = on ? L_.clearSure : L_.clear; $('mapClear').classList.toggle('warn', on);
+}
+function askClear() {
+  clearTimeout(clearT);
+  if (clearAt && Date.now() - clearAt < 3000) { clearAt = 0; clearLabels(false); route = []; planChanged(); return; }
+  clearAt = Date.now(); clearLabels(true);
+  clearT = setTimeout(() => { clearAt = 0; clearLabels(false); }, 3000);
+}
+$('mapClear').onclick = askClear;
+
+// legs: casing + core + arrowheads, in screen pixels (redrawn on zoom). A line
+// swum more than once is drawn as parallel lines (up to 3), each with its own arrows.
+function drawPlan() {
+  Object.entries(marks).forEach(([id, mk]) => {
+    const el = mk.getElement(); if (!el) return;
+    el.classList.toggle('inr', mode === 'plan' && route.includes(id));
+    el.classList.toggle('cur', mode === 'plan' && route.length > 0 && route[route.length - 1] === id);
+  });
+  planG.clearLayers(); legLines = [];
+  if (mode !== 'plan' || route.length < 2 || !map._loaded) return;
+  const SP = 9, toLL = (x, y) => map.layerPointToLatLng([x, y]);
+  planLegs().forEach(g => {
+    const A = map.latLngToLayerPoint(LL(P[g.a].x, P[g.a].y)), B = map.latLngToLayerPoint(LL(P[g.b].x, P[g.b].y));
+    // offset side is fixed by the pair (not by direction), so the two passes never share a side
+    const [c1, c2] = g.a < g.b ? [A, B] : [B, A];
+    let nx = -(c2.y - c1.y), ny = c2.x - c1.x; const nl = Math.hypot(nx, ny) || 1; nx /= nl; ny /= nl;
+    const o = (g.occ - (g.cnt - 1) / 2) * SP;   // 1 pass: 0; 2: ±4.5 px; 3: −9, 0, +9 px
+    const ax = A.x + nx * o, ay = A.y + ny * o, bx = B.x + nx * o, by = B.y + ny * o;
+    const ll = [toLL(ax, ay), toLL(bx, by)];
+    const casing = L.polyline(ll, { color: '#13222a', weight: 6.5, opacity: .8, interactive: false }).addTo(planG);
+    const core = L.polyline(ll, { color: '#ffcf33', weight: 3.2, opacity: 1, interactive: false }).addTo(planG);
+    const arrows = [];
+    const len = Math.hypot(bx - ax, by - ay) || 1, ux = (bx - ax) / len, uy = (by - ay) / len;
+    const s0 = pinR(g.a) + 6, s1 = len - pinR(g.b) - 8, room = s1 - s0;
+    if (room > 14) {
+      const k = Math.max(1, Math.floor(room / 120));
+      for (let j = 0; j < k; j++) {
+        // parallel passes: arrows staggered along the line so they do not merge
+        const s = s0 + room * (j + 0.5 + (g.occ - (g.cnt - 1) / 2) * 0.3) / k, tx = ax + ux * (s + 6), ty = ay + uy * (s + 6), bx_ = ax + ux * (s - 5), by_ = ay + uy * (s - 5);
+        arrows.push(L.polygon([toLL(tx, ty), toLL(bx_ - uy * 5.5, by_ + ux * 5.5), toLL(bx_ + uy * 5.5, by_ - ux * 5.5)],
+          { color: '#13222a', weight: 1.4, fillColor: '#ffcf33', fillOpacity: 1, interactive: false }).addTo(planG));
+      }
+    }
+    legLines[g.i] = { core, arrows };
+  });
+}
+function hlLeg(i, on) {
+  const l = legLines[i]; if (!l) return;
+  l.core.setStyle({ color: on ? '#ffffff' : '#ffcf33', weight: on ? 4.2 : 3.2 });
+  l.arrows.forEach(a => a.setStyle({ fillColor: on ? '#ffffff' : '#ffcf33' }));
+}
+
+function renderPlan(b, L_) {
+  if (!route.length) {
+    b.innerHTML = `<div class="view-pad"><p class="plan-intro">${L_.planIntro}</p><ul class="plan-tips">${L_.planTips.map(x => `<li>${x}</li>`).join('')}</ul></div>`;
+    return;
+  }
+  const s = planStats(), legs = s.legs, last = route.length - 1;
+  let rows = '';
+  route.forEach((id, i) => {
+    const p = P[id], d = depthOf(p);
+    if (i > 0) {
+      const g = legs[i - 1], dx = p.x - P[g.a].x, dy = p.y - P[g.a].y;
+      rows += `<li class="leg"><button data-leg="${g.i}" aria-label="${esc(P[g.a].nr)} → ${esc(p.nr)}: ${az(g.az)}, ${dm(g.m)}"><span></span>${arrow(dx, dy, 'ar')}` +
+        `<span class="az">${az(g.az)}</span><span class="m">${dm(g.m)}</span>${g.occ ? `<span class="x2">${L_.twice(g.occ + 1)}</span>` : ''}</button></li>`;
+    }
+    const tag = i === 0 ? L_.start : (i === last ? L_.finish : '');
+    rows += `<li class="pt"><button data-id="${esc(id)}"><span class="badge${p.maly || p.nr === '7b' ? ' small' : ''}">${esc(p.nr)}</span>` +
+      `<span><span class="t">${esc(name(p))}</span>${tag ? `<span class="s">${tag}</span>` : ''}</span><span class="dp">${d === null ? '' : n(d) + ' m*'}</span></button></li>`;
+  });
+  b.innerHTML = `<div class="view-pad">
+    <dl class="plan-sum">
+      <div><dt>${L_.sumDist}</dt><dd>${dm(s.m)}</dd></div>
+      <div><dt>${L_.sumPts}</dt><dd>${route.length}/${MAXPTS}</dd></div>
+      <div><dt>${L_.sumDepth}</dt><dd>${s.depth || L_.depthNone}</dd></div>
+    </dl>
+    <ol class="stops">${rows}</ol>
+    <div class="plan-act">
+      <button class="pbtn" id="pUndo">${L_.undo}</button>
+      <button class="pbtn" id="pClear">${L_.clear}</button>
+      <button class="pbtn" id="pLink">${L_.link}</button>
+      <button class="pbtn" id="pPdf"${route.length < 2 ? ' disabled' : ''}>${L_.pdfRoute}</button>
+    </div>
+    <p class="note">${L_.planNote}</p>
+    <p class="note">${s.known ? L_.depthKnown(s.known, s.total) : L_.depthNoData}</p>
+  </div>`;
+  b.querySelectorAll('.stops .pt button').forEach(x => x.onclick = () => {
+    const p = P[x.dataset.id]; map.panTo(LL(p.x, p.y));
+  });
+  b.querySelectorAll('.stops .leg button').forEach(x => {
+    const i = +x.dataset.leg;
+    x.onmouseenter = x.onfocus = () => hlLeg(i, true);
+    x.onmouseleave = x.onblur = () => hlLeg(i, false);
+    x.onclick = () => {
+      const g = legs[i], pad = panelPad();
+      map.flyToBounds(L.latLngBounds([LL(P[g.a].x, P[g.a].y), LL(P[g.b].x, P[g.b].y)]),
+        { paddingTopLeft: pad.tl, paddingBottomRight: pad.br, maxZoom: ZN - 1, duration: .5 });
+    };
+  });
+  $('pUndo').onclick = undoStop;
+  $('pClear').onclick = askClear;
+  $('pPdf').onclick = routePdf;
+  $('pLink').onclick = () => {
+    const url = location.origin + location.pathname + '#trasa=' + route.map(id => P[id].nr).join('.');
+    const ok = () => { const c = $('pLink'); if (c) c.textContent = t().linkOk; };
+    try { navigator.clipboard.writeText(url).then(ok, () => toast(url)); } catch (e) { toast(url); }
+  };
+}
+
+// ---------- route PDF: A4 landscape, drawn on a 300 dpi canvas (map crop from the
+// tiles, route, table), then wrapped in a PDF by jsPDF. Text is drawn on the canvas
+// with the page fonts, so Polish letters need no font embedding in the PDF.
+let jspdfP = null;
+function loadJsPdf() {
+  if (window.jspdf) return Promise.resolve();
+  return jspdfP = jspdfP || new Promise((ok, no) => {
+    const s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js';
+    s.onload = ok; s.onerror = () => { jspdfP = null; no(new Error('jspdf')); };
+    document.head.appendChild(s);
+  });
+}
+const loadImg = src => new Promise(ok => { const i = new Image(); i.onload = () => ok(i); i.onerror = () => ok(null); i.src = src; });
+async function routePdf() {
+  const btn = $('pPdf'), L_ = t();
+  if (!btn || btn.disabled || route.length < 2) return;
+  btn.disabled = true; btn.textContent = L_.pdfRouteBusy;
+  try {
+    await Promise.all([loadJsPdf(), document.fonts ? Promise.all([
+      document.fonts.load('700 40px "Saira Condensed"'), document.fonts.load('600 40px "Source Sans 3"'),
+      document.fonts.load('400 40px "Source Sans 3"'), document.fonts.load('600 40px "IBM Plex Mono"')]) : 0]);
+    const cnv = await drawRoutePage(L_);
+    const doc = new window.jspdf.jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4', compress: true });
+    doc.setProperties({ title: `Koparki · ${L_.pdfTitle}` });
+    doc.addImage(cnv.toDataURL('image/jpeg', 0.9), 'JPEG', 0, 0, 297, 210);
+    doc.save(`${L_.pdfFile}_${route.map(id => P[id].nr).join('-')}.pdf`);
+  } catch (e) { toast(L_.pdfRouteErr); }
+  const b = $('pPdf'); if (b) { b.disabled = route.length < 2; b.textContent = t().pdfRoute; }
+}
+async function drawRoutePage(L_) {
+  const MM = 300 / 25.4, W = Math.round(297 * MM), H = Math.round(210 * MM), mm = v => v * MM;
+  const c = document.createElement('canvas'); c.width = W; c.height = H;
+  const g = c.getContext('2d');
+  const FD = '"Saira Condensed", "Arial Narrow", sans-serif', FB = '"Source Sans 3", system-ui, sans-serif', FM = '"IBM Plex Mono", Menlo, monospace';
+  const INK = '#13222a', MUT = '#56686d', RED = '#b01a20', YEL = '#ffcf33', LINE = '#d2dcdb';
+  const font = (w, sz, f) => g.font = `${w} ${mm(sz)}px ${f}`;
+  const fit = (txt, w) => { if (g.measureText(txt).width <= w) return txt; while (txt.length > 1 && g.measureText(txt + '…').width > w) txt = txt.slice(0, -1); return txt + '…'; };
+  g.fillStyle = '#fff'; g.fillRect(0, 0, W, H);
+  const s = planStats(), M = 10;
+
+  // header
+  g.fillStyle = INK; g.textBaseline = 'alphabetic';
+  font(700, 9, FD); g.fillText('KOPARKI', mm(M), mm(M + 7.5));
+  const kw = g.measureText('KOPARKI ').width;
+  g.fillStyle = RED; g.fillText(L_.pdfTitle.toUpperCase(), mm(M) + kw, mm(M + 7.5));
+  font(600, 3.6, FM); g.fillStyle = INK;
+  const sum = `${L_.sumDist} ${dm(s.m)}   ·   ${L_.sumPts} ${route.length}   ·   ${L_.sumDepth} ${s.depth || L_.depthNone}`;
+  g.fillText(sum, mm(M), mm(M + 14));
+  font(400, 3, FB); g.fillStyle = MUT; g.textAlign = 'right';
+  const now = new Date(), dd = String(now.getDate()).padStart(2, '0') + '.' + String(now.getMonth() + 1).padStart(2, '0') + '.' + now.getFullYear();
+  g.fillText(`${L_.pdfDate} ${dd}`, mm(297 - M), mm(M + 7.5));
+  font(600, 2.4, FM); g.fillStyle = INK;
+  g.fillText(fit((location.host + location.pathname).replace(/index\.html$/, '') + '#trasa=' + route.map(id => P[id].nr).join('.'), mm(120)), mm(297 - M), mm(M + 14));
+  g.textAlign = 'left';
+  g.strokeStyle = LINE; g.lineWidth = mm(.3); g.beginPath(); g.moveTo(mm(M), mm(M + 17)); g.lineTo(mm(297 - M), mm(M + 17)); g.stroke();
+
+  // map box. Layout: a wide route (the lake is a long strip) gets the full page
+  // width with the table below in two columns, if the rows still fit; otherwise
+  // the map is on the left and the table on the right. The box takes the route's
+  // proportions (never wider than ~2:1 on its short side), so no empty background.
+  const xs = route.map(id => P[id].x), ys = route.map(id => P[id].y);
+  let x0 = Math.min(...xs), x1 = Math.max(...xs), y0 = Math.min(...ys), y1 = Math.max(...ys);
+  const padI = Math.max(70, 0.1 * Math.max(x1 - x0, y1 - y0));
+  x0 -= padI; x1 += padI; y0 -= padI; y1 += padI;
+  // a very long, thin route would give a strip of a map: show more surroundings instead
+  if ((x1 - x0) / (y1 - y0) > 2.2) { const h = (x1 - x0) / 2.2, cy = (y0 + y1) / 2; y0 = cy - h / 2; y1 = cy + h / 2; }
+  if ((y1 - y0) / (x1 - x0) > 1.6) { const w = (y1 - y0) / 1.6, cx = (x0 + x1) / 2; x0 = cx - w / 2; x1 = cx + w / 2; }
+  const A = (x1 - x0) / (y1 - y0), top = M + 21, bottom = 210 - M - 14, nR = route.length, ROW = 5.6;
+  // candidate layouts, the one with the largest map wins
+  const lays = [];
+  { const W0 = 178, H0 = bottom - top; lays.push(A > W0 / H0 ? { k: 0, w: W0, h: W0 / A } : { k: 0, w: H0 * A, h: H0 }); }
+  [2, 3].forEach(k => {
+    const tH = 7 + Math.ceil(nR / k) * ROW, h = Math.min(277 / A, bottom - top - 5 - tH);
+    if (h > 40) lays.push({ k, w: Math.min(277, h * A), h });
+  });
+  const lay = lays.reduce((u, v) => v.w * v.h > u.w * u.h * 1.05 ? v : u);
+  const wide = lay.k > 0;
+  let bw = mm(lay.w), bh = mm(lay.h), by = mm(top), bx = wide ? mm(M + (277 - lay.w) / 2) : mm(M);
+  // grow the crop to the box's proportions
+  if ((x1 - x0) / (y1 - y0) > bw / bh) { const h = (x1 - x0) * bh / bw, cy = (y0 + y1) / 2; y0 = cy - h / 2; y1 = cy + h / 2; }
+  else { const w = (y1 - y0) * bw / bh, cx = (x0 + x1) / 2; x0 = cx - w / 2; x1 = cx + w / 2; }
+  const sc = bw / (x1 - x0);                       // print px per image px
+  const z = Math.max(0, Math.min(ZN, ZN + Math.ceil(Math.log2(sc) - 0.01))), f = Math.pow(2, z - ZN), T = D.kafel;
+  g.save(); g.beginPath(); g.rect(bx, by, bw, bh); g.clip();
+  g.fillStyle = D.tlo || '#15282e'; g.fillRect(bx, by, bw, bh);
+  const nx = Math.ceil(D.szer * f / T), ny = Math.ceil(D.wys * f / T), jobs = [];
+  for (let ty = Math.max(0, Math.floor(y0 * f / T)); ty <= Math.min(ny - 1, Math.floor(y1 * f / T)); ty++)
+    for (let tx = Math.max(0, Math.floor(x0 * f / T)); tx <= Math.min(nx - 1, Math.floor(x1 * f / T)); tx++)
+      jobs.push(loadImg(`kafle/${z}/${tx}_${ty}.jpg`).then(im => im && g.drawImage(im, bx + (tx * T / f - x0) * sc, by + (ty * T / f - y0) * sc, T / f * sc + 1, T / f * sc + 1)));
+  await Promise.all(jobs);
+  const px = id => [bx + (P[id].x - x0) * sc, by + (P[id].y - y0) * sc];
+  const rOf = id => mm(P[id].maly || P[id].nr === '7b' ? 2.4 : 3.2);
+
+  // legs: casing, core, arrows; a line swum more than once is drawn as parallel lines
+  const SP = mm(1.5);
+  s.legs.forEach(lg => {
+    const [ax0, ay0] = px(lg.a), [bx0, by0] = px(lg.b);
+    const [c1, c2] = lg.a < lg.b ? [[ax0, ay0], [bx0, by0]] : [[bx0, by0], [ax0, ay0]];
+    let nx_ = -(c2[1] - c1[1]), ny_ = c2[0] - c1[0]; const nl = Math.hypot(nx_, ny_) || 1; nx_ /= nl; ny_ /= nl;
+    const o = (lg.occ - (lg.cnt - 1) / 2) * SP;
+    const ax = ax0 + nx_ * o, ay = ay0 + ny_ * o, bx_ = bx0 + nx_ * o, by_ = by0 + ny_ * o;
+    g.lineCap = 'round';
+    g.strokeStyle = INK; g.globalAlpha = .85; g.lineWidth = mm(1.15); g.beginPath(); g.moveTo(ax, ay); g.lineTo(bx_, by_); g.stroke();
+    g.globalAlpha = 1; g.strokeStyle = YEL; g.lineWidth = mm(.55); g.beginPath(); g.moveTo(ax, ay); g.lineTo(bx_, by_); g.stroke();
+    const len = Math.hypot(bx_ - ax, by_ - ay) || 1, ux = (bx_ - ax) / len, uy = (by_ - ay) / len;
+    const s0 = rOf(lg.a) + mm(1.2), s1 = len - rOf(lg.b) - mm(1.6), room = s1 - s0;
+    if (room > mm(3)) {
+      const k = Math.max(1, Math.floor(room / mm(28)));
+      for (let j = 0; j < k; j++) {
+        const sp = s0 + room * (j + .5 + (lg.occ - (lg.cnt - 1) / 2) * .3) / k, L1 = mm(1.4), L2 = mm(1.1), Wd = mm(1.25);
+        const tx = ax + ux * (sp + L1), ty = ay + uy * (sp + L1), qx = ax + ux * (sp - L2), qy = ay + uy * (sp - L2);
+        g.beginPath(); g.moveTo(tx, ty); g.lineTo(qx - uy * Wd, qy + ux * Wd); g.lineTo(qx + uy * Wd, qy - ux * Wd); g.closePath();
+        g.fillStyle = YEL; g.fill(); g.strokeStyle = INK; g.lineWidth = mm(.25); g.stroke();
+      }
+    }
+  });
+  // points: those on the route in full colour with a yellow ring, the others faded
+  const inR = new Set(route);
+  D.punkty.forEach(p => {
+    const [x, y] = px(p.id), r = rOf(p.id);
+    if (x < bx - r || x > bx + bw + r || y < by - r || y > by + bh + r) return;
+    g.globalAlpha = inR.has(p.id) ? 1 : .6;
+    if (inR.has(p.id)) { g.beginPath(); g.arc(x, y, r + mm(.7), 0, 2 * Math.PI); g.fillStyle = YEL; g.fill(); }
+    g.beginPath(); g.arc(x, y, r, 0, 2 * Math.PI); g.fillStyle = RED; g.fill();
+    g.lineWidth = mm(.45); g.strokeStyle = '#fff'; g.stroke();
+    g.fillStyle = '#fff'; g.textAlign = 'center'; g.textBaseline = 'middle';
+    font(700, r / MM * (p.nr.length > 1 ? .9 : 1.05), FD); g.fillText(p.nr, x, y + mm(.15));
+    g.globalAlpha = 1;
+  });
+  g.textAlign = 'left'; g.textBaseline = 'alphabetic';
+  // magnetic north
+  const cx = bx + bw - mm(9), cy = by + mm(9);
+  g.beginPath(); g.arc(cx, cy, mm(6.5), 0, 2 * Math.PI); g.fillStyle = 'rgba(255,255,255,.92)'; g.fill();
+  g.save(); g.translate(cx, cy); g.rotate(D.polnoc_mag * Math.PI / 180);
+  g.beginPath(); g.moveTo(0, -mm(5)); g.lineTo(mm(1.2), 0); g.lineTo(-mm(1.2), 0); g.closePath(); g.fillStyle = RED; g.fill();
+  g.beginPath(); g.moveTo(0, mm(5)); g.lineTo(mm(1.2), 0); g.lineTo(-mm(1.2), 0); g.closePath(); g.fillStyle = INK; g.globalAlpha = .55; g.fill(); g.globalAlpha = 1;
+  g.restore();
+  font(600, 2.3, FM); g.fillStyle = INK; g.textAlign = 'center'; g.fillText(L_.rose, cx, cy + mm(9.6)); g.textAlign = 'left';
+  // scale bar
+  const mpp = D.gsd / sc, want = mpp * mm(30), nice = [5, 10, 20, 25, 50, 100, 200].filter(v => v <= want).pop() || 5, sw = nice / mpp;
+  const sx = bx + mm(5), sy = by + bh - mm(6);
+  g.fillStyle = 'rgba(255,255,255,.92)'; g.fillRect(sx - mm(2), sy - mm(6), sw + mm(4), mm(8.5));
+  g.fillStyle = INK; g.fillRect(sx, sy, sw, mm(.6)); g.fillRect(sx, sy - mm(1.5), mm(.5), mm(2.1)); g.fillRect(sx + sw - mm(.5), sy - mm(1.5), mm(.5), mm(2.1));
+  font(600, 2.6, FM); g.fillText(`${nice} m`, sx, sy - mm(2.2));
+  g.restore();
+  g.strokeStyle = LINE; g.lineWidth = mm(.3); g.strokeRect(bx, by, bw, bh);
+
+  // table: one or two blocks of rows; "next bearing" and "leg" lead to the following point
+  let blocks;
+  if (wide) {
+    const per = Math.ceil(nR / lay.k), cw = (277 - 8 * (lay.k - 1)) / lay.k;
+    blocks = [...Array(lay.k)].map((_, j) => [j * per, Math.min(nR, (j + 1) * per), mm(M + j * (cw + 8)), by + bh + mm(5), mm(cw)]);
+  } else blocks = [[0, nR, mm(M + 178 + 6), by, mm(297 - M) - mm(M + 178 + 6)]];
+  const rows = Math.max(...blocks.map(b => b[1] - b[0]));
+  const rowH = Math.min(mm(7), (mm(bottom) - blocks[0][3] - mm(7)) / rows);
+  const fs = Math.min(3.2, rowH / MM * .5);
+  const cumAt = [0]; s.legs.forEach((lg, i) => cumAt.push(cumAt[i] + lg.m));
+  blocks.forEach(([i0, i1, tx0, ty0, tw]) => {
+    if (i0 >= i1) return;
+    const tEnd = tx0 + tw, R = [tx0 + mm(6), tEnd - mm(31), tEnd - mm(20), tEnd - mm(10), tEnd];   // name, depth|, az|, leg|, sum|
+    let y = ty0 + mm(3);
+    font(600, 2.1, FM); g.fillStyle = MUT;
+    g.fillText(L_.colNo.toUpperCase(), tx0, y + mm(2.4)); g.fillText(L_.colPt.toUpperCase(), R[0], y + mm(2.4));
+    g.textAlign = 'right';
+    [[L_.colDepth, 1], [L_.colAz, 2], [L_.colLeg, 3], [L_.colSum, 4]].forEach(([h, k]) => {
+      const ls = h.toUpperCase().split('\n'), x = R[k] - (k < 4 ? mm(1.5) : 0);
+      ls.forEach((l, q) => g.fillText(l, x, y + mm(2.4) - (ls.length - 1 - q) * mm(2.5)));
+    });
+    g.textAlign = 'left';
+    y += mm(4);
+    g.strokeStyle = INK; g.lineWidth = mm(.3); g.beginPath(); g.moveTo(tx0, y); g.lineTo(tEnd, y); g.stroke();
+    for (let i = i0; i < i1; i++) {
+      const id = route[i], p = P[id], mid = y + rowH / 2, lg = s.legs[i], d = depthOf(p);
+      g.textBaseline = 'middle';
+      font(600, fs * .9, FM); g.fillStyle = MUT; g.fillText(String(i + 1), tx0, mid);
+      const r = Math.min(mm(2.6), rowH * .38);
+      g.beginPath(); g.arc(R[0] + r, mid, r, 0, 2 * Math.PI); g.fillStyle = RED; g.fill();
+      g.fillStyle = '#fff'; g.textAlign = 'center'; font(700, r / MM * (p.nr.length > 1 ? .95 : 1.15), FD); g.fillText(p.nr, R[0] + r, mid + mm(.1));
+      g.textAlign = 'left'; g.fillStyle = INK; font(600, fs, FB);
+      g.fillText(fit(name(p), R[1] - mm(14) - R[0] - 2 * r - mm(1.5)), R[0] + 2 * r + mm(1.5), mid);
+      g.textAlign = 'right'; font(600, fs * .9, FM);
+      g.fillStyle = MUT; if (d !== null) g.fillText(n(d) + ' m*', R[1] - mm(1.5), mid);
+      if (lg) { g.fillStyle = RED; g.fillText(az(lg.az), R[2] - mm(1.5), mid); g.fillStyle = INK; g.fillText(dm(lg.m), R[3] - mm(1.5), mid); }
+      g.fillStyle = INK; g.fillText(dm(cumAt[i]), R[4], mid);
+      g.textAlign = 'left'; g.textBaseline = 'alphabetic';
+      y += rowH;
+      g.strokeStyle = LINE; g.lineWidth = mm(.2); g.beginPath(); g.moveTo(tx0, y); g.lineTo(tEnd, y); g.stroke();
+    }
+  });
+
+  // footer
+  font(400, 2.6, FB); g.fillStyle = MUT;
+  const fy = H - mm(M) - mm(4);
+  g.fillText(`${L_.planNote} ${s.known ? L_.depthKnown(s.known, s.total) : L_.depthNoData}`, mm(M), fy);
+  g.fillText(L_.pdfFoot, mm(M), fy + mm(4));
+  return c;
+}
+
+function setMode(m) {
+  if (m === mode) return;
+  mode = m;
+  $('app').classList.toggle('plan', m === 'plan');
+  $('mView').setAttribute('aria-pressed', String(m === 'view'));
+  $('mPlan').setAttribute('aria-pressed', String(m === 'plan'));
+  map.closePopup(); $('ptoast').hidden = true;
+  if (m === 'plan') {
+    hintOff = false;
+    viewG.remove(); planG.addTo(map);
+    Object.values(marks).forEach(mk => { const el = mk.getElement(); if (el) el.classList.remove('on'); });
+  } else {
+    planG.remove(); viewG.addTo(map);
+  }
+  view = mainView();
+  chrome(); render(); drawPlan();
+  if (m === 'view') { drawSel(); try { history.replaceState(null, '', sel ? '#p' + P[sel].nr : location.pathname + location.search); } catch (e) {} }
+  else setHash();
+}
+$('mView').onclick = () => setMode('view');
+$('mPlan').onclick = () => setMode('plan');
+try { const v = JSON.parse(localStorage.getItem('koparki-trasa') || '[]'); if (Array.isArray(v)) parseRoute(v); } catch (e) {}
+function fromHash() {
+  const m = location.hash.match(/^#trasa(?:=([\w.]*))?$/);
+  if (!m) return false;
+  if (m[1]) { parseRoute(m[1].split('.').map(nr => byNr[nr] && byNr[nr].id).filter(Boolean)); savePlan(); }
+  setMode('plan'); drawPlan(); planHint();
+  if (view === 'plan') render();
+  return true;
+}
+
 // ------------------------------------------------------------ start
 placeHead(); chrome(); render(); setSheet('peek');
 requestAnimationFrame(() => {
@@ -1018,10 +1605,12 @@ requestAnimationFrame(() => {
   map.invalidateSize();
   refit();
   zoomCls(); layoutLabels();
+  if (fromHash()) return;
   const h = (location.hash.match(/^#p(\w+)$/) || [])[1];
   if (h && byNr[h]) select(byNr[h].id, { move: 'fit' });
 });
 window.addEventListener('hashchange', () => {
+  if (fromHash()) return;
   const h = (location.hash.match(/^#p(\w+)$/) || [])[1];
   if (h && byNr[h] && byNr[h].id !== sel) select(byNr[h].id, { move: 'fit' });
 });
