@@ -271,7 +271,7 @@ button { font: inherit; color: inherit; }
 .mode button[aria-pressed="true"] { background: var(--ink); color: var(--surface); }
 #app.plan .lay, #app.plan .lay-hint { display: none; }
 .plan-hint {
-  top: 16px; left: calc(50% + 194px); transform: translateX(-50%); max-width: min(420px, calc(100vw - 520px));
+  top: 50%; left: calc(50% + 194px); transform: translate(-50%, -50%); max-width: min(420px, calc(100vw - 520px));
   padding: 7px 14px; border-radius: 999px; background: rgba(19, 34, 42, .55); color: #fff; font-size: 13px; line-height: 1.3;
   text-align: center; pointer-events: none; box-shadow: 0 2px 10px rgba(0,0,0,.3); backdrop-filter: blur(4px);
 }
@@ -381,7 +381,7 @@ button { font: inherit; color: inherit; }
   #layers { top: 12px; left: calc(max(16px, env(safe-area-inset-left, 0px)) + 50px); }
   .lay button { padding: 6px 8px; }
   .mode button { padding: 6px 9px; }
-  .plan-hint { top: 92px; left: 50%; max-width: calc(100vw - 40px); }
+  .plan-hint { top: calc((100% - var(--sheet-h)) / 2); left: 50%; max-width: calc(100vw - 40px); }
   #mapClear { bottom: calc(var(--sheet-h) + 12px); left: 50%; transition: bottom .25s ease; }
   #ptoast { top: auto; bottom: calc(var(--sheet-h) + 108px); left: 50%; max-width: calc(100vw - 40px); }
   .rose { width: 66px; height: 66px; }
@@ -397,6 +397,7 @@ button { font: inherit; color: inherit; }
   #zoom { bottom: calc(12px + env(safe-area-inset-bottom, 0px)); }
   #compass { top: 10px; }
   #menuBtn, #layers { top: 10px; }
+  .plan-hint { top: 50%; }
   #menu:not([hidden]) { top: 58px; max-height: calc(100% - 68px); }
   #menu .head { padding: 12px 14px; gap: 8px; }
   #menu .brand h1 { font-size: 24px; }
@@ -508,7 +509,8 @@ const N = id => (D.punkty.find(p => p.id === id) || {}).nr;
 const T = {
   pl: {
     sub: 'Mapa nurkowa zalanego wyrobiska',
-    pdfT: 'Plan do druku', pdfS: 'PDF · A4 · po polsku',
+    pdfT: 'Plan do druku', pdfS: 'PDF · A4 · po polsku', pdfRouteT: 'Trasa do druku',
+    pdfNeed2: 'Trasa do druku wymaga co najmniej 2 punktów.',
     pdfBusy: 'Przygotowywanie pliku…', pdfSaved: 'Plan zapisany.', pdfDeclined: 'Pobieranie anulowane.',
     pdfFail: 'Nie udało się zapisać pliku.', pdfOpen: 'Otwórz PDF',
     ig: 'Kontakt',
@@ -571,7 +573,8 @@ const T = {
   },
   en: {
     sub: 'Dive map of a flooded quarry',
-    pdfT: 'Print plan', pdfS: 'PDF · A4 · in English',
+    pdfT: 'Print plan', pdfS: 'PDF · A4 · in English', pdfRouteT: 'Print route',
+    pdfNeed2: 'A printable route needs at least 2 points.',
     pdfBusy: 'Preparing the file…', pdfSaved: 'Plan saved.', pdfDeclined: 'Download cancelled.',
     pdfFail: 'Could not save the file here.', pdfOpen: 'Open the PDF',
     ig: 'Contact',
@@ -939,7 +942,7 @@ function chrome() {
   const L_ = t();
   document.documentElement.lang = lang;
   $('sub').textContent = L_.sub;
-  $('pdfT').textContent = L_.pdfT; $('pdfS').textContent = L_.pdfS;
+  $('pdfT').textContent = mode === 'plan' ? L_.pdfRouteT : L_.pdfT; $('pdfS').textContent = L_.pdfS;
   $('tList').textContent = mode === 'plan' ? L_.tPlan : L_.tList; $('tInfo').textContent = L_.tInfo;
   $('lPL').setAttribute('aria-pressed', String(lang === 'pl')); $('lEN').setAttribute('aria-pressed', String(lang === 'en'));
   $('lyAzT').textContent = L_.lyAz; $('lyDistT').textContent = L_.lyDist; $('lyHint').textContent = L_.lyHint; $('layers').setAttribute('aria-label', L_.layers);
@@ -1170,7 +1173,7 @@ async function savePdf() {
   } catch (e) { fallback(); }
   btn.removeAttribute('aria-busy'); busy = false;
 }
-$('pdfBtn').onclick = savePdf;
+$('pdfBtn').onclick = () => mode === 'plan' ? routePdf() : savePdf();
 
 // ------------------------------------------------------------ route planning
 // A separate mode: only the point markers stay on the map. Each point chosen is
@@ -1381,11 +1384,16 @@ function loadJsPdf() {
     document.head.appendChild(s);
   });
 }
+const QR_IG = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAkQAAAJEAQAAAADfmwb3AAACLElEQVR42u3dTWrDMBAGUNML5P631A1USGv0NzIpFEaLp0WatPZbzOLrMJad65rXq/6s9vH9s/2u/2u3vq7/WiQSiUT607qD+zefh49Tem+PU3ESiURKzfH+XcvnMqb3+2PpjxsAFSeRSKSDcnyI8NaP91MXOU4ikUin9+N1nJRfYysux0kkEumcHJ/m3ktSD8t8nEQikc7K8ag9/+BFxUkkEumIHK+7Ne1AnC5xLquoOIlEIiX1469gM0p0yLBpZd3NouIkEomU1I+XceTdEn3I8egGof5cFSeRSKSsfnyK6ytotuuyp7zl+H2GipNIJFJejsdbUIaknjYaTkMYOU4ikUjJ/fgazX1n/hTm919VnEQikVJy/GE+/goerVKW01znJJFIpPwcnzaHx5sPowevFBUnkUik9Bzf9NnTrGX77n5RcRKJRErJ8eVyZhTm0dbxoSmX4yQSiZQ6V4keM94+xgOX+VwVJ5FIpMx+vAbPo21RX3c53s1kVJxEIpGS+vHN0CS6i7Mfjc97WFScRCKRkvvxZaNh2bXsw7n3gF3FSSQSKbMfrw/DlW0/Phyn4iQSiZTUj0fteQm68Ff8VRP2q5BIJFJyjn9wnXNzq5CKk0gk0iE53r/bfs3b1U9Ylv8B+nESiUQ6J8c3Sb3cIDS07CpOIpFIB/Xj0wMO140s0zdKqDiJRCKl5nh0OXO98345w3VOEolEOiHHo/b86Qm2m4dlqTiJRCJlSN80iC6owBK+MQAAAABJRU5ErkJggg==';   // the print plan's QR code to the Instagram profile
 const loadImg = src => new Promise(ok => { const i = new Image(); i.onload = () => ok(i); i.onerror = () => ok(null); i.src = src; });
+let routeBusy = false;
 async function routePdf() {
-  const btn = $('pPdf'), L_ = t();
-  if (!btn || btn.disabled || route.length < 2) return;
-  btn.disabled = true; btn.textContent = L_.pdfRouteBusy;
+  const L_ = t();
+  if (routeBusy) return;
+  if (route.length < 2) { toast(L_.pdfNeed2); return; }
+  routeBusy = true;
+  const btn = $('pPdf'); if (btn) { btn.disabled = true; btn.textContent = L_.pdfRouteBusy; }
+  $('pdfBtn').setAttribute('aria-busy', 'true');
   try {
     await Promise.all([loadJsPdf(), document.fonts ? Promise.all([
       document.fonts.load('700 40px "Saira Condensed"'), document.fonts.load('600 40px "Source Sans 3"'),
@@ -1397,6 +1405,7 @@ async function routePdf() {
     doc.save(`${L_.pdfFile}_${route.map(id => P[id].nr).join('-')}.pdf`);
   } catch (e) { toast(L_.pdfRouteErr); }
   const b = $('pPdf'); if (b) { b.disabled = route.length < 2; b.textContent = t().pdfRoute; }
+  $('pdfBtn').removeAttribute('aria-busy'); routeBusy = false;
 }
 async function drawRoutePage(L_) {
   const MM = 300 / 25.4, W = Math.round(297 * MM), H = Math.round(210 * MM), mm = v => v * MM;
@@ -1420,8 +1429,6 @@ async function drawRoutePage(L_) {
   font(400, 3, FB); g.fillStyle = MUT; g.textAlign = 'right';
   const now = new Date(), dd = String(now.getDate()).padStart(2, '0') + '.' + String(now.getMonth() + 1).padStart(2, '0') + '.' + now.getFullYear();
   g.fillText(`${L_.pdfDate} ${dd}`, mm(297 - M), mm(M + 7.5));
-  font(600, 2.4, FM); g.fillStyle = INK;
-  g.fillText(fit((location.host + location.pathname).replace(/index\.html$/, '') + '#trasa=' + route.map(id => P[id].nr).join('.'), mm(120)), mm(297 - M), mm(M + 14));
   g.textAlign = 'left';
   g.strokeStyle = LINE; g.lineWidth = mm(.3); g.beginPath(); g.moveTo(mm(M), mm(M + 17)); g.lineTo(mm(297 - M), mm(M + 17)); g.stroke();
 
@@ -1436,7 +1443,7 @@ async function drawRoutePage(L_) {
   // a very long, thin route would give a strip of a map: show more surroundings instead
   if ((x1 - x0) / (y1 - y0) > 2.2) { const h = (x1 - x0) / 2.2, cy = (y0 + y1) / 2; y0 = cy - h / 2; y1 = cy + h / 2; }
   if ((y1 - y0) / (x1 - x0) > 1.6) { const w = (y1 - y0) / 1.6, cx = (x0 + x1) / 2; x0 = cx - w / 2; x1 = cx + w / 2; }
-  const A = (x1 - x0) / (y1 - y0), top = M + 21, bottom = 210 - M - 14, nR = route.length, ROW = 5.6;
+  const A = (x1 - x0) / (y1 - y0), top = M + 21, bottom = 210 - M - 21, nR = route.length, ROW = 5.6;
   // candidate layouts, the one with the largest map wins
   const lays = [];
   { const W0 = 178, H0 = bottom - top; lays.push(A > W0 / H0 ? { k: 0, w: W0, h: W0 / A } : { k: 0, w: H0 * A, h: H0 }); }
@@ -1559,11 +1566,23 @@ async function drawRoutePage(L_) {
     }
   });
 
-  // footer
+  // footer: notes on the left (wrapped), QR code to the Instagram profile in the
+  // bottom right corner, as on the print plan (same image, 29 modules, no margin of its own)
+  const QS = 15, qx = mm(297 - M - QS), qy = mm(210 - M - QS - 3.5);
+  const qr = await loadImg(QR_IG);
+  if (qr) { g.imageSmoothingEnabled = false; g.drawImage(qr, qx, qy, mm(QS), mm(QS)); g.imageSmoothingEnabled = true; }
+  font(600, 2.3, FM); g.fillStyle = MUT; g.textAlign = 'center';
+  g.fillText('@deeperbluediving', qx + mm(QS / 2), mm(210 - M));
+  g.textAlign = 'left';
   font(400, 2.6, FB); g.fillStyle = MUT;
-  const fy = H - mm(M) - mm(4);
-  g.fillText(`${L_.planNote} ${s.known ? L_.depthKnown(s.known, s.total) : L_.depthNoData}`, mm(M), fy);
-  g.fillText(L_.pdfFoot, mm(M), fy + mm(4));
+  const maxW = qx - mm(M) - mm(8);
+  const lines = [];
+  [`${L_.planNote} ${s.known ? L_.depthKnown(s.known, s.total) : L_.depthNoData}`, L_.pdfFoot].forEach(par => {
+    let cur = '';
+    par.split(' ').forEach(w => { const tr = cur ? cur + ' ' + w : w; if (g.measureText(tr).width > maxW && cur) { lines.push(cur); cur = w; } else cur = tr; });
+    if (cur) lines.push(cur);
+  });
+  lines.forEach((l, i) => g.fillText(l, mm(M), mm(210 - M - QS - 3.5 + 3) + i * mm(3.8)));
   return c;
 }
 
