@@ -360,6 +360,8 @@ button { font: inherit; color: inherit; }
   .mode button { padding: 6px 9px; }
   .plan-hint { top: calc((100% - var(--sheet-h)) / 2); left: 50%; max-width: calc(100vw - 40px); }
   #mapClear { bottom: calc(var(--sheet-h) + 12px); left: 50%; transition: bottom .25s ease; }
+  /* sheet open: the panel has its own Clear button, the map stays uncovered */
+  #app:has(#panel:not([data-sheet="peek"])) #mapClear { display: none; }
   #ptoast { top: auto; bottom: calc(var(--sheet-h) + 108px); left: 50%; max-width: calc(100vw - 40px); }
   .rose { width: 66px; height: 66px; }
   .rose svg { width: 60px; height: 60px; }
@@ -653,7 +655,10 @@ L.tileLayer('kafle/{z}/{x}_{y}.jpg', {
 // half the screen; on a desktop the side panel covers ~420 px on the left, and with the
 // whole lake fitted in a narrow window that is more than a whole image width, so a tight
 // box pinned the left points under the panel
-map.setMaxBounds(L.latLngBounds(LL(-D.szer * 1.5, D.wys * 2.5), LL(D.szer * 2.5, -D.wys * 1.5)));
+// Vertically even more: with the whole lake shown on a phone the screen is taller
+// than a tight box, Leaflet then re-centres the view after every move and the map
+// snapped back under the open sheet (19.11).
+map.setMaxBounds(L.latLngBounds(LL(-D.szer * 1.5, D.wys * 9), LL(D.szer * 2.5, -D.wys * 8)));
 
 // everything except the point markers: hidden in the route planning mode
 const viewG = L.layerGroup().addTo(map);
@@ -735,7 +740,7 @@ function setSheet(s) {
   $('sbTog').setAttribute('aria-label', open ? L_.sbFold : L_.sbOpen);
 }
 function peekH() { return $('sbar').offsetHeight + 2; }
-function toggleSheet() { setSheet(sheet === 'peek' ? (mqSide.matches ? 'full' : 'half') : 'peek'); setTimeout(revealSel, 280); }
+function toggleSheet() { setSheet(sheet === 'peek' ? (mqSide.matches ? 'full' : 'half') : 'peek'); setTimeout(revealView, 280); }
 function openSheet() { if (mq.matches && sheet === 'peek') setSheet(mqSide.matches ? 'full' : 'half'); }
 
 // drag the bar to resize; a short tap on the bar toggles
@@ -768,7 +773,7 @@ function endDrag(e, cancel) {
     k = d.v > 0 ? keys.slice().reverse().find(x => S[x] < h - 4) || keys[0]
                 : keys.find(x => S[x] > h + 4) || keys[keys.length - 1];
   } else k = keys.reduce((a, b) => Math.abs(S[b] - h) < Math.abs(S[a] - h) ? b : a);
-  setSheet(k); setTimeout(revealSel, 280);
+  setSheet(k); setTimeout(revealView, 280);
 }
 $('sbar').addEventListener('pointerup', e => endDrag(e, false));
 $('sbar').addEventListener('pointercancel', e => endDrag(e, true));
@@ -947,7 +952,7 @@ function setLang(l) {
 }
 $('lPL').onclick = () => setLang('pl');
 $('lEN').onclick = () => setLang('en');
-function go(v) { view = v; render(); closeMenu(); openSheet(); }
+function go(v) { const was = sheet; view = v; render(); closeMenu(); openSheet(); if (v === 'plan' && was === 'peek') setTimeout(revealView, 280); }
 $('tList').onclick = () => go(mainView());
 $('tInfo').onclick = () => go('info');
 
@@ -1089,6 +1094,18 @@ function select(id, opt) {
 // On a phone held upright the open sheet covers the lower half, so the point goes to
 // the middle of the free area above it (the lake would otherwise sit at the sheet's
 // edge with empty space above).
+// On a phone the open sheet covers the lower half of the map: whatever matters goes
+// into the free area above it — the selected point in Map mode, the route (or the
+// whole lake while the route is empty) in planning mode.
+function revealView() { if (mode === 'plan') revealPlan(); else revealSel(); }
+function revealPlan() {
+  if (mode !== 'plan' || !mq.matches || sheet === 'peek') return;
+  const pad = panelPad();
+  if (!route.length) { fitAll(true); return; }
+  const b = L.latLngBounds(route.map(id => LL(P[id].x, P[id].y)));
+  map.flyToBounds(b.pad(route.length > 1 ? 0.08 : 0), { paddingTopLeft: pad.tl, paddingBottomRight: pad.br,
+    maxZoom: route.length > 1 ? ZN - 1 : Math.max(map.getZoom(), 2), duration: .5 });
+}
 function revealSel() {
   if (!sel || mode !== 'view') return;
   const ll = LL(P[sel].x, P[sel].y), pad = panelPad();
@@ -1320,13 +1337,13 @@ function renderPlan(b, L_) {
       <div><dt>${L_.sumPts}</dt><dd>${route.length}/${MAXPTS}</dd></div>
       <div><dt>${L_.sumDepth}</dt><dd>${s.depth || L_.depthNone}</dd></div>
     </dl>
-    <ol class="stops">${rows}</ol>
     <div class="plan-act">
       <button class="pbtn" id="pUndo">${L_.undo}</button>
       <button class="pbtn" id="pClear">${L_.clear}</button>
       <button class="pbtn" id="pLink">${L_.link}</button>
       <button class="pbtn" id="pPdf"${route.length < 2 ? ' disabled' : ''}>${L_.pdfRoute}</button>
     </div>
+    <ol class="stops">${rows}</ol>
     <p class="note">${L_.planNote}</p>
     <p class="note">${s.known ? L_.depthKnown(s.known, s.total) : L_.depthNoData}</p>
   </div>`;
@@ -1584,6 +1601,7 @@ function setMode(m) {
   }
   view = mainView();
   chrome(); render(); drawPlan();
+  if (m === 'plan') setTimeout(revealPlan, 50);
   if (m === 'view') { drawSel(); try { history.replaceState(null, '', sel ? '#p' + P[sel].nr : location.pathname + location.search); } catch (e) {} }
   else setHash();
 }
