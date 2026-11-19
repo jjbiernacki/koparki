@@ -35,4 +35,5 @@ plan. Polish and English.*
 ## Licencja i kontakt
 
 Licencja MIT, zobacz plik `LICENSE`.
-Kontakt: [@deeperbluediving](https://www.instagram.com/deeperbluediving) na Instagramie.
+Kontakt: [@deeperbluediving](https://www.instagram.com/deeperbluediving) na Instagramie
+i [facebook.com/jjbiernacki](https://www.facebook.com/jjbiernacki) na Facebooku.
