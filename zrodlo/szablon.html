@@ -177,11 +177,15 @@ button { font: inherit; color: inherit; }
 .shore-grid .v small { font-size: 11px; color: var(--muted); }
 .shore p { margin: 8px 0 0; font-size: 12px; color: var(--muted); text-align: center; }
 
-#zoom { right: max(16px, env(safe-area-inset-right, 0px)); bottom: calc(16px + env(safe-area-inset-bottom, 0px)); display: grid; gap: 6px; }
+#zoom { right: max(16px, env(safe-area-inset-right, 0px)); bottom: calc(16px + env(safe-area-inset-bottom, 0px)); display: grid; grid-auto-flow: column; gap: 6px; }
 #zoom button {
   width: 42px; height: 42px; border: 0; border-radius: 10px; background: var(--surface); box-shadow: var(--shadow);
   cursor: pointer; display: grid; place-items: center; color: var(--ink);
 }
+/* one row: − and + joined in one block with a divider, "whole map" apart on the right */
+#zoom .zo { order: 1; border-radius: 10px 0 0 10px; }
+#zoom .zi { order: 2; border-radius: 0 10px 10px 0; margin-left: -6px; border-left: 1px solid var(--line); }
+#zFit { order: 3; }
 #layers { top: 16px; left: 404px; display: grid; gap: 6px; justify-items: start; }
 .lay { display: inline-flex; gap: 2px; padding: 3px; border-radius: 10px; background: var(--surface); box-shadow: var(--shadow); }
 .lay button {
@@ -353,7 +357,6 @@ button { font: inherit; color: inherit; }
 
   #scale { display: none; }
   #zoom { bottom: calc(var(--sheet-h) + 12px); transition: bottom .25s ease; }
-  #zoom .zi, #zoom .zo { display: none; }
   #compass { top: 12px; }
   #layers { top: 12px; left: calc(max(16px, env(safe-area-inset-left, 0px)) + 50px); }
   .lay button { padding: 6px 8px; }
@@ -1134,7 +1137,13 @@ function zoomCls() {
   $('scaleTxt').textContent = best + ' m';
 }
 map.on('zoomend', () => { zoomCls(); layoutLabels(); drawPlan(); });
-map.on('click', () => { closeMenu(); if (mq.matches && sheet !== 'peek') setSheet('peek'); });
+// a click on the map outside the points (they stop the click) deselects the point
+// in Map mode; on a phone it also folds the sheet
+map.on('click', () => {
+  closeMenu();
+  if (mode === 'view' && sel) deselect();
+  if (mq.matches && sheet !== 'peek') setSheet('peek');
+});
 function syncLayers() {
   $('lyAz').setAttribute('aria-pressed', String(showAz)); $('lyDist').setAttribute('aria-pressed', String(showDist));
   try { localStorage.setItem('koparki-labels', JSON.stringify({ az: showAz, dist: showDist })); } catch (e) {}
@@ -1146,8 +1155,16 @@ $('lyAz').setAttribute('aria-pressed', String(showAz)); $('lyDist').setAttribute
 if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => layoutLabels());
 $('needle').setAttribute('transform', `rotate(${D.polnoc_mag})`);
 $('roseBtn').onclick = () => { const h = $('shore'); h.hidden = !h.hidden; $('roseBtn').setAttribute('aria-expanded', String(!h.hidden)); };
-$('zIn').onclick = () => { fitted = false; map.zoomIn(0.75); };
-$('zOut').onclick = () => { fitted = false; map.zoomOut(0.75); };
+// + / − zoom around the middle of the visible part of the map (above the sheet on a
+// phone, right of the panel on a desktop), not the middle of the whole window: the
+// map no longer jumps up on + and down on −
+function zoomBy(d) {
+  fitted = false;
+  const z = Math.max(map.getMinZoom(), Math.min(map.getMaxZoom(), map.getZoom() + d));
+  if (z !== map.getZoom()) map.setZoomAround(freeC(), z);
+}
+$('zIn').onclick = () => zoomBy(0.75);
+$('zOut').onclick = () => zoomBy(-0.75);
 function fitAll(animate) {
   const ptsB = L.latLngBounds(D.punkty.map(p => LL(p.x, p.y))).pad(0.06), pad = panelPad();
   map.fitBounds(ptsB, { paddingTopLeft: pad.tl, paddingBottomRight: pad.br, animate: !!animate });
@@ -1618,9 +1635,12 @@ function fromHash() {
 }
 
 // ------------------------------------------------------------ start
-placeHead(); chrome(); render(); setSheet('peek');
+// a phone held upright starts with the sheet half open (the list of sites) and the
+// whole lake fitted into the free area above it; elsewhere the sheet starts folded
+const sheet0 = () => mq.matches && !mqSide.matches ? 'half' : 'peek';
+placeHead(); chrome(); render(); setSheet(sheet0());
 requestAnimationFrame(() => {
-  setSheet('peek');
+  setSheet(sheet0());
   map.invalidateSize();
   refit();
   zoomCls(); layoutLabels();
