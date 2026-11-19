@@ -735,7 +735,7 @@ function setSheet(s) {
   $('sbTog').setAttribute('aria-label', open ? L_.sbFold : L_.sbOpen);
 }
 function peekH() { return $('sbar').offsetHeight + 2; }
-function toggleSheet() { setSheet(sheet === 'peek' ? (mqSide.matches ? 'full' : 'half') : 'peek'); }
+function toggleSheet() { setSheet(sheet === 'peek' ? (mqSide.matches ? 'full' : 'half') : 'peek'); setTimeout(revealSel, 280); }
 function openSheet() { if (mq.matches && sheet === 'peek') setSheet(mqSide.matches ? 'full' : 'half'); }
 
 // drag the bar to resize; a short tap on the bar toggles
@@ -768,7 +768,7 @@ function endDrag(e, cancel) {
     k = d.v > 0 ? keys.slice().reverse().find(x => S[x] < h - 4) || keys[0]
                 : keys.find(x => S[x] > h + 4) || keys[keys.length - 1];
   } else k = keys.reduce((a, b) => Math.abs(S[b] - h) < Math.abs(S[a] - h) ? b : a);
-  setSheet(k);
+  setSheet(k); setTimeout(revealSel, 280);
 }
 $('sbar').addEventListener('pointerup', e => endDrag(e, false));
 $('sbar').addEventListener('pointercancel', e => endDrag(e, true));
@@ -1083,16 +1083,21 @@ function select(id, opt) {
   if (opt && opt.move === 'fit') {
     const pts = [ll].concat(routesOf(id).map(r => LL(r.other.x, r.other.y)));
     map.flyToBounds(L.latLngBounds(pts), { paddingTopLeft: pad.tl, paddingBottomRight: pad.br, maxZoom: ZN - 1, duration: .6 });
-  } else {
-    // keep the map where it is, but bring the point out from under the panel
-    setTimeout(() => {
-      const c = map.latLngToContainerPoint(ll), s = map.getSize();
-      const minX = pad.tl[0], maxX = s.x - pad.br[0], minY = pad.tl[1], maxY = s.y - pad.br[1];
-      const dx = c.x < minX ? c.x - minX - 20 : c.x > maxX ? c.x - maxX + 20 : 0;
-      const dy = c.y < minY ? c.y - minY - 20 : c.y > maxY ? c.y - maxY + 20 : 0;
-      if (dx || dy) map.panBy([dx, dy]);
-    }, 280);
-  }
+  } else setTimeout(revealSel, 280);
+}
+// Keep the map where it is, but bring the selected point out from under the panel.
+// On a phone held upright the open sheet covers the lower half, so the point goes to
+// the middle of the free area above it (the lake would otherwise sit at the sheet's
+// edge with empty space above).
+function revealSel() {
+  if (!sel || mode !== 'view') return;
+  const ll = LL(P[sel].x, P[sel].y), pad = panelPad();
+  const c = map.latLngToContainerPoint(ll), s = map.getSize();
+  const minX = pad.tl[0], maxX = s.x - pad.br[0], minY = pad.tl[1], maxY = s.y - pad.br[1];
+  const dx = c.x < minX ? c.x - minX - 20 : c.x > maxX ? c.x - maxX + 20 : 0;
+  let dy = c.y < minY ? c.y - minY - 20 : c.y > maxY ? c.y - maxY + 20 : 0;
+  if (mq.matches && !mqSide.matches && sheet !== 'peek' && maxY - minY > 80) dy = c.y - (minY + maxY) / 2;
+  if (Math.abs(dx) > 1 || Math.abs(dy) > 1) map.panBy([dx, dy]);
 }
 function deselect() {
   sel = null; view = 'list'; render(); drawSel(); map.closePopup();
