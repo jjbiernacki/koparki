@@ -634,6 +634,7 @@ const T = {
     back: 'All sites',
     planAlt: 'Koparki dive map – plan of the quarry with dive sites, depths, routes and bearings', planCap: 'Koparki dive map', planJpg: 'JPG image',
     photoAlt: (n, i) => `${n} – underwater photo ${i}, Koparki quarry`,
+    docTitle: 'Koparki dive map (Jaworzno, Poland) – dive sites, routes, PDF plan',
     photos: 'Underwater photos', photoN: (i, n) => `Photo ${i} of ${n}`, lbClose: 'Close photo', lbPrev: 'Previous photo', lbNext: 'Next photo',
     alt: 'Local name', coords: 'WGS84 coordinates', copy: 'Copy', copied: 'Copied',
     routes: 'Routes from here', tip: 'Explanation', routesHint: 'Magnetic bearings from this point, as shown by a dive compass. Selecting a route moves to its destination.',
@@ -694,6 +695,14 @@ const T = {
 
 let lang = 'pl';
 try { const s = localStorage.getItem('koparki-lang'); if (s === 'en' || s === 'pl') lang = s; } catch (e) {}
+// ?lang=en / ?lang=pl in the address wins over the remembered choice (link to the English version, 22.11)
+try { const q = new URLSearchParams(location.search).get('lang'); if (q === 'en' || q === 'pl') { lang = q; localStorage.setItem('koparki-lang', q); } } catch (e) {}
+// the address follows the language: ?lang=en for English, nothing for Polish (the default); hash kept
+const TITLE_PL = document.title;   // set by the build (Polish); English below
+function langUrl(l) {
+  try { const u = new URL(location.href); if (l === 'en') u.searchParams.set('lang', 'en'); else u.searchParams.delete('lang');
+    history.replaceState(null, '', u.pathname + u.search + u.hash); } catch (e) {}
+}
 const t = () => T[lang];
 function n(v) { return Number(v).toLocaleString(lang === 'pl' ? 'pl-PL' : 'en-GB', { maximumFractionDigits: 1 }); }
 function esc(s) { return String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c])); }
@@ -1065,6 +1074,7 @@ $('lb').addEventListener('click', e => { if (Date.now() - lbSwiped < 400) e.stop
 function chrome() {
   const L_ = t();
   document.documentElement.lang = lang;
+  document.title = lang === 'pl' ? TITLE_PL : L_.docTitle;
   $('sub').textContent = L_.sub;
   $('pdfT').textContent = mode === 'plan' ? L_.pdfRouteT : L_.pdfT; $('pdfS').textContent = L_.pdfS;
   $('tList').textContent = mode === 'plan' ? L_.tPlan : L_.tList; $('tInfo').textContent = L_.tInfo;
@@ -1089,6 +1099,7 @@ function chrome() {
 }
 function setLang(l) {
   lang = l; try { localStorage.setItem('koparki-lang', l); } catch (e) {}
+  langUrl(l);
   chrome(); render(); if (sel && mode === 'view') drawSel();
   requestAnimationFrame(() => setSheet(sheet));
 }
