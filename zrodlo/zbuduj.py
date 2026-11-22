@@ -12,7 +12,8 @@ from html import escape as _esc
 ADRES = 'https://jjbiernacki.github.io/koparki/'   # adres publiczny strony; zmien przy wlasnej domenie
 TYTUL = 'Mapa nurkowa Koparki (Jaworzno) – atrakcje, trasy, plan PDF'
 OPIS = ('Interaktywna mapa nurkowa zbiornika Koparki w Jaworznie: wrak Wilhelm, Ford Fairlane, '
-        'koparki i inne atrakcje z głębokościami, trasy z azymutami, plan do druku.')
+        'koparki i inne atrakcje z głębokościami, trasy z azymutami, planowanie własnej trasy '
+        'nurkowania (PDF lub link) i plan do druku.')
 
 Z = os.path.dirname(os.path.abspath(__file__)); S = os.path.dirname(Z)
 esc = lambda x: _esc(str(x), quote=True)
