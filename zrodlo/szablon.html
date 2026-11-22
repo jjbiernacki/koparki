@@ -15,6 +15,7 @@
   --line: #d2dcdb;
   --accent: #b01a20;
   --accent-ink: #ffffff;
+  --accent-fill: #b01a20;   /* filled buttons with white text */
   --accent-soft: #f6e3e3;
   --link: #0d6b78;
   --water: #15282e;
@@ -31,14 +32,14 @@
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
     --bg: #0d171b; --surface: #12212a; --surface-2: #182b33; --ink: #e3ecec; --muted: #94a8ac;
-    --line: #263c44; --accent: #e5535a; --accent-ink: #ffffff; --accent-soft: #3a1e22; --link: #6cc6d2;
+    --line: #263c44; --accent: #ea6369; --accent-fill: #c42a30; --accent-ink: #ffffff; --accent-soft: #3a1e22; --link: #6cc6d2;
     --shadow: 0 10px 30px rgba(0,0,0,.5), 0 1px 3px rgba(0,0,0,.4);
     color-scheme: dark;
   }
 }
 :root[data-theme="dark"] {
   --bg: #0d171b; --surface: #12212a; --surface-2: #182b33; --ink: #e3ecec; --muted: #94a8ac;
-  --line: #263c44; --accent: #e5535a; --accent-ink: #ffffff; --accent-soft: #3a1e22; --link: #6cc6d2;
+  --line: #263c44; --accent: #ea6369; --accent-fill: #c42a30; --accent-ink: #ffffff; --accent-soft: #3a1e22; --link: #6cc6d2;
   --shadow: 0 10px 30px rgba(0,0,0,.5), 0 1px 3px rgba(0,0,0,.4);
   color-scheme: dark;
 }
@@ -67,7 +68,7 @@ button { font: inherit; color: inherit; }
 .actions { display: grid; grid-template-columns: 1fr; gap: 8px; }
 .btn-pdf {
   display: flex; align-items: center; gap: 10px; text-align: left; border: 0; cursor: pointer;
-  background: var(--accent); color: var(--accent-ink); border-radius: 10px; padding: 8px 12px; min-width: 0;
+  background: var(--accent-fill); color: var(--accent-ink); border-radius: 10px; padding: 8px 12px; min-width: 0;
 }
 .btn-pdf svg { flex: none; }
 .btn-pdf b { display: block; font-weight: 700; font-size: 15px; line-height: 1.15; }
@@ -188,7 +189,8 @@ button { font: inherit; color: inherit; }
 .routes .az { font-family: var(--f-data); font-weight: 600; font-size: 16px; color: var(--accent); font-variant-numeric: tabular-nums; }
 .routes .m { font-family: var(--f-data); font-size: 14px; font-variant-numeric: tabular-nums; }
 .routes .to { display: flex; gap: 8px; align-items: center; min-width: 0; font-size: 14px; }
-.routes .to span:last-child { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.routes .to span:last-child { min-width: 0; overflow-wrap: break-word; line-height: 1.2; }   /* 22.11: wrapped, not cut */
+@media (max-width: 400px) { .routes button { grid-template-columns: 18px 48px 48px 1fr; gap: 6px; } }
 
 /* info / contact */
 .prose { display: grid; gap: 12px; }
@@ -311,7 +313,7 @@ button { font: inherit; color: inherit; }
   background: var(--surface); color: var(--ink); box-shadow: var(--shadow); font-weight: 600; font-size: 14px; cursor: pointer; white-space: nowrap;
 }
 #mapClear svg { width: 16px; height: 16px; flex: none; }
-#mapClear.warn { background: var(--accent); color: var(--accent-ink); }
+#mapClear.warn { background: var(--accent-fill); color: var(--accent-ink); }
 #ptoast { top: 58px; left: calc(50% + 194px); max-width: min(420px, calc(100vw - 520px)); text-align: center; font-size: 13px; pointer-events: none; }
 @keyframes pinPulse {
   0% { box-shadow: 0 0 0 0 rgba(255,255,255,.75), 0 1px 4px rgba(0,0,0,.55); }
@@ -362,7 +364,8 @@ button { font: inherit; color: inherit; }
 
 /* ---------- phones: bottom sheet (portrait) / floating card (landscape) ---------- */
 /* the same query string is in JS (MQ) */
-@media (max-width: 760px), (max-height: 520px) and (orientation: landscape) {
+/* 22.11: also tablets held upright (up to 900 px): a side panel left the lake a narrow strip */
+@media (max-width: 760px), (max-height: 520px) and (orientation: landscape), (max-width: 900px) and (orientation: portrait) {
   #panel {
     top: auto; left: 0; right: 0; bottom: 0; width: auto; border-radius: 18px 18px 0 0;
     height: var(--sheet-h); transition: height .25s ease;
@@ -414,6 +417,8 @@ button { font: inherit; color: inherit; }
 
   #scale { display: none; }
   #zoom { bottom: calc(var(--sheet-h) + 12px); transition: bottom .25s ease; }
+  #app:has(#panel[data-sheet="full"]) #zoom { display: none; }   /* 22.11: no map left to zoom; it covered the compass */
+  .lay-hint { display: none; }   /* 22.11: a third row over the map covered points; shown on wide screens only */
   #compass { top: 12px; }
   #layers { top: 12px; left: calc(max(16px, env(safe-area-inset-left, 0px)) + 50px); max-width: calc(100vw - max(16px, env(safe-area-inset-left, 0px)) - 50px - 96px); }
   .lay button { padding: 6px 8px; }
@@ -434,6 +439,8 @@ button { font: inherit; color: inherit; }
   .view { padding-left: 8px; padding-right: 8px; }
   .view-pad { padding-left: 16px; padding-right: 16px; }
   #zoom { bottom: calc(12px + env(safe-area-inset-bottom, 0px)); }
+  #app:has(#panel[data-sheet="full"]) #zoom { display: grid; }   /* card on the left: zoom stays on the right */
+  #layers .lay-hint { display: block; }   /* the map has the whole screen: room for the hint */
   #compass { top: 10px; }
   #menuBtn, #layers { top: 10px; }
   .plan-hint { top: 50%; }
@@ -453,6 +460,41 @@ button { font: inherit; color: inherit; }
 </style>
 
 <div id="app">
+  <!-- 22.11: the panel comes first in the document, so Tab reaches it before the 32 map markers -->
+  <aside id="panel" aria-label="Panel">
+    <div class="sbar" id="sbar">
+      <button class="handle" id="handle" aria-label="Rozwiń panel"><span></span></button>
+      <div class="sbar-row">
+        <div class="sbar-t" id="sbT"></div>
+        <button class="ib" id="sbClose" hidden><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M5 5l10 10M15 5L5 15" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg></button>
+        <button class="ib" id="sbTog"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M5 8l5 5 5-5" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+      </div>
+    </div>
+    <div class="head">
+      <div class="brand">
+        <div>
+          <h1>Koparki</h1>
+          <p id="sub"></p>
+        </div>
+        <div class="lang" role="group" aria-label="Język / Language">
+          <button id="lPL" aria-pressed="true">PL</button>
+          <button id="lEN" aria-pressed="false">EN</button>
+        </div>
+      </div>
+      <div class="actions">
+        <button class="btn-pdf" id="pdfBtn">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12M7 10l5 5 5-5M4 19h16"/></svg>
+          <span><b id="pdfT"></b><small id="pdfS"></small></span>
+        </button>
+      </div>
+      <div id="status" role="status" aria-live="polite"></div>
+      <div class="tabs" role="tablist">
+        <button role="tab" id="tList" aria-selected="true"></button>
+        <button role="tab" id="tInfo" aria-selected="false"></button>
+      </div>
+    </div>
+    <div class="body" id="body"></div>
+  </aside>
   <div id="map" role="region" aria-label="Mapa"></div>
 
   <div class="ctrl" id="compass">
@@ -500,40 +542,6 @@ button { font: inherit; color: inherit; }
   <button class="ctrl" id="mapClear" hidden><svg viewBox="0 0 16 16" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 4h11M6 4V2.5h4V4M4 4l.7 9.5h6.6L12 4M6.8 6.5v4.5M9.2 6.5v4.5"/></svg><span id="mapClearT"></span></button>
   <div class="ctrl" id="scale"><span id="scaleTxt"></span><div class="bar" id="scaleBar"></div></div>
 
-  <aside id="panel" aria-label="Panel">
-    <div class="sbar" id="sbar">
-      <button class="handle" id="handle" aria-label="Rozwiń panel"><span></span></button>
-      <div class="sbar-row">
-        <div class="sbar-t" id="sbT"></div>
-        <button class="ib" id="sbClose" hidden><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M5 5l10 10M15 5L5 15" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg></button>
-        <button class="ib" id="sbTog"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M5 8l5 5 5-5" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
-      </div>
-    </div>
-    <div class="head">
-      <div class="brand">
-        <div>
-          <h1>Koparki</h1>
-          <p id="sub"></p>
-        </div>
-        <div class="lang" role="group" aria-label="Język / Language">
-          <button id="lPL" aria-pressed="true">PL</button>
-          <button id="lEN" aria-pressed="false">EN</button>
-        </div>
-      </div>
-      <div class="actions">
-        <button class="btn-pdf" id="pdfBtn">
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12M7 10l5 5 5-5M4 19h16"/></svg>
-          <span><b id="pdfT"></b><small id="pdfS"></small></span>
-        </button>
-      </div>
-      <div id="status" role="status" aria-live="polite"></div>
-      <div class="tabs" role="tablist">
-        <button role="tab" id="tList" aria-selected="true"></button>
-        <button role="tab" id="tInfo" aria-selected="false"></button>
-      </div>
-    </div>
-    <div class="body" id="body"></div>
-  </aside>
 </div>
 
 <div id="lb" role="dialog" aria-modal="true" aria-labelledby="lbCap" hidden>
@@ -795,13 +803,16 @@ function edgePopup(k, at) {
 
 // points
 const marks = {};
-D.punkty.forEach(p => {
+order.forEach(p => {   // 22.11: in number order, so Tab goes 1, 2, 3, 3a … over the map
   const small = p.maly || p.nr === '7b', s = small ? 22 : 30;
   const m = L.marker(LL(p.x, p.y), {
     title: `${p.nr} ${name(p)}`, riseOnHover: true,
     icon: L.divIcon({ className: '', html: `<div class="pin${small ? ' small' : ''}">${esc(p.nr)}</div>`, iconSize: [s, s], iconAnchor: [s / 2, s / 2] })
   }).addTo(map);
-  m.on('click', () => mode === 'plan' ? addStop(p.id) : select(p.id, { move: map.getZoom() < 2 ? 'fit' : 'reveal' }));
+  const act = () => mode === 'plan' ? addStop(p.id) : select(p.id, { move: map.getZoom() < 2 ? 'fit' : 'reveal' });
+  m.on('click', act);
+  // 22.11: keyboard — markers take focus, Leaflet itself handles Enter only for popups
+  m.on('keydown', e => { const k = e.originalEvent.key; if (k === 'Enter' || k === ' ') { e.originalEvent.preventDefault(); act(); } });
   marks[p.id] = m;
 });
 // leaders of bearing and of distance callouts are kept apart, so each set
@@ -819,7 +830,7 @@ try { const v = JSON.parse(localStorage.getItem('koparki-labels') || '{}'); if (
 
 // ------------------------------------------------------------ panel
 const $ = id => document.getElementById(id);
-const MQ = '(max-width: 760px), (max-height: 520px) and (orientation: landscape)';   // same as the CSS
+const MQ = '(max-width: 760px), (max-height: 520px) and (orientation: landscape), (max-width: 900px) and (orientation: portrait)';   // same as the CSS
 const mq = window.matchMedia(MQ);
 const mqSide = window.matchMedia('(max-height: 520px) and (orientation: landscape)');
 let view = 'list', sel = null, sheet = 'peek', mode = 'view';
