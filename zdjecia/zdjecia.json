@@ -93,12 +93,6 @@
    "mini": "zdjecia/mag_1_m.jpg",
    "w": 1200,
    "h": 1600
-  },
-  {
-   "plik": "zdjecia/mag_2.jpg",
-   "mini": "zdjecia/mag_2_m.jpg",
-   "w": 1200,
-   "h": 1600
   }
  ],
  "12": [
@@ -137,12 +131,6 @@
   {
    "plik": "zdjecia/11_4.jpg",
    "mini": "zdjecia/11_4_m.jpg",
-   "w": 1600,
-   "h": 1200
-  },
-  {
-   "plik": "zdjecia/11_5.jpg",
-   "mini": "zdjecia/11_5_m.jpg",
    "w": 1600,
    "h": 1200
   }
@@ -305,12 +293,6 @@
    "mini": "zdjecia/rower_1_m.jpg",
    "w": 1600,
    "h": 1200
-  },
-  {
-   "plik": "zdjecia/rower_2.jpg",
-   "mini": "zdjecia/rower_2_m.jpg",
-   "w": 1600,
-   "h": 1200
   }
  ],
  "obr": [
@@ -325,12 +307,6 @@
   {
    "plik": "zdjecia/walec_1.jpg",
    "mini": "zdjecia/walec_1_m.jpg",
-   "w": 1200,
-   "h": 1600
-  },
-  {
-   "plik": "zdjecia/walec_2.jpg",
-   "mini": "zdjecia/walec_2_m.jpg",
    "w": 1200,
    "h": 1600
   }
@@ -349,10 +325,12 @@
    "mini": "zdjecia/kajak_1_m.jpg",
    "w": 1600,
    "h": 1200
-  },
+  }
+ ],
+ "lus": [
   {
-   "plik": "zdjecia/kajak_2.jpg",
-   "mini": "zdjecia/kajak_2_m.jpg",
+   "plik": "zdjecia/lus_1.jpg",
+   "mini": "zdjecia/lus_1_m.jpg",
    "w": 1600,
    "h": 1200
   }
