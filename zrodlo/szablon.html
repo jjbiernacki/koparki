@@ -225,7 +225,10 @@ button { font: inherit; color: inherit; }
 #zoom .zo { order: 1; border-radius: 10px 0 0 10px; }
 #zoom .zi { order: 2; border-radius: 0 10px 10px 0; margin-left: -6px; border-left: 1px solid var(--line); }
 #zFit { order: 3; }
-#layers { top: 16px; left: 404px; display: grid; gap: 6px; justify-items: start; }
+/* 22.11: mode switch and label toggles in one row; they wrap to a second row when the screen is too narrow
+   (room is left for the compass in the top right corner) */
+#layers { top: 16px; left: 404px; display: flex; flex-wrap: wrap; align-items: center; gap: 6px; max-width: calc(100vw - 404px - 120px); }
+#layers .lay-hint { flex-basis: 100%; }
 .lay { display: inline-flex; gap: 2px; padding: 3px; border-radius: 10px; background: var(--surface); box-shadow: var(--shadow); }
 .lay button {
   display: inline-flex; align-items: center; gap: 6px; border: 0; background: none; cursor: pointer;
@@ -289,7 +292,7 @@ button { font: inherit; color: inherit; }
 }
 .mode button svg { width: 15px; height: 15px; flex: none; }
 .mode button[aria-pressed="true"] { background: var(--ink); color: var(--surface); }
-#app.plan .lay, #app.plan .lay-hint { display: none; }
+#app.plan .lay-hint { display: none; }   /* 22.11: label toggles also in the planning mode */
 .plan-hint {
   top: 50%; left: calc(50% + 194px); transform: translate(-50%, -50%); max-width: min(420px, calc(100vw - 520px));
   padding: 7px 14px; border-radius: 999px; background: rgba(19, 34, 42, .55); color: #fff; font-size: 13px; line-height: 1.3;
@@ -405,7 +408,7 @@ button { font: inherit; color: inherit; }
   #scale { display: none; }
   #zoom { bottom: calc(var(--sheet-h) + 12px); transition: bottom .25s ease; }
   #compass { top: 12px; }
-  #layers { top: 12px; left: calc(max(16px, env(safe-area-inset-left, 0px)) + 50px); }
+  #layers { top: 12px; left: calc(max(16px, env(safe-area-inset-left, 0px)) + 50px); max-width: calc(100vw - max(16px, env(safe-area-inset-left, 0px)) - 50px - 96px); }
   .lay button { padding: 6px 8px; }
   .mode button { padding: 6px 9px; }
   .plan-hint { top: calc((100% - var(--sheet-h)) / 2); left: 50%; max-width: calc(100vw - 40px); }
@@ -1270,7 +1273,7 @@ map.on('click', () => {
 function syncLayers() {
   $('lyAz').setAttribute('aria-pressed', String(showAz)); $('lyDist').setAttribute('aria-pressed', String(showDist));
   try { localStorage.setItem('koparki-labels', JSON.stringify({ az: showAz, dist: showDist })); } catch (e) {}
-  layoutLabels();
+  layoutLabels(); drawPlan();
 }
 $('lyAz').onclick = () => { showAz = !showAz; syncLayers(); };
 $('lyDist').onclick = () => { showDist = !showDist; syncLayers(); };
@@ -1446,6 +1449,12 @@ function drawPlan() {
           { color: '#13222a', weight: 1.4, fillColor: '#ffcf33', fillOpacity: 1, interactive: false }).addTo(planG));
       }
     }
+    // 22.11: bearing (from the start of the leg) and distance labels, switched like in the map mode;
+    // bearing at ~30% of the leg, distance at ~65% (once per line); short legs: both at the middle, on either side
+    const lbl = (x, y, html) => L.marker(toLL(x, y), { interactive: false, keyboard: false, icon: L.divIcon({ className: '', html, iconSize: [0, 0] }) }).addTo(planG);
+    const short = len < 130, side = (sgn) => short ? [nx * 14 * sgn, ny * 14 * sgn] : [0, 0];
+    if (showAz) { const f = short ? .5 : .3, [ox, oy] = side(1); lbl(ax + ux * len * f + ox, ay + uy * len * f + oy, `<div class="lbl az">${arrow(ux, uy)}${az(g.az)}</div>`); }
+    if (showDist && g.occ === 0) { const f = short ? .5 : .65, [ox, oy] = side(-1); lbl(ax + ux * len * f + ox, ay + uy * len * f + oy, `<div class="lbl">${dm(g.m)}</div>`); }
     legLines[g.i] = { core, arrows };
   });
 }
@@ -1471,7 +1480,7 @@ function renderPlan(b, L_) {
     }
     const tag = i === 0 ? L_.start : (i === last ? L_.finish : '');
     rows += `<li class="pt"><button data-id="${esc(id)}"><span class="badge${p.maly || p.nr === '7b' ? ' small' : ''}">${esc(p.nr)}</span>` +
-      `<span><span class="t">${esc(name(p))}</span>${tag ? `<span class="s">${tag}</span>` : ''}</span><span class="dp">${d === null ? '' : n(d) + ' m'}</span></button></li>`;
+      `<span><span class="t">${esc(name(p))}${depTag(p)}</span>${tag ? `<span class="s">${tag}</span>` : ''}</span></button></li>`;   // 22.11: depth as in the map mode
   });
   b.innerHTML = `<div class="view-pad">
     <dl class="plan-sum">
@@ -1610,6 +1619,15 @@ async function drawRoutePage(L_) {
   const px = id => [bx + (P[id].x - x0) * sc, by + (P[id].y - y0) * sc];
   const rOf = id => mm(P[id].maly || P[id].nr === '7b' ? 2.4 : 3.2);
 
+  // 22.11: drawings of the objects, as on the screen (white outlines, pipe stubs grey)
+  const ptP = ([x, y]) => [bx + (x - x0) * sc, by + (y - y0) * sc];
+  const pathP = (l, close) => { g.beginPath(); l.forEach((q, i) => { const [x, y] = ptP(q); i ? g.lineTo(x, y) : g.moveTo(x, y); }); if (close) g.closePath(); };
+  g.lineJoin = 'round';
+  D.obrysy.forEach(o => {
+    if (o.px) { pathP(o.px, true); g.fillStyle = 'rgba(255,255,255,.18)'; g.fill(); g.setLineDash([mm(1.2), mm(.8)]); g.strokeStyle = '#fff'; g.lineWidth = mm(.45); g.stroke(); g.setLineDash([]); }
+    (o.czesci || []).forEach(c => { pathP(c, true); g.fillStyle = 'rgba(255,255,255,.22)'; g.fill(); g.strokeStyle = 'rgba(255,255,255,.9)'; g.lineWidth = mm(.25); g.stroke(); });
+    (o.linie || []).forEach(l => { pathP(l, false); g.strokeStyle = o.rura ? 'rgba(55,60,66,.8)' : 'rgba(255,255,255,.9)'; g.lineWidth = mm(o.rura ? .35 : .25); g.stroke(); });
+  });
   // legs: casing, core, arrows; a line swum more than once is drawn as parallel lines
   const SP = mm(1.5);
   s.legs.forEach(lg => {
@@ -1633,6 +1651,30 @@ async function drawRoutePage(L_) {
       }
     }
   });
+  // 22.11: bearing and distance labels on the map, as switched on the screen (showAz, showDist)
+  const tagP = (x, y, txt, col, dir) => {
+    font(600, 2.5, FM); const tw = g.measureText(txt).width, aw = dir ? mm(2.6) : 0, w = tw + aw + mm(2), h = mm(4);
+    g.fillStyle = 'rgba(255,255,255,.95)'; g.strokeStyle = col; g.lineWidth = mm(.3);
+    g.beginPath(); if (g.roundRect) g.roundRect(x - w / 2, y - h / 2, w, h, mm(.8)); else g.rect(x - w / 2, y - h / 2, w, h); g.fill(); g.stroke();
+    g.fillStyle = col; g.textBaseline = 'middle'; g.textAlign = 'left'; g.fillText(txt, x - w / 2 + mm(1) + aw, y + mm(.1));
+    if (dir) {                                  // small arrow in the direction of the leg
+      const cx = x - w / 2 + mm(1) + aw / 2 - mm(.2), [ux, uy] = dir;
+      g.strokeStyle = col; g.lineWidth = mm(.35); g.lineCap = 'round';
+      g.beginPath(); g.moveTo(cx - ux * mm(1), y - uy * mm(1)); g.lineTo(cx + ux * mm(1), y + uy * mm(1));
+      g.moveTo(cx + ux * mm(1) - (ux * .6 - uy * .6) * mm(1), y + uy * mm(1) - (uy * .6 + ux * .6) * mm(1)); g.lineTo(cx + ux * mm(1), y + uy * mm(1));
+      g.lineTo(cx + ux * mm(1) - (ux * .6 + uy * .6) * mm(1), y + uy * mm(1) - (uy * .6 - ux * .6) * mm(1)); g.stroke();
+    }
+  };
+  if (showAz || showDist) s.legs.forEach(lg => {
+    const [ax0, ay0] = px(lg.a), [bx0, by0] = px(lg.b);
+    const [c1, c2] = lg.a < lg.b ? [[ax0, ay0], [bx0, by0]] : [[bx0, by0], [ax0, ay0]];
+    let nx_ = -(c2[1] - c1[1]), ny_ = c2[0] - c1[0]; const nl = Math.hypot(nx_, ny_) || 1; nx_ /= nl; ny_ /= nl;
+    const o = (lg.occ - (lg.cnt - 1) / 2) * SP, ax = ax0 + nx_ * o, ay = ay0 + ny_ * o, bx_ = bx0 + nx_ * o, by_ = by0 + ny_ * o;
+    const len = Math.hypot(bx_ - ax, by_ - ay) || 1, ux = (bx_ - ax) / len, uy = (by_ - ay) / len, short = len < mm(24);
+    if (showAz) { const f = short ? .5 : .3, k = short ? mm(2.6) : 0; tagP(ax + ux * len * f + nx_ * k, ay + uy * len * f + ny_ * k, az(lg.az), RED, [ux, uy]); }
+    if (showDist && lg.occ === 0) { const f = short ? .5 : .65, k = short ? -mm(2.6) : 0; tagP(ax + ux * len * f + nx_ * k, ay + uy * len * f + ny_ * k, dm(lg.m), INK, null); }
+  });
+  g.textAlign = 'left'; g.textBaseline = 'alphabetic';
   // points: those on the route in full colour with a yellow ring, the others faded
   const inR = new Set(route);
   D.punkty.forEach(p => {
