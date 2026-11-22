@@ -1356,9 +1356,29 @@ function zoomBy(d) {
 }
 $('zIn').onclick = () => zoomBy(0.75);
 $('zOut').onclick = () => zoomBy(-0.75);
+// Whole map: the image fills the whole width of the free area (right of the panel on
+// a desktop, edge to edge on a phone) as far as the height allows - every point must
+// still fit between the top controls and the sheet. Vertically the image is centred,
+// shifted only as much as needed to keep all points in view (22.11). The zoom is not
+// snapped to the 0.25 steps: a snapped zoom left up to a fifth of the width empty.
+function freeX0() {
+  if (mq.matches && (!mqSide.matches || sheet === 'peek')) return 0;
+  return Math.max(0, $('panel').getBoundingClientRect().right);
+}
 function fitAll(animate) {
-  const ptsB = L.latLngBounds(D.punkty.map(p => LL(p.x, p.y))).pad(0.06), pad = panelPad();
-  map.fitBounds(ptsB, { paddingTopLeft: pad.tl, paddingBottomRight: pad.br, animate: !!animate });
+  const pad = panelPad(), sz = map.getSize(), x0 = freeX0();
+  const ys = D.punkty.map(p => p.y), m = (Math.max(...ys) - Math.min(...ys)) * 0.06;
+  const y0 = Math.min(...ys) - m, y1 = Math.max(...ys) + m;
+  const t = pad.tl[1], b = sz.y - pad.br[1];
+  const z = Math.min(ZN + Math.log2(Math.max(sz.x - x0, 40) / D.szer), ZN + Math.log2(Math.max(b - t, 40) / (y1 - y0)));
+  const k = Math.pow(2, z - ZN), half = (b - t) / 2 / k;
+  const yc = Math.min(Math.max(D.wys / 2, y1 - half), y0 + half);
+  const fc = L.point((x0 + sz.x) / 2, (t + b) / 2);
+  const c = map.unproject(L.point(D.szer / 2 * k, yc * k).subtract(fc.subtract(sz.divideBy(2))), z);
+  const snap = map.options.zoomSnap;
+  map.options.zoomSnap = 0;
+  map.setView(c, z, { animate: !!animate });
+  map.options.zoomSnap = snap;
   fitted = true;
 }
 $('zFit').onclick = () => fitAll(true);
