@@ -121,6 +121,8 @@ button { font: inherit; color: inherit; }
 .plan-fig img { display: block; width: 100%; height: auto; }
 .plan-fig figcaption { font-size: 13px; color: var(--muted); }
 .plan-fig figcaption a { color: var(--link); font-weight: 600; }
+.lic { font-size: 13px; color: var(--muted); }
+.lic a { color: var(--link); }
 .badge {
   display: inline-grid; place-items: center; width: 30px; height: 30px; border-radius: 50%;
   background: var(--pin); color: var(--pin-ink); font-family: var(--f-display); font-weight: 700; font-size: 16px; line-height: 1;
@@ -565,6 +567,7 @@ const T = {
     listCap: 'Wybierz punkt na liście lub na mapie, aby wyświetlić trasy i azymuty.',
     back: 'Wszystkie atrakcje',
     planAlt: 'Mapa nurkowa zbiornika Koparki – plan z atrakcjami, głębokościami, trasami i azymutami', planCap: 'Mapa nurkowa zbiornika Koparki', planJpg: 'obraz JPG',
+    pdfLicense: '© 2026 Jerzy Biernacki (@deeperbluediving) · Mapa udostępniona na licencji CC BY-SA 4.0 · jjbiernacki.github.io/koparki',
     photoAlt: (n, i) => `${n} – zdjęcie spod wody ${i}, zbiornik Koparki`,
     photos: 'Zdjęcia spod wody', photoN: (i, n) => `Zdjęcie ${i} z ${n}`, lbClose: 'Zamknij zdjęcie', lbPrev: 'Poprzednie zdjęcie', lbNext: 'Następne zdjęcie',
     alt: 'Nazwa w bazie', coords: 'Współrzędne WGS84', copy: 'Kopiuj', copied: 'Skopiowano',
@@ -615,7 +618,8 @@ const T = {
         <li>Głębokości oznaczone gwiazdką zależą od poziomu wody.</li>
         <li>Przy części atrakcji są zdjęcia spod wody. Wybranie miniatury powiększa zdjęcie; kolejne zdjęcia przełącza się strzałkami.</li>
         <li>Kompas w prawym górnym rogu wskazuje północ magnetyczną. Po jego wybraniu wyświetlają się kursy na brzeg.</li>
-      </ul>`,
+      </ul>
+      <p class="lic">© 2026 Jerzy Biernacki (@deeperbluediving). Mapa, plan do druku i plany tras są udostępnione na licencji <a href="https://creativecommons.org/licenses/by-sa/4.0/deed.pl" target="_blank" rel="noopener license">CC BY-SA 4.0</a>: można je kopiować, drukować i przerabiać, także komercyjnie, z podaniem autora i linku do strony oraz na tej samej licencji. Zdjęcia spod wody nie są objęte tą licencją.</p>`,
     contact: `
       <h2>Uwagi i poprawki</h2>
       <p>Mapa powstała na podstawie zdjęć z drona i pomiarów pod wodą. Uwagi, poprawki oraz propozycje nowych punktów proszę przesyłać przez Instagram lub Facebook.</p>
@@ -633,6 +637,7 @@ const T = {
     listCap: 'Select a site in the list or on the map to show its routes and bearings.',
     back: 'All sites',
     planAlt: 'Koparki dive map – plan of the quarry with dive sites, depths, routes and bearings', planCap: 'Koparki dive map', planJpg: 'JPG image',
+    pdfLicense: '© 2026 Jerzy Biernacki (@deeperbluediving) · Map licensed under CC BY-SA 4.0 · jjbiernacki.github.io/koparki',
     photoAlt: (n, i) => `${n} – underwater photo ${i}, Koparki quarry`,
     docTitle: 'Koparki dive map (Jaworzno, Poland) – dive sites, routes, PDF plan',
     photos: 'Underwater photos', photoN: (i, n) => `Photo ${i} of ${n}`, lbClose: 'Close photo', lbPrev: 'Previous photo', lbNext: 'Next photo',
@@ -684,7 +689,8 @@ const T = {
         <li>Depths marked with an asterisk depend on the water level.</li>
         <li>Some sites have underwater photos. Selecting a thumbnail enlarges the photo; the arrows switch between photos.</li>
         <li>The compass in the top right corner shows magnetic north. Selecting it displays courses to shore.</li>
-      </ul>`,
+      </ul>
+      <p class="lic">© 2026 Jerzy Biernacki (@deeperbluediving). The map, the printable plan and route plans are licensed under <a href="https://creativecommons.org/licenses/by-sa/4.0/" target="_blank" rel="noopener license">CC BY-SA 4.0</a>: they may be copied, printed and adapted, also commercially, with credit to the author, a link to this site and under the same licence. Underwater photos are not covered by this licence.</p>`,
     contact: `
       <h2>Feedback and corrections</h2>
       <p>The map is based on drone photographs and underwater measurements. Please send comments, corrections and suggestions for new points via Instagram or Facebook.</p>
@@ -718,7 +724,7 @@ const depth = p => { const m = DEP.exec(desc(p) || ''); return m ? m[1] : ''; };
 const descRest = p => (desc(p) || '').replace(DEP, '');
 // plan do druku jako obraz pod lista atrakcji (ten sam plik co w wyszukiwarce grafik)
 const planFig = L_ => { const o = PLANIMG[lang === 'pl' ? 'PL' : 'EN']; return o ? `<figure class="plan-fig"><a href="${o.obraz}"><img src="${o.podglad}" alt="${esc(L_.planAlt)}" width="${o.w_podglad}" height="${o.h_podglad}" loading="lazy"></a>` +
-  `<figcaption>${L_.planCap}: <a href="${o.obraz}">${L_.planJpg}</a> · <a href="${o.pdf}">PDF A4</a></figcaption></figure>` : ''; };
+  `<figcaption>${L_.planCap}: <a href="${o.obraz}">${L_.planJpg}</a> · <a href="${o.pdf}">PDF A4</a> · <a href="${lang === 'pl' ? 'https://creativecommons.org/licenses/by-sa/4.0/deed.pl' : 'https://creativecommons.org/licenses/by-sa/4.0/'}" target="_blank" rel="noopener license">CC BY-SA 4.0</a></figcaption></figure>` : ''; };
 const depTag = p => depth(p) ? `<span class="dep">${esc(depth(p))}</span>` : '';
 const order = D.punkty.slice().sort((a, b) => (parseInt(a.nr) - parseInt(b.nr)) || a.nr.localeCompare(b.nr));
 function routesOf(id) {
@@ -1784,7 +1790,7 @@ async function drawRoutePage(L_) {
   font(400, 2.6, FB); g.fillStyle = MUT;
   const maxW = qx - mm(M) - mm(8);
   const lines = [];
-  [`${L_.planNote} ${s.known ? L_.depthKnown(s.known, s.total) : L_.depthNoData}`, L_.pdfFoot].forEach(par => {
+  [`${L_.planNote} ${s.known ? L_.depthKnown(s.known, s.total) : L_.depthNoData}`, L_.pdfFoot, L_.pdfLicense].forEach(par => {   // 22.11: autor i licencja
     let cur = '';
     par.split(' ').forEach(w => { const tr = cur ? cur + ' ' + w : w; if (g.measureText(tr).width > maxW && cur) { lines.push(cur); cur = w; } else cur = tr; });
     if (cur) lines.push(cur);

@@ -55,7 +55,7 @@ for p in sorted(D['punkty'], key=lambda p: (int(re.match(r'\d+', p['nr']).group(
 cap = re.search(r"listCap: '([^']*)'", s).group(1)
 pl = PO['PL']
 plan_fig = ('<figure class="plan-fig"><a href="%s"><img src="%s" alt="Mapa nurkowa zbiornika Koparki – plan z atrakcjami, głębokościami, trasami i azymutami" width="%d" height="%d" loading="lazy"></a>'
-            '<figcaption>Mapa nurkowa zbiornika Koparki: <a href="%s">obraz JPG</a> · <a href="%s">PDF A4</a></figcaption></figure>'
+            '<figcaption>Mapa nurkowa zbiornika Koparki: <a href="%s">obraz JPG</a> · <a href="%s">PDF A4</a> · <a href="https://creativecommons.org/licenses/by-sa/4.0/deed.pl" target="_blank" rel="noopener license">CC BY-SA 4.0</a></figcaption></figure>'
             % (pl['obraz'], pl['podglad'], pl['w_podglad'], pl['h_podglad'], pl['obraz'], pl['pdf']))
 lista = '<div class="view"><p class="list-cap">%s</p><ul class="list">%s</ul>%s</div>' % (cap, ''.join(pozycje), plan_fig)
 assert s.count('<div class="body" id="body"></div>') == 1
@@ -75,10 +75,10 @@ ld = {'@context': 'https://schema.org', '@graph': [
     {'@type': 'ImageObject', '@id': ADRES + '#mapa', 'contentUrl': ADRES + PO['PL']['obraz'],
      'thumbnailUrl': ADRES + PO['PL']['podglad'], 'name': 'Mapa nurkowa Koparki',
      'caption': 'Mapa nurkowa zbiornika Koparki w Jaworznie z atrakcjami, głębokościami, trasami i azymutami',
-     'width': PO['PL']['w'], 'height': PO['PL']['h'], 'creditText': '@deeperbluediving', 'inLanguage': 'pl'},
+     'width': PO['PL']['w'], 'height': PO['PL']['h'], 'license': 'https://creativecommons.org/licenses/by-sa/4.0/', 'acquireLicensePage': ADRES, 'creator': {'@type': 'Person', 'name': 'Jerzy Biernacki', 'url': 'https://www.instagram.com/deeperbluediving'}, 'copyrightNotice': '© 2026 Jerzy Biernacki (@deeperbluediving), CC BY-SA 4.0', 'creditText': '@deeperbluediving', 'inLanguage': 'pl'},
     {'@type': 'ImageObject', 'contentUrl': ADRES + PO['EN']['obraz'], 'name': 'Koparki dive map',
      'caption': 'Dive map of the Koparki flooded quarry in Jaworzno, Poland: dive sites, depths, routes and bearings',
-     'width': PO['EN']['w'], 'height': PO['EN']['h'], 'creditText': '@deeperbluediving', 'inLanguage': 'en'},
+     'width': PO['EN']['w'], 'height': PO['EN']['h'], 'license': 'https://creativecommons.org/licenses/by-sa/4.0/', 'acquireLicensePage': ADRES, 'creator': {'@type': 'Person', 'name': 'Jerzy Biernacki', 'url': 'https://www.instagram.com/deeperbluediving'}, 'copyrightNotice': '© 2026 Jerzy Biernacki (@deeperbluediving), CC BY-SA 4.0', 'creditText': '@deeperbluediving', 'inLanguage': 'en'},
 ]}
 
 # --- naglowek: kolejne linie <title>/<meta>/<link> na poczatku szablonu ----------------------

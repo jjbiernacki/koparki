@@ -34,6 +34,9 @@ plan. Polish and English.*
 
 ## Licencja i kontakt
 
-Licencja MIT, zobacz plik `LICENSE`.
+- **Kod strony** (`index.html`, `zrodlo/`): licencja MIT, zobacz plik `LICENSE`.
+- **Mapa, plan do druku (`plan_PL.pdf`, `plan_EN.pdf`, `koparki-mapa-nurkowa*.jpg`, `koparki-dive-map*.jpg`), kafle mapy i dane punktów (`dane.json`)**: © 2026 Jerzy Biernacki (@deeperbluediving), licencja [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/deed.pl). Można je kopiować, drukować i przerabiać, także komercyjnie, z podaniem autora i linku do strony oraz na tej samej licencji.
+- **Zdjęcia spod wody** (`zdjecia/`) nie są objęte żadną z tych licencji; prawa należą do ich autorów.
+
 Kontakt: [@deeperbluediving](https://www.instagram.com/deeperbluediving) na Instagramie
 i [facebook.com/jjbiernacki](https://www.facebook.com/jjbiernacki) na Facebooku.
