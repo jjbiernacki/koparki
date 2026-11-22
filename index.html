@@ -124,7 +124,17 @@ button { font: inherit; color: inherit; }
 .list button:hover { background: var(--surface-2); }
 .list .t { font-weight: 600; font-size: 15px; line-height: 1.2; display: block; }
 .list .s { display: block; color: var(--muted); font-size: 13px; line-height: 1.3; }
+/* depth next to the name */
+.dep { display: inline-block; margin-left: 7px; padding: 1px 6px; border-radius: 6px; background: var(--surface-2); border: 1px solid var(--line); color: var(--ink); font-family: var(--f-data); font-size: 12px; font-weight: 600; line-height: 1.35; letter-spacing: 0; white-space: nowrap; vertical-align: 1px; }
+.d-title h2 .dep { font-size: 14px; vertical-align: 5px; margin-left: 9px; }
 .list li.sub button { padding-left: 22px; grid-template-columns: 26px 1fr; }
+/* pictograms of the objects (22.11) */
+.ico { display: block; flex: none; }
+.list button:has(.ico) { grid-template-columns: 30px 32px 1fr; }
+.list li.sub button:has(.ico) { grid-template-columns: 26px 32px 1fr; }
+.d-title.has-ico { grid-template-columns: auto auto 1fr; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .ico { background: #f4f4f1; border-radius: 6px; } }
+:root[data-theme="dark"] .ico { background: #f4f4f1; border-radius: 6px; }
 .list-cap { margin: 6px 8px 8px; font-size: 13px; color: var(--muted); }
 .badge {
   display: inline-grid; place-items: center; width: 30px; height: 30px; border-radius: 50%;
@@ -141,6 +151,32 @@ button { font: inherit; color: inherit; }
 .d-title h2 { margin: 0; font-family: var(--f-display); font-weight: 700; font-size: 28px; line-height: 1; text-wrap: balance; }
 .d-title .alt { display: block; color: var(--muted); font-size: 13px; margin-top: 3px; }
 .d-desc { margin: 0; font-size: 16px; }
+/* photos of the attraction: thumbnails in the detail view, viewer on top of everything */
+.gal { list-style: none; margin: 0; padding: 2px; display: flex; flex-wrap: wrap; gap: 8px; }
+.gal li { flex: none; }
+.gal button { display: block; padding: 0; border: 0; border-radius: 8px; overflow: hidden; cursor: zoom-in; background: var(--surface-2); box-shadow: 0 0 0 1px var(--line); }
+.gal img { display: block; height: 78px; width: auto; transition: transform .2s ease; }
+.gal button:hover img { transform: scale(1.04); }
+#lb { position: fixed; inset: 0; z-index: 2000; background: rgba(4, 11, 14, .93); display: grid; grid-template-rows: 1fr auto; touch-action: pan-y pinch-zoom; }
+#lb[hidden] { display: none; }
+.lb-fig { margin: 0; display: grid; place-items: center; min-height: 0; padding: 56px 64px 0; }
+.lb-fig img { max-width: 100%; max-height: calc(100vh - 128px); max-height: calc(100dvh - 128px); object-fit: contain; border-radius: 6px; box-shadow: 0 12px 40px rgba(0,0,0,.6); user-select: none; -webkit-user-drag: none; }
+.lb-cap { color: #e3ecec; text-align: center; padding: 14px 16px calc(18px + env(safe-area-inset-bottom, 0px)); font-size: 15px; display: flex; justify-content: center; align-items: center; gap: 10px; }
+.lb-cap .badge { box-shadow: none; }
+.lb-cap .n { font-family: var(--f-data); font-size: 13px; color: #94a8ac; }
+.lb-b { position: absolute; width: 46px; height: 46px; border-radius: 50%; border: 0; background: rgba(255,255,255,.12); color: #fff; display: grid; place-items: center; cursor: pointer; padding: 0; }
+.lb-b:hover { background: rgba(255,255,255,.24); }
+.lb-b svg { width: 22px; height: 22px; }
+#lbX { top: max(10px, env(safe-area-inset-top, 0px)); right: max(10px, env(safe-area-inset-right, 0px)); }
+#lbP, #lbN { top: calc(50% - 36px); }
+#lbP { left: max(10px, env(safe-area-inset-left, 0px)); }
+#lbN { right: max(10px, env(safe-area-inset-right, 0px)); }
+@media (max-width: 640px) {
+  .lb-fig { padding: 56px 0 0; }
+  .lb-fig img { border-radius: 0; }
+  #lbP, #lbN { top: auto; bottom: calc(8px + env(safe-area-inset-bottom, 0px)); }
+  .lb-cap { padding-left: 64px; padding-right: 64px; }
+}
 .facts { display: grid; gap: 10px; margin: 0; }
 .facts div { display: grid; gap: 2px; }
 .facts dt { font-family: var(--f-data); font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
@@ -349,6 +385,9 @@ button { font: inherit; color: inherit; }
   .sbar-t .badge { width: 34px; height: 34px; font-size: 18px; flex: none; }
   .sbar-t > div { min-width: 0; }
   .sbar-t h2 { margin: 0; font-family: var(--f-display); font-weight: 700; font-size: 22px; line-height: 1.05; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .sbar-t h2:has(.dep) { display: flex; align-items: center; }
+  .sbar-t h2 .nm { min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+  .sbar-t h2 .dep { flex: none; font-size: 13px; vertical-align: 0; }
   .sbar-t small { display: block; color: var(--muted); font-size: 13px; line-height: 1.2; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .ib { width: 40px; height: 40px; flex: none; border: 0; border-radius: 50%; background: var(--surface-2); color: var(--ink); display: grid; place-items: center; cursor: pointer; padding: 0; }
   .ib svg { width: 20px; height: 20px; transition: transform .25s ease; }
@@ -502,9 +541,18 @@ button { font: inherit; color: inherit; }
   </aside>
 </div>
 
+<div id="lb" role="dialog" aria-modal="true" aria-labelledby="lbCap" hidden>
+  <figure class="lb-fig" id="lbFig"><img id="lbImg" alt=""></figure>
+  <div class="lb-cap" id="lbCap"></div>
+  <button class="lb-b" id="lbX"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M5 5l10 10M15 5L5 15" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg></button>
+  <button class="lb-b" id="lbP"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M12.5 4l-6 6 6 6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+  <button class="lb-b" id="lbN"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M7.5 4l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+</div>
+
 <script src="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
-const D = {"szer":9328,"wys":3692,"kafel":512,"zmax":5,"gsd":0.03913,"tlo":"#15282e","polnoc":133.18,"polnoc_mag":139.45,"deklinacja":6.27,"brzegi":[{"az":221,"kier":"SW","ekran":"g"},{"az":41,"kier":"NE","ekran":"d"},{"az":131,"kier":"SE","ekran":"l"},{"az":311,"kier":"NW","ekran":"p"}],"punkty":[{"id":"1","nr":"1","x":1900.5,"y":2899.5,"pl":"Wejście do wody","en":"Water entry","opis_pl":"schody i drabinka przy bazie","opis_en":"steps and ladder by the base","maly":false,"legenda":true,"lat":50.228018,"lon":19.312684},{"id":"2","nr":"2","x":2621.5,"y":2791.0,"pl":"Pomost I","en":"Jetty I","opis_pl":"","opis_en":"","maly":false,"legenda":true,"lat":50.228177,"lon":19.31237},{"id":"3","nr":"3","x":3335.5,"y":2833.0,"pl":"Pomost II","en":"Jetty II","opis_pl":"pod pomostem platforma szkoleniowa","opis_en":"training platform under the jetty","maly":false,"legenda":true,"lat":50.228371,"lon":19.312118},{"id":"deco","nr":"3a","x":3525.7,"y":2841.5,"pl":"Deco bar","en":"Deco bar","opis_pl":"rurki PCV na różnych głębokościach do ćwiczenia pływalności","opis_en":"PVC pipes at different depths for buoyancy practice","maly":false,"legenda":true,"lat":50.228422,"lon":19.31205},{"id":"4","nr":"4","x":4513.0,"y":2784.0,"pl":"Pomost III","en":"Jetty III","opis_pl":"","opis_en":"","maly":false,"legenda":true,"lat":50.228662,"lon":19.311656},{"id":"5","nr":"5","x":6602.5,"y":2766.5,"pl":"Basen","en":"Pool","opis_pl":"pływająca platforma z basenem","opis_en":"floating platform with a pool","maly":false,"legenda":true,"lat":50.229194,"lon":19.310863},{"id":"6","nr":"6","x":593.2,"y":2104.9,"pl":"Star (ciężarówka)","en":"Star (truck)","opis_pl":"","opis_en":"","maly":false,"legenda":true,"lat":50.227491,"lon":19.312857},{"id":"lina","nr":"7","x":1383.0,"y":1021.1,"pl":"Wrak WILHELM","en":"WILHELM wreck","opis_pl":"15 m* · przypięcie poręczówki z 9; 7b dziób","opis_en":"15 m* · guideline from 9 tied here; 7b bow","maly":false,"legenda":true,"lat":50.227432,"lon":19.312126},{"id":"dz","nr":"7b","x":1089.8,"y":1219.9,"pl":"Wilhelm — dziób","en":"Wilhelm bow","opis_pl":"dziób wraku","opis_en":"bow of the wreck","maly":false,"legenda":false,"lat":50.227405,"lon":19.312316},{"id":"8","nr":"8","x":2474.7,"y":2498.7,"pl":"Transformator","en":"Transformer","opis_pl":"","opis_en":"","maly":false,"legenda":true,"lat":50.228069,"lon":19.312308},{"id":"9","nr":"9","x":3281.3,"y":1526.7,"pl":"Głęboka koparka","en":"Deep excavator","opis_pl":"15 m*","opis_en":"15 m*","maly":false,"legenda":true,"lat":50.228042,"lon":19.311615},{"id":"10","nr":"10","x":4062.9,"y":2409.9,"pl":"Łyżki","en":"Buckets","opis_pl":"","opis_en":"","maly":false,"legenda":true,"lat":50.228456,"lon":19.311675},{"id":"11","nr":"11","x":4371.7,"y":1093.5,"pl":"Ford Fairlane 500","en":"Ford Fairlane 500","opis_pl":"","opis_en":"","maly":false,"legenda":true,"lat":50.228218,"lon":19.311032},{"id":"12","nr":"12","x":5381.6,"y":593.0,"pl":"Mostek","en":"Bridge","opis_pl":"18,5 m*","opis_en":"18.5 m*","maly":false,"legenda":true,"lat":50.228357,"lon":19.310451},{"id":"13","nr":"13","x":5965.3,"y":1484.0,"pl":"Płytka koparka","en":"Shallow excavator","opis_pl":"12 m*","opis_en":"12 m*","maly":false,"legenda":true,"lat":50.228721,"lon":19.310589},{"id":"mag","nr":"14","x":6633.6,"y":1316.4,"pl":"Magazyn strzałowego","en":"Explosives store","opis_pl":"","opis_en":"","maly":false,"legenda":true,"lat":50.228853,"lon":19.310271},{"id":"prz","nr":"15","x":6710.0,"y":1020.0,"pl":"Przepompownia","en":"Pumping station","opis_pl":"","opis_en":"","maly":false,"legenda":true,"lat":50.228801,"lon":19.310123},{"id":"14","nr":"16","x":6917.0,"y":2471.5,"pl":"Most pontonowy","en":"Pontoon bridge","opis_pl":"","opis_en":"","maly":false,"legenda":true,"lat":50.229204,"lon":19.310627},{"id":"16","nr":"17","x":7226.5,"y":2836.5,"pl":"Platforma szkoleniowa I","en":"Training platform I","opis_pl":"5 m*","opis_en":"5 m*","maly":true,"legenda":true,"lat":50.229372,"lon":19.310657},{"id":"17","nr":"18","x":7415.0,"y":2752.5,"pl":"Platforma szkoleniowa II","en":"Training platform II","opis_pl":"5 m*","opis_en":"5 m*","maly":true,"legenda":true,"lat":50.2294,"lon":19.310552},{"id":"15","nr":"19","x":7894.5,"y":2926.0,"pl":"Korytarz","en":"Corridor","opis_pl":"zatopiony korytarz w kształcie L","opis_en":"sunken L-shaped corridor","maly":false,"legenda":true,"lat":50.229565,"lon":19.310441},{"id":"18","nr":"20","x":8448.0,"y":2587.0,"pl":"Lustra","en":"Mirrors","opis_pl":"na dnie, w płyciźnie od NW","opis_en":"on the bottom, in the shallows on the NW side","maly":false,"legenda":true,"lat":50.229625,"lon":19.310097}],"krawedzie":[{"a":"mag","b":"prz","m":12.0,"ab":235.02,"ba":55.02},{"a":"2","b":"8","m":12.8,"ab":193.95,"ba":13.95},{"a":"5","b":"14","m":16.9,"ab":267.51,"ba":87.51},{"a":"4","b":"10","m":23.0,"ab":170.34,"ba":350.34},{"a":"15","b":"18","m":25.4,"ab":278.94,"ba":98.94},{"a":"13","b":"mag","m":27.0,"ab":296.64,"ba":116.64},{"a":"1","b":"8","m":27.4,"ab":275.67,"ba":95.67},{"a":"3","b":"10","m":33.0,"ab":280.38,"ba":100.38},{"a":"dz","b":"6","m":39.8,"ab":69.81,"ba":249.81},{"a":"12","b":"13","m":41.7,"ab":7.4,"ba":187.4},{"a":"14","b":"15","m":42.3,"ab":335.44,"ba":155.44},{"a":"11","b":"12","m":44.2,"ab":284.18,"ba":104.18},{"a":"9","b":"11","m":46.0,"ab":288.93,"ba":108.93},{"a":"9","b":"10","m":46.2,"ab":359.04,"ba":179.04},{"a":"8","b":"9","m":49.5,"ab":260.25,"ba":80.25},{"a":"5","b":"15","m":51.1,"ab":317.61,"ba":137.61},{"a":"3","b":"9","m":51.3,"ab":218.17,"ba":38.17},{"a":"14","b":"13","m":53.8,"ab":176.62,"ba":356.62},{"a":"5","b":"13","m":56.1,"ab":194.12,"ba":14.11},{"a":"1","b":"6","m":59.9,"ab":161.84,"ba":341.84},{"a":"13","b":"11","m":64.3,"ab":144.26,"ba":324.26},{"a":"4","b":"11","m":66.5,"ab":215.77,"ba":35.77},{"a":"lina","b":"8","m":72.0,"ab":4.12,"ba":184.12},{"a":"9","b":"lina","m":77.0,"ab":145.48,"ba":325.48},{"a":"13","b":"9","m":105.2,"ab":129.62,"ba":309.62}],"obrysy":[{"nazwa":"Wilhelm","L":16.5,"B":3.5,"az":90.0,"px":[[1374.2,917.8],[1131.1,1125.8],[1109.0,1151.7],[1094.8,1180.4],[1089.7,1203.5],[1089.8,1219.9],[1089.8,1219.9],[1105.9,1222.5],[1129.6,1221.1],[1160.1,1211.4],[1189.2,1193.6],[1432.2,985.7],[1431.1,977.8],[1392.2,925.9],[1409.6,946.3],[1427.0,966.6],[1381.8,920.2]]}]};
+const D = {"szer":9328,"wys":3692,"kafel":512,"zmax":5,"gsd":0.03913,"tlo":"#15282e","polnoc":133.19,"polnoc_mag":139.46,"deklinacja":6.27,"brzegi":[{"az":221,"kier":"SW","ekran":"g"},{"az":41,"kier":"NE","ekran":"d"},{"az":131,"kier":"SE","ekran":"l"},{"az":311,"kier":"NW","ekran":"p"}],"punkty":[{"id":"1","nr":"1","x":1900.5,"y":2899.5,"pl":"Wejście do wody","en":"Water entry","opis_pl":"schody i drabinka przy bazie","opis_en":"steps and ladder by the base","maly":false,"legenda":true,"lat":50.228018,"lon":19.312684,"ikona":"ikony/1.png"},{"id":"2","nr":"2","x":2621.5,"y":2791.0,"pl":"Pomost I","en":"Jetty I","opis_pl":"","opis_en":"","maly":false,"legenda":true,"lat":50.228177,"lon":19.31237,"ikona":"ikony/2.png"},{"id":"3","nr":"3","x":3335.5,"y":2833.0,"pl":"Pomost II","en":"Jetty II","opis_pl":"pod pomostem platforma szkoleniowa","opis_en":"training platform under the jetty","maly":false,"legenda":true,"lat":50.228371,"lon":19.312118,"ikona":"ikony/3.png"},{"id":"deco","nr":"3a","x":3525.7,"y":2841.5,"pl":"Deco bar","en":"Deco bar","opis_pl":"rurki PCV na różnych głębokościach do ćwiczenia pływalności","opis_en":"PVC pipes at different depths for buoyancy practice","maly":true,"legenda":true,"lat":50.228422,"lon":19.31205,"ikona":"ikony/deco.png"},{"id":"4","nr":"4","x":4513.0,"y":2784.0,"pl":"Pomost III","en":"Jetty III","opis_pl":"","opis_en":"","maly":false,"legenda":true,"lat":50.228662,"lon":19.311656,"ikona":"ikony/4.png"},{"id":"5","nr":"5","x":6602.5,"y":2766.5,"pl":"Basen","en":"Pool","opis_pl":"pływająca platforma z basenem","opis_en":"floating platform with a pool","maly":true,"legenda":true,"lat":50.229194,"lon":19.310863,"ikona":"ikony/5.png"},{"id":"6","nr":"6","x":414.8,"y":2013.8,"pl":"Star (ciężarówka)","en":"Star (truck)","opis_pl":"14 m*","opis_en":"14 m*","maly":false,"legenda":true,"lat":50.227423,"lon":19.312888,"ikona":"ikony/6.png"},{"id":"lina","nr":"7","x":1288.6,"y":886.6,"pl":"Wrak WILHELM","en":"WILHELM wreck","opis_pl":"14 m*","opis_en":"14 m*","maly":false,"legenda":true,"lat":50.227375,"lon":19.312108,"ikona":"ikony/lina.png"},{"id":"dz","nr":"7b","x":994.5,"y":1019.6,"pl":"Wilhelm — dziób","en":"Wilhelm bow","opis_pl":"dziób wraku","opis_en":"bow of the wreck","maly":false,"legenda":false,"lat":50.227332,"lon":19.312272},{"id":"8","nr":"12","x":2370.2,"y":2428.8,"pl":"Transformator","en":"Transformer","opis_pl":"13,5 m*","opis_en":"13.5 m*","maly":false,"legenda":true,"lat":50.228025,"lon":19.312319,"ikona":"ikony/8.png"},{"id":"9","nr":"14","x":3378.5,"y":1562.5,"pl":"Głęboka koparka","en":"Deep excavator","opis_pl":"14,5 m*","opis_en":"14.5 m*","maly":false,"legenda":true,"lat":50.228076,"lon":19.311593,"ikona":"ikony/9.png"},{"id":"10","nr":"16","x":3848.5,"y":2399.2,"pl":"Łyżki","en":"Buckets","opis_pl":"14 m*","opis_en":"14 m*","maly":false,"legenda":true,"lat":50.228398,"lon":19.311751,"ikona":"ikony/10.png"},{"id":"11","nr":"17","x":4352.1,"y":1102.8,"pl":"Ford Fairlane 500","en":"Ford Fairlane 500","opis_pl":"14,5 m*","opis_en":"14.5 m*","maly":false,"legenda":true,"lat":50.228215,"lon":19.311043,"ikona":"ikony/11.png"},{"id":"12","nr":"19","x":5420.6,"y":639.8,"pl":"Mostek","en":"Bridge","opis_pl":"15,5 m*","opis_en":"15.5 m*","maly":false,"legenda":true,"lat":50.228378,"lon":19.310456,"ikona":"ikony/12.png"},{"id":"13","nr":"20","x":6049.7,"y":1463.7,"pl":"Płytka koparka","en":"Shallow excavator","opis_pl":"10,5 m*","opis_en":"10.5 m*","maly":false,"legenda":true,"lat":50.228738,"lon":19.310549,"ikona":"ikony/13.png"},{"id":"mag","nr":"21","x":6625.8,"y":1344.7,"pl":"Magazyn strzałowego","en":"Explosives store","opis_pl":"9 m*","opis_en":"9 m*","maly":false,"legenda":true,"lat":50.228858,"lon":19.310285,"ikona":"ikony/mag.png"},{"id":"prz","nr":"22","x":6691.5,"y":981.5,"pl":"Przepompownia","en":"Pumping station","opis_pl":"9 m*","opis_en":"9 m*","maly":false,"legenda":true,"lat":50.228787,"lon":19.310115,"ikona":"ikony/prz.png"},{"id":"14","nr":"23","x":6917.0,"y":2471.5,"pl":"Most pontonowy","en":"Pontoon bridge","opis_pl":"6,5 m*","opis_en":"6.5 m*","maly":false,"legenda":true,"lat":50.229204,"lon":19.310627,"ikona":"ikony/14.png"},{"id":"16","nr":"24","x":7226.5,"y":2836.5,"pl":"Platforma szkoleniowa I","en":"Training platform I","opis_pl":"4 m*","opis_en":"4 m*","maly":true,"legenda":true,"lat":50.229372,"lon":19.310657,"ikona":"ikony/16.png"},{"id":"17","nr":"25","x":7415.0,"y":2752.5,"pl":"Platforma szkoleniowa II","en":"Training platform II","opis_pl":"4 m*","opis_en":"4 m*","maly":true,"legenda":true,"lat":50.2294,"lon":19.310552,"ikona":"ikony/17.png"},{"id":"15","nr":"26","x":7894.5,"y":2926.0,"pl":"Korytarz","en":"Corridor","opis_pl":"ok. 4 m* · zatopiony korytarz w kształcie L","opis_en":"approx. 4 m* · sunken L-shaped corridor","maly":false,"legenda":true,"lat":50.229565,"lon":19.310441,"ikona":"ikony/15.png"},{"id":"18","nr":"27","x":8448.0,"y":2587.0,"pl":"Platforma z lustrami","en":"Mirror platform","opis_pl":"ok. 3 m*","opis_en":"approx. 3 m*","maly":false,"legenda":true,"lat":50.229625,"lon":19.310097,"ikona":"ikony/18.png"},{"id":"rower","nr":"8","x":1799.3,"y":1063.9,"pl":"Rower","en":"Bicycle","opis_pl":"14 m*","opis_en":"14 m*","maly":true,"legenda":true,"lat":50.227549,"lon":19.311987,"ikona":"ikony/rower.png"},{"id":"wind","nr":"9","x":1880.5,"y":2016.4,"pl":"Windsurfing","en":"Windsurf board","opis_pl":"14 m*","opis_en":"14 m*","maly":true,"legenda":true,"lat":50.2278,"lon":19.312338,"ikona":"ikony/wind.png"},{"id":"lus","nr":"10","x":1968.5,"y":2514.7,"pl":"Lustro","en":"Mirror","opis_pl":"14 m* · lustro na głazach","opis_en":"14 m* · mirror on the boulders","maly":true,"legenda":true,"lat":50.227943,"lon":19.312504,"ikona":"ikony/lus.png"},{"id":"wych","nr":"11","x":2239.5,"y":952.0,"pl":"Budka","en":"Hut","opis_pl":"14 m*","opis_en":"14 m*","maly":true,"legenda":true,"lat":50.227636,"lon":19.311777,"ikona":"ikony/wych.png"},{"id":"walec","nr":"13","x":2692.9,"y":2006.6,"pl":"Bunkier strzałowego","en":"Blaster's bunker","opis_pl":"14 m*","opis_en":"14 m*","maly":true,"legenda":true,"lat":50.228006,"lon":19.312029,"ikona":"ikony/walec.png"},{"id":"obr","nr":"15","x":3694.3,"y":2483.6,"pl":"Obręcze","en":"Hoops","opis_pl":"14 m* · do ćwiczenia pływalności","opis_en":"14 m* · for buoyancy practice","maly":true,"legenda":true,"lat":50.228379,"lon":19.311843,"ikona":"ikony/obr.png"},{"id":"pian","nr":"18","x":5117.7,"y":2090.4,"pl":"Pianista","en":"Pianist","opis_pl":"12 m* · postać przy klawiszach","opis_en":"12 m* · figure at a keyboard","maly":true,"legenda":true,"lat":50.22865,"lon":19.311151,"ikona":"ikony/pian.png"},{"id":"tel","nr":"10a","x":1953.6,"y":2378.1,"pl":"Telefon","en":"Telephone","opis_pl":"14 m* · telefon na głazie obok lustra (10)","opis_en":"14 m* · telephone on a boulder next to the mirror (10)","maly":true,"legenda":true,"lat":50.227906,"lon":19.312455,"ikona":"ikony/tel.png"},{"id":"kajak","nr":"9a","x":1993.8,"y":1901.3,"pl":"Kajak","en":"Kayak","opis_pl":"14 m* · obok windsurfingu (9)","opis_en":"14 m* · next to the windsurf board (9)","maly":true,"legenda":true,"lat":50.227801,"lon":19.312249,"ikona":"ikony/kajak.png"},{"id":"lina5","nr":"5a","x":6786.8,"y":2753.8,"pl":"Lina opustowa przy basenie","en":"Shot line by the pool","opis_pl":"","opis_en":"","maly":false,"legenda":true,"lat":50.229239,"lon":19.310789,"ikona":"ikony/lina5.png"}],"krawedzie":[{"a":"lina5","b":"14","m":12.2,"ab":245.12,"ba":65.12},{"a":"mag","b":"prz","m":14.5,"ab":230.66,"ba":50.66},{"a":"2","b":"8","m":17.3,"ab":185.88,"ba":5.88},{"a":"13","b":"mag","m":23.1,"ab":299.05,"ba":119.05},{"a":"15","b":"18","m":25.4,"ab":278.94,"ba":98.94},{"a":"1","b":"8","m":26.1,"ab":265.44,"ba":85.44},{"a":"3","b":"10","m":26.4,"ab":270.27,"ba":90.27},{"a":"4","b":"10","m":30.1,"ab":160.73,"ba":340.73},{"a":"9","b":"10","m":37.5,"ab":11.2,"ba":191.2},{"a":"12","b":"13","m":40.6,"ab":3.14,"ba":183.14},{"a":"9","b":"11","m":42.2,"ab":285.23,"ba":105.23},{"a":"14","b":"15","m":42.3,"ab":335.44,"ba":155.44},{"a":"lina5","b":"15","m":43.9,"ab":319.33,"ba":139.33},{"a":"dz","b":"6","m":45.1,"ab":70.76,"ba":250.76},{"a":"11","b":"12","m":45.6,"ab":287.14,"ba":107.14},{"a":"3","b":"9","m":49.8,"ab":222.51,"ba":42.51},{"a":"8","b":"9","m":52.1,"ab":269.98,"ba":89.98},{"a":"14","b":"13","m":52.1,"ab":179.86,"ba":359.86},{"a":"1","b":"6","m":67.8,"ab":161.33,"ba":341.33},{"a":"13","b":"11","m":68.0,"ab":142.52,"ba":322.52},{"a":"lina","b":"8","m":73.9,"ab":5.49,"ba":185.49},{"a":"4","b":"13","m":79.4,"ab":269.84,"ba":89.84},{"a":"9","b":"lina","m":86.2,"ab":148.5,"ba":328.5},{"a":"13","b":"9","m":104.7,"ab":128.4,"ba":308.4}],"obrysy":[{"nazwa":"Wilhelm","px":[[1267.4,758.4],[1028.5,920.9],[1007.6,944.2],[995.4,973.6],[992.5,999.8],[994.5,1019.6],[994.5,1019.6],[1012.2,1028.7],[1037.6,1035.6],[1069.4,1035.2],[1098.8,1024.3],[1337.7,861.8],[1335.6,851.9],[1287.8,774.8],[1308.9,805.8],[1330.0,836.8],[1275.8,764.0]]},{"nazwa":"Ford Fairlane 500","czesci":[[[4400.5,1155.3],[4288.3,1097.1],[4283.6,1087.3],[4301.9,1053.7],[4312.8,1052.3],[4422.4,1115.0]],[[4362.7,1131.3],[4328.0,1112.3],[4347.0,1077.4],[4381.8,1096.3]]],"linie":[[[4328.0,1112.3],[4315.9,1107.8],[4336.7,1069.7],[4347.0,1077.4]],[[4362.7,1131.3],[4370.8,1137.7],[4391.6,1099.6],[4381.8,1096.3]],[[4326.3,1088.8],[4293.8,1071.1]]]},{"nazwa":"Łyżki","czesci":[[[3843.5,2365.1],[3802.4,2330.7],[3773.0,2366.0],[3814.1,2400.3]],[[3843.5,2365.1],[3802.4,2330.7],[3797.8,2336.2],[3833.5,2366.0],[3813.2,2390.3],[3777.5,2360.5],[3773.0,2366.0],[3814.1,2400.3]],[[3797.5,2336.6],[3788.7,2333.2],[3793.6,2341.3]],[[3791.6,2343.6],[3782.8,2340.3],[3787.7,2348.3]],[[3785.7,2350.7],[3776.9,2347.3],[3781.8,2355.4]],[[3781.8,2355.4],[3773.0,2352.0],[3777.9,2360.1]],[[3882.9,2398.0],[3924.0,2432.4],[3894.6,2467.6],[3853.5,2433.3]],[[3882.9,2398.0],[3924.0,2432.4],[3919.4,2437.9],[3883.8,2408.1],[3863.5,2432.4],[3899.1,2462.2],[3894.6,2467.6],[3853.5,2433.3]],[[3919.1,2438.3],[3924.0,2446.4],[3915.2,2443.0]],[[3913.2,2445.3],[3918.1,2453.4],[3909.3,2450.0]],[[3907.3,2452.4],[3912.2,2460.4],[3903.4,2457.1]],[[3903.4,2457.1],[3908.3,2465.1],[3899.5,2461.8]]]},{"nazwa":"Obręcze","linie":[[[3586.9,2475.2],[3590.5,2464.6],[3596.4,2464.4],[3601.0,2474.5],[3601.6,2489.2],[3597.9,2499.7],[3592.1,2500.0],[3587.5,2489.8],[3586.9,2475.2]],[[3643.6,2488.0],[3647.3,2477.5],[3653.1,2477.2],[3657.7,2487.4],[3658.4,2502.0],[3654.7,2512.5],[3648.8,2512.8],[3644.2,2502.6],[3643.6,2488.0]],[[3699.7,2485.5],[3703.4,2475.0],[3709.2,2474.7],[3713.8,2484.9],[3714.5,2499.5],[3710.8,2510.1],[3704.9,2510.3],[3700.3,2500.2],[3699.7,2485.5]],[[3755.8,2483.1],[3759.4,2472.5],[3765.3,2472.3],[3769.9,2482.4],[3770.5,2497.1],[3766.8,2507.6],[3761.0,2507.9],[3756.4,2497.7],[3755.8,2483.1]]]},{"nazwa":"Mostek","czesci":[[[5343.7,478.1],[5482.0,722.3],[5459.8,734.9],[5321.5,490.7]],[[5350.5,477.2],[5355.5,486.1],[5346.7,491.1],[5341.6,482.2]],[[5481.2,708.1],[5486.3,717.0],[5477.4,722.0],[5472.4,713.1]],[[5326.1,491.0],[5331.1,499.9],[5322.2,504.9],[5317.2,496.0]],[[5456.8,721.9],[5461.8,730.8],[5453.0,735.8],[5447.9,726.9]]],"linie":[[[5356.3,500.3],[5334.1,512.9]],[[5368.8,522.5],[5346.6,535.1]],[[5381.4,544.7],[5359.2,557.3]],[[5394.0,566.9],[5371.8,579.5]],[[5406.5,589.1],[5384.3,601.7]],[[5419.1,611.3],[5396.9,623.9]],[[5431.7,633.5],[5409.5,646.1]],[[5444.3,655.7],[5422.1,668.3]],[[5456.8,677.9],[5434.6,690.5]],[[5469.4,700.1],[5447.2,712.7]],[[5350.4,474.3],[5488.6,718.6]]]},{"nazwa":"Płytka koparka","czesci":[[[5915.3,1428.9],[6022.7,1497.7],[6009.0,1519.1],[5901.5,1450.3]],[[5973.1,1338.6],[6080.5,1407.4],[6066.7,1428.9],[5959.3,1360.1]],[[5943.3,1337.7],[6063.7,1414.8],[6008.6,1500.8],[5888.3,1423.7]],[[6038.0,1445.4],[6184.7,1539.3],[6172.3,1558.6],[6025.6,1464.7]],[[6185.8,1523.4],[6222.3,1546.7],[6194.8,1589.7],[6158.3,1566.3]]]},{"nazwa":"Głęboka koparka","czesci":[[[3228.7,1597.6],[3356.2,1602.5],[3355.2,1628.0],[3227.7,1623.1]],[[3232.8,1490.6],[3360.3,1495.4],[3359.3,1520.9],[3231.8,1516.1]],[[3206.7,1504.9],[3349.5,1510.3],[3345.6,1612.3],[3202.8,1606.9]],[[3342.9,1549.7],[3516.9,1556.3],[3516.1,1579.2],[3342.0,1572.6]],[[3509.8,1542.0],[3553.2,1543.6],[3551.2,1594.6],[3507.9,1593.0]]]},{"nazwa":"Star","czesci":[[[351.4,2051.2],[365.5,2030.0],[378.9,2039.0],[364.7,2060.2]],[[391.0,2077.8],[405.2,2056.6],[418.6,2065.5],[404.4,2086.7]],[[356.3,2076.0],[425.8,1972.1],[430.7,1975.4],[361.1,2079.3]],[[374.7,2088.4],[444.2,1984.5],[449.1,1987.7],[379.6,2091.6]],[[413.1,1963.6],[440.0,1923.3],[488.8,1955.9],[461.8,1996.2]]],"linie":[[[364.0,2075.0],[377.6,2084.1]],[[399.5,2022.0],[413.0,2031.1]],[[420.7,1990.2],[434.3,1999.3]],[[482.4,1965.5],[495.6,1987.3]],[[433.7,1932.9],[408.4,1929.0]]]},{"nazwa":"Rury przy Mostku","linie":[[[5422.6,632.4],[5545.8,665.5]],[[5418.6,647.2],[5541.8,680.3]]],"rura":true},{"nazwa":"Transformator","czesci":[[[2378.8,2409.5],[2389.5,2437.4],[2361.6,2448.1],[2350.9,2420.2]]],"linie":[[[2385.9,2376.7],[2416.5,2457.3],[2354.5,2480.9],[2323.9,2400.3],[2385.9,2376.7]],[[2364.9,2414.8],[2375.5,2442.8]]]},{"nazwa":"Magazyn strzałowego","czesci":[[[6638.9,1306.2],[6662.2,1362.8],[6612.7,1383.2],[6589.4,1326.6]]],"linie":[[[6614.1,1316.4],[6637.5,1373.0]],[[6649.9,1367.9],[6665.3,1380.2]]]},{"nazwa":"Przepompownia","czesci":[[[6757.1,941.6],[6723.4,1051.4],[6625.9,1021.4],[6659.6,911.6]]],"linie":[[[6757.1,941.6],[6625.9,1021.4]],[[6659.6,911.6],[6723.4,1051.4]],[[6642.7,966.5],[6603.7,954.5]]]},{"nazwa":"Most pontonowy","czesci":[[[6916.7,2377.3],[7006.3,2501.5],[6964.9,2531.3],[6875.3,2407.2]],[[6869.1,2411.7],[6958.7,2535.8],[6917.3,2565.7],[6827.7,2441.5]]],"linie":[[[6896.0,2392.3],[6985.6,2516.4]],[[6848.4,2426.6],[6938.0,2550.7]]]},{"nazwa":"Rower","czesci":[[[1762.3,1081.6],[1788.5,1065.0],[1793.7,1073.2],[1767.5,1089.8]],[[1804.9,1054.6],[1831.1,1038.0],[1836.3,1046.2],[1810.1,1062.8]],[[1782.5,1068.2],[1792.4,1062.0],[1798.1,1071.0],[1788.2,1077.2]]],"linie":[[[1791.1,1069.1],[1807.5,1058.7]],[[1808.4,1037.5],[1827.1,1067.0]]]},{"nazwa":"Windsurfing","czesci":[[[1903.7,1982.9],[1882.5,2037.1],[1873.2,2049.8],[1865.2,2053.1],[1861.9,2045.1],[1864.4,2029.6],[1887.9,1976.4]]],"linie":[[[1879.3,2019.2],[1882.6,1967.5]]]},{"nazwa":"Kajak","czesci":[[[2038.4,1876.5],[2032.6,1876.6],[2027.5,1877.9],[2022.6,1879.5],[2017.7,1881.3],[2013.0,1883.3],[2008.3,1885.4],[2003.7,1887.5],[1999.1,1889.8],[1994.6,1892.2],[1990.1,1894.6],[1985.6,1897.1],[1981.3,1899.7],[1976.9,1902.4],[1972.6,1905.2],[1968.4,1908.0],[1964.2,1911.0],[1960.1,1914.2],[1956.1,1917.5],[1952.3,1921.1],[1949.2,1926.1],[1949.2,1926.1],[1955.0,1926.0],[1960.1,1924.7],[1965.0,1923.1],[1969.9,1921.3],[1974.6,1919.3],[1979.3,1917.2],[1983.9,1915.1],[1988.5,1912.8],[1993.0,1910.4],[1997.5,1908.0],[2002.0,1905.5],[2006.3,1902.9],[2010.7,1900.2],[2015.0,1897.4],[2019.2,1894.6],[2023.4,1891.6],[2027.5,1888.4],[2031.5,1885.1],[2035.3,1881.5],[2038.4,1876.5]],[[1980.4,1908.7],[1980.4,1905.8],[1982.7,1902.4],[1986.9,1899.3],[1991.7,1897.4],[1995.8,1897.3],[1998.3,1898.8],[1998.3,1901.7],[1995.9,1905.2],[1991.8,1908.2],[1987.0,1910.1],[1982.8,1910.3]]]},{"nazwa":"Lustro","czesci":[[[1982.2,2485.0],[1988.3,2540.8],[1954.8,2544.4],[1948.7,2488.6]]],"linie":[[[1975.4,2499.8],[1958.5,2515.8]],[[1978.5,2513.6],[1961.6,2529.6]]]},{"nazwa":"Telefon","czesci":[[[1966.9,2358.7],[1970.8,2394.2],[1939.8,2392.4],[1937.0,2367.1]],[[1954.5,2386.3],[1949.5,2385.3],[1946.0,2381.5],[1945.5,2376.4],[1948.0,2372.0],[1952.7,2369.9],[1957.7,2370.9],[1961.2,2374.7],[1961.7,2379.8],[1959.2,2384.2]]],"linie":[[[1971.7,2355.6],[1976.1,2396.2]]]},{"nazwa":"Budka","czesci":[[[2248.3,988.5],[2203.0,960.8],[2230.7,915.5],[2276.0,943.2]]],"linie":[[[2248.3,988.5],[2230.7,915.5]]]},{"nazwa":"Bunkier strzałowego","czesci":[[[2703.3,2048.3],[2651.2,2017.0],[2682.5,1964.9],[2734.6,1996.2]],[[2675.1,1995.9],[2680.5,1989.9],[2687.9,1986.4],[2696.0,1986.0],[2703.6,1988.8],[2709.6,1994.2],[2713.1,2001.6],[2713.5,2009.7],[2710.7,2017.3],[2705.3,2023.3],[2697.9,2026.8],[2689.8,2027.2],[2682.2,2024.4],[2676.2,2019.0],[2672.7,2011.6],[2672.3,2003.5]]],"linie":[[[2670.6,2003.3],[2679.5,1988.4]]]},{"nazwa":"Pianista","czesci":[[[5094.4,2115.5],[5078.7,2110.9],[5095.9,2052.1],[5111.6,2056.7]],[[5115.3,2089.7],[5120.0,2080.7],[5127.4,2075.3],[5135.5,2074.9],[5142.1,2079.6],[5145.5,2088.1],[5144.6,2098.3],[5139.9,2107.2],[5132.5,2112.7],[5124.4,2113.1],[5117.8,2108.4],[5114.4,2099.8]],[[5116.2,2090.0],[5118.5,2086.6],[5122.4,2085.2],[5126.3,2086.3],[5128.8,2089.6],[5129.0,2093.7],[5126.7,2097.1],[5122.8,2098.5],[5118.9,2097.3],[5116.4,2094.1]]],"linie":[[[5097.3,2105.7],[5089.4,2103.4]],[[5100.1,2095.9],[5092.3,2093.6]],[[5103.0,2086.1],[5095.2,2083.8]],[[5105.9,2076.3],[5098.0,2074.0]],[[5108.7,2066.5],[5100.9,2064.2]]]},{"nazwa":"Platforma szkoleniowa I","czesci":[[[7191,2789],[7273,2791],[7275,2887],[7193,2886]]]},{"nazwa":"Platforma szkoleniowa II","czesci":[[[7389,2712],[7448,2717],[7445,2789],[7380,2782]]]},{"nazwa":"Korytarz","czesci":[[[7804,2836],[7848,2846],[7840,2903],[8047,2948],[8041,2990],[7787,2935]],[[8047,2953],[8105,2961],[8097,3003],[8041,2995]]]},{"nazwa":"Lustra","czesci":[[[8413,2557],[8481,2550],[8492,2608],[8420,2624]]]},{"nazwa":"Deco bar","czesci":[[[3501.0,2811.0],[3499.3,2816.3],[3494.8,2819.6],[3489.2,2819.6],[3484.7,2816.3],[3483.0,2811.0],[3484.7,2805.7],[3489.2,2802.4],[3494.8,2802.4],[3499.3,2805.7]],[[3574.0,2812.0],[3572.3,2817.3],[3567.8,2820.6],[3562.2,2820.6],[3557.7,2817.3],[3556.0,2812.0],[3557.7,2806.7],[3562.2,2803.4],[3567.8,2803.4],[3572.3,2806.7]],[[3570.0,2870.0],[3568.3,2875.3],[3563.8,2878.6],[3558.2,2878.6],[3553.7,2875.3],[3552.0,2870.0],[3553.7,2864.7],[3558.2,2861.4],[3563.8,2861.4],[3568.3,2864.7]],[[3497.0,2871.0],[3495.3,2876.3],[3490.8,2879.6],[3485.2,2879.6],[3480.7,2876.3],[3479.0,2871.0],[3480.7,2865.7],[3485.2,2862.4],[3490.8,2862.4],[3495.3,2865.7]]],"linie":[[[3492,2811],[3565,2812],[3561,2870],[3488,2871],[3492,2811]],[[3489.0,2856.0],[3562.0,2855.5]],[[3490.0,2841.0],[3563.0,2841.0]],[[3491.0,2826.0],[3564.0,2826.5]]]}]};
+const FOTO = {"16":[{"plik":"zdjecia/16_1.jpg","mini":"zdjecia/16_1_m.jpg","w":1600,"h":1200},{"plik":"zdjecia/16_2.jpg","mini":"zdjecia/16_2_m.jpg","w":1600,"h":1200}],"17":[{"plik":"zdjecia/17_1.jpg","mini":"zdjecia/17_1_m.jpg","w":1600,"h":1200},{"plik":"zdjecia/17_2.jpg","mini":"zdjecia/17_2_m.jpg","w":1600,"h":1200}],"14":[{"plik":"zdjecia/14_1.jpg","mini":"zdjecia/14_1_m.jpg","w":1600,"h":1200},{"plik":"zdjecia/14_2.jpg","mini":"zdjecia/14_2_m.jpg","w":1600,"h":1200}],"13":[{"plik":"zdjecia/13_1.jpg","mini":"zdjecia/13_1_m.jpg","w":1600,"h":1200},{"plik":"zdjecia/13_2.jpg","mini":"zdjecia/13_2_m.jpg","w":1600,"h":1200},{"plik":"zdjecia/13_3.jpg","mini":"zdjecia/13_3_m.jpg","w":1600,"h":1200},{"plik":"zdjecia/13_4.jpg","mini":"zdjecia/13_4_m.jpg","w":1600,"h":1200}],"prz":[{"plik":"zdjecia/prz_1.jpg","mini":"zdjecia/prz_1_m.jpg","w":1600,"h":1200},{"plik":"zdjecia/prz_2.jpg","mini":"zdjecia/prz_2_m.jpg","w":1600,"h":1200},{"plik":"zdjecia/prz_3.jpg","mini":"zdjecia/prz_3_m.jpg","w":1600,"h":1200}],"mag":[{"plik":"zdjecia/mag_1.jpg","mini":"zdjecia/mag_1_m.jpg","w":1200,"h":1600},{"plik":"zdjecia/mag_2.jpg","mini":"zdjecia/mag_2_m.jpg","w":1200,"h":1600}],"12":[{"plik":"zdjecia/12_1.jpg","mini":"zdjecia/12_1_m.jpg","w":1600,"h":1200},{"plik":"zdjecia/12_2.jpg","mini":"zdjecia/12_2_m.jpg","w":1600,"h":1200}],"11":[{"plik":"zdjecia/11_1.jpg","mini":"zdjecia/11_1_m.jpg","w":1600,"h":1200},{"plik":"zdjecia/11_2.jpg","mini":"zdjecia/11_2_m.jpg","w":1600,"h":1200},{"plik":"zdjecia/11_3.jpg","mini":"zdjecia/11_3_m.jpg","w":1600,"h":1200},{"plik":"zdjecia/11_4.jpg","mini":"zdjecia/11_4_m.jpg","w":1600,"h":1200},{"plik":"zdjecia/11_5.jpg","mini":"zdjecia/11_5_m.jpg","w":1600,"h":1200}],"9":[{"plik":"zdjecia/9_1.jpg","mini":"zdjecia/9_1_m.jpg","w":1600,"h":1200},{"plik":"zdjecia/9_2.jpg","mini":"zdjecia/9_2_m.jpg","w":1600,"h":1200},{"plik":"zdjecia/9_3.jpg","mini":"zdjecia/9_3_m.jpg","w":1600,"h":1200}],"lina":[{"plik":"zdjecia/lina_1.jpg","mini":"zdjecia/lina_1_m.jpg","w":1200,"h":1600},{"plik":"zdjecia/lina_2.jpg","mini":"zdjecia/lina_2_m.jpg","w":1600,"h":1200},{"plik":"zdjecia/lina_3.jpg","mini":"zdjecia/lina_3_m.jpg","w":1600,"h":1200},{"plik":"zdjecia/lina_4.jpg","mini":"zdjecia/lina_4_m.jpg","w":1600,"h":1200},{"plik":"zdjecia/lina_5.jpg","mini":"zdjecia/lina_5_m.jpg","w":1600,"h":1200}],"dz":[{"plik":"zdjecia/dz_1.jpg","mini":"zdjecia/dz_1_m.jpg","w":1600,"h":1200},{"plik":"zdjecia/dz_2.jpg","mini":"zdjecia/dz_2_m.jpg","w":1600,"h":1200},{"plik":"zdjecia/dz_3.jpg","mini":"zdjecia/dz_3_m.jpg","w":1600,"h":1200}],"10":[{"plik":"zdjecia/10_1.jpg","mini":"zdjecia/10_1_m.jpg","w":1600,"h":1200},{"plik":"zdjecia/10_2.jpg","mini":"zdjecia/10_2_m.jpg","w":1600,"h":1200},{"plik":"zdjecia/10_3.jpg","mini":"zdjecia/10_3_m.jpg","w":1600,"h":1200}],"6":[{"plik":"zdjecia/6_1.jpg","mini":"zdjecia/6_1_m.jpg","w":1600,"h":1200},{"plik":"zdjecia/6_2.jpg","mini":"zdjecia/6_2_m.jpg","w":1600,"h":1200},{"plik":"zdjecia/6_3.jpg","mini":"zdjecia/6_3_m.jpg","w":1600,"h":1200}],"8":[{"plik":"zdjecia/8_1.jpg","mini":"zdjecia/8_1_m.jpg","w":1600,"h":1200},{"plik":"zdjecia/8_2.jpg","mini":"zdjecia/8_2_m.jpg","w":1600,"h":1200},{"plik":"zdjecia/8_3.jpg","mini":"zdjecia/8_3_m.jpg","w":1200,"h":1600}],"wych":[{"plik":"zdjecia/wych_1.jpg","mini":"zdjecia/wych_1_m.jpg","w":1600,"h":1200},{"plik":"zdjecia/wych_2.jpg","mini":"zdjecia/wych_2_m.jpg","w":1200,"h":1600},{"plik":"zdjecia/wych_3.jpg","mini":"zdjecia/wych_3_m.jpg","w":1200,"h":1600}],"rower":[{"plik":"zdjecia/rower_1.jpg","mini":"zdjecia/rower_1_m.jpg","w":1600,"h":1200},{"plik":"zdjecia/rower_2.jpg","mini":"zdjecia/rower_2_m.jpg","w":1600,"h":1200}],"obr":[{"plik":"zdjecia/obr_1.jpg","mini":"zdjecia/obr_1_m.jpg","w":1200,"h":1600}],"walec":[{"plik":"zdjecia/walec_1.jpg","mini":"zdjecia/walec_1_m.jpg","w":1200,"h":1600},{"plik":"zdjecia/walec_2.jpg","mini":"zdjecia/walec_2_m.jpg","w":1200,"h":1600}],"wind":[{"plik":"zdjecia/wind_1.jpg","mini":"zdjecia/wind_1_m.jpg","w":1200,"h":1600}],"kajak":[{"plik":"zdjecia/kajak_1.jpg","mini":"zdjecia/kajak_1_m.jpg","w":1600,"h":1200},{"plik":"zdjecia/kajak_2.jpg","mini":"zdjecia/kajak_2_m.jpg","w":1600,"h":1200}],"tel":[{"plik":"zdjecia/tel_1.jpg","mini":"zdjecia/tel_1_m.jpg","w":1600,"h":1200}],"pian":[{"plik":"zdjecia/pian_1.jpg","mini":"zdjecia/pian_1_m.jpg","w":1600,"h":1200},{"plik":"zdjecia/pian_2.jpg","mini":"zdjecia/pian_2_m.jpg","w":1200,"h":1600},{"plik":"zdjecia/pian_3.jpg","mini":"zdjecia/pian_3_m.jpg","w":1600,"h":1200},{"plik":"zdjecia/pian_4.jpg","mini":"zdjecia/pian_4_m.jpg","w":1600,"h":1200}]};   // point id -> [{plik, mini, w, h}]
 const IG = 'https://www.instagram.com/deeperbluediving';
 const FB = 'https://www.facebook.com/jjbiernacki';
 const PDF = { pl: { src: 'plan_PL.pdf', name: 'Koparki_plan_nurkowy.pdf' }, en: { src: 'plan_EN.pdf', name: 'Koparki_dive_plan.pdf' } };
@@ -522,6 +570,7 @@ const T = {
     tList: 'Atrakcje', tInfo: 'O mapie', tContact: 'Kontakt',
     listCap: 'Wybierz punkt na liście lub na mapie, aby wyświetlić trasy i azymuty.',
     back: 'Wszystkie atrakcje',
+    photos: 'Zdjęcia spod wody', photoN: (i, n) => `Zdjęcie ${i} z ${n}`, lbClose: 'Zamknij zdjęcie', lbPrev: 'Poprzednie zdjęcie', lbNext: 'Następne zdjęcie',
     alt: 'Nazwa w bazie', coords: 'Współrzędne WGS84', copy: 'Kopiuj', copied: 'Skopiowano',
     routes: 'Trasy z tego punktu', tip: 'Objaśnienie', routesHint: 'Azymuty magnetyczne, zgodne ze wskazaniem kompasu nurkowego, liczone od tego punktu. Wybranie trasy przenosi do punktu docelowego.',
     noRoutes: 'Punkt nie ma własnych tras na planie.',
@@ -568,6 +617,7 @@ const T = {
         <li><b>Azymuty są magnetyczne</b> i odpowiadają wskazaniom kompasu nurkowego.</li>
         <li>Pozycje atrakcji wyznaczone na podstawie położenia boi mogą być nieznacznie przesunięte.</li>
         <li>Głębokości oznaczone gwiazdką zależą od poziomu wody.</li>
+        <li>Przy części atrakcji są zdjęcia spod wody. Wybranie miniatury powiększa zdjęcie; kolejne zdjęcia przełącza się strzałkami.</li>
         <li>Kompas w prawym górnym rogu wskazuje północ magnetyczną. Po jego wybraniu wyświetlają się kursy na brzeg.</li>
       </ul>`,
     contact: `
@@ -586,6 +636,7 @@ const T = {
     tList: 'Sites', tInfo: 'About', tContact: 'Contact',
     listCap: 'Select a site in the list or on the map to show its routes and bearings.',
     back: 'All sites',
+    photos: 'Underwater photos', photoN: (i, n) => `Photo ${i} of ${n}`, lbClose: 'Close photo', lbPrev: 'Previous photo', lbNext: 'Next photo',
     alt: 'Local name', coords: 'WGS84 coordinates', copy: 'Copy', copied: 'Copied',
     routes: 'Routes from here', tip: 'Explanation', routesHint: 'Magnetic bearings from this point, as shown by a dive compass. Selecting a route moves to its destination.',
     noRoutes: 'This point has no routes of its own on the plan.',
@@ -632,6 +683,7 @@ const T = {
         <li><b>Bearings are magnetic</b> and correspond to a dive compass reading.</li>
         <li>Positions of sites determined from buoy locations may be slightly offset.</li>
         <li>Depths marked with an asterisk depend on the water level.</li>
+        <li>Some sites have underwater photos. Selecting a thumbnail enlarges the photo; the arrows switch between photos.</li>
         <li>The compass in the top right corner shows magnetic north. Selecting it displays courses to shore.</li>
       </ul>`,
     contact: `
@@ -653,6 +705,11 @@ const P = {}; D.punkty.forEach(p => P[p.id] = p);
 const byNr = {}; D.punkty.forEach(p => byNr[p.nr] = p);
 const name = p => lang === 'pl' ? p.pl : p.en;
 const desc = p => lang === 'pl' ? p.opis_pl : p.opis_en;
+// depth ("15 m*") opens the description; it is shown next to the name, the rest stays below
+const DEP = /^\s*((?:ok\.\s*|approx\.\s*)?\d+(?:[.,]\d+)?\s*m\*)\s*(?:·\s*)?/;
+const depth = p => { const m = DEP.exec(desc(p) || ''); return m ? m[1] : ''; };
+const descRest = p => (desc(p) || '').replace(DEP, '');
+const depTag = p => depth(p) ? `<span class="dep">${esc(depth(p))}</span>` : '';
 const order = D.punkty.slice().sort((a, b) => (parseInt(a.nr) - parseInt(b.nr)) || a.nr.localeCompare(b.nr));
 function routesOf(id) {
   return D.krawedzie.filter(k => k.a === id || k.b === id).map(k => {
@@ -688,9 +745,12 @@ map.setMaxBounds(L.latLngBounds(LL(-D.szer * 1.5, D.wys * 9), LL(D.szer * 2.5, -
 
 // everything except the point markers: hidden in the route planning mode
 const viewG = L.layerGroup().addTo(map);
-// Wilhelm hull outline
+// outlines: Wilhelm hull (dashed), schematic drawings of the objects (parts + lines), pipe stubs
+const LLs = l => l.map(([x, y]) => LL(x, y));
 D.obrysy.forEach(o => {
-  L.polygon(o.px.map(([x, y]) => LL(x, y)), { color: '#fff', weight: 2.5, opacity: .95, fillColor: '#fff', fillOpacity: .18, dashArray: '6 4', interactive: false }).addTo(viewG);
+  if (o.px) L.polygon(LLs(o.px), { color: '#fff', weight: 2.5, opacity: .95, fillColor: '#fff', fillOpacity: .18, dashArray: '6 4', interactive: false }).addTo(viewG);
+  (o.czesci || []).forEach(c => L.polygon(LLs(c), { color: '#fff', weight: 1.5, opacity: .9, fillColor: '#fff', fillOpacity: .22, interactive: false }).addTo(viewG));
+  (o.linie || []).forEach(l => L.polyline(LLs(l), o.rura ? { color: '#373c42', weight: 2, opacity: .8, interactive: false } : { color: '#fff', weight: 1.5, opacity: .9, interactive: false }).addTo(viewG));
 });
 
 // routes
@@ -865,7 +925,7 @@ function bar() {
   if (view === 'detail' && sel) {
     const p = P[sel];
     const alt = lang === 'en' && p.pl !== p.en ? `<small>${L_.alt}: ${esc(p.pl)}</small>` : '';
-    h = `<span class="badge">${esc(p.nr)}</span><div><h2>${esc(name(p))}</h2>${alt}</div>`;
+    h = `<span class="badge">${esc(p.nr)}</span><div><h2><span class="nm">${esc(name(p))}</span>${depTag(p)}</h2>${alt}</div>`;
   } else if (view === 'info') h = `<div><h2>${L_.tInfo}</h2></div>`;
   else if (view === 'plan') {
     const s = planStats();
@@ -894,7 +954,7 @@ function render() {
       order.map(p => {
         const sub = p.nr === '7b';
         return `<li class="${sub ? 'sub' : ''}"><button data-id="${esc(p.id)}"><span class="badge${sub || p.maly ? ' small' : ''}">${esc(p.nr)}</span>` +
-          `<span><span class="t">${esc(name(p))}</span>${desc(p) ? `<span class="s">${esc(desc(p))}</span>` : ''}</span></button></li>`;
+          `${p.ikona ? `<img class="ico" src="${esc(p.ikona)}" alt="" width="32" height="32">` : ''}<span><span class="t">${esc(name(p))}${depTag(p)}</span>${descRest(p) ? `<span class="s">${esc(descRest(p))}</span>` : ''}</span></button></li>`;
       }).join('') + `</ul></div>`;
     b.querySelectorAll('.list button').forEach(x => x.onclick = () => select(x.dataset.id, { move: 'fit' }));
   } else if (view === 'detail' && sel) {
@@ -903,8 +963,10 @@ function render() {
     const star = /\*/.test(desc(p));
     b.innerHTML = `<div class="view-pad">
       <button class="back" id="back">${arrow(-1, 0)} ${L_.back}</button>
-      <div class="d-title"><span class="badge">${esc(p.nr)}</span><div><h2>${esc(name(p))}</h2>${altName}</div></div>
-      ${desc(p) ? `<p class="d-desc">${esc(desc(p))}</p>` : ''}
+      <div class="d-title${p.ikona ? ' has-ico' : ''}"><span class="badge">${esc(p.nr)}</span>${p.ikona ? `<img class="ico" src="${esc(p.ikona)}" alt="" width="48" height="48">` : ''}<div><h2>${esc(name(p))}${depTag(p)}</h2>${altName}</div></div>
+      ${descRest(p) ? `<p class="d-desc">${esc(descRest(p))}</p>` : ''}
+      ${(FOTO[p.id] || []).length ? `<ul class="gal" aria-label="${L_.photos}">` + FOTO[p.id].map((f, i) =>
+        `<li><button data-i="${i}" aria-label="${esc(L_.photoN(i + 1, FOTO[p.id].length))}"><img src="${esc(f.mini)}" alt="" loading="lazy" width="${Math.round(78 * f.w / f.h)}" height="78"></button></li>`).join('') + `</ul>` : ''}
       <div class="sect-row"><h3 class="sect">${L_.routes}</h3>${R.length ? `<button class="tip" id="tip" aria-expanded="false" aria-controls="tipPop" aria-label="${L_.tip}" title="${esc(L_.routesHint)}">i</button>` : ''}</div>
       ${R.length ? `<p class="tip-pop" id="tipPop" hidden>${L_.routesHint}</p><ul class="routes">` + R.map(r =>
         `<li><button data-id="${esc(r.other.id)}">${arrow(r.dx, r.dy, 'ar')}<span class="az">${az(r.az)}</span><span class="m">${dm(r.m)}</span>` +
@@ -916,6 +978,7 @@ function render() {
       ${star ? `<p class="note">${L_.depthNote}</p>` : ''}
     </div>`;
     $('back').onclick = () => { deselect(); };
+    b.querySelectorAll('.gal button').forEach(x => x.onclick = () => lbOpen(p.id, +x.dataset.i, x));
     if ($('tip')) $('tip').onclick = () => { const pp = $('tipPop'); pp.hidden = !pp.hidden; $('tip').setAttribute('aria-expanded', String(!pp.hidden)); };
     b.querySelectorAll('.routes button').forEach(x => x.onclick = () => select(x.dataset.id, { move: 'fit' }));
     $('cpy').onclick = () => {
@@ -946,6 +1009,56 @@ function render() {
 }
 function selectText(el) { const r = document.createRange(); r.selectNodeContents(el); const s = getSelection(); s.removeAllRanges(); s.addRange(r); }
 
+// ---------- photo viewer: centred popup, arrows / keys / swipe, closes on ×, Esc or a click beside the photo ----------
+const lb = { id: null, i: 0, from: null };
+function lbShow() {
+  const L_ = t(), A = FOTO[lb.id], f = A[lb.i], p = P[lb.id], many = A.length > 1;
+  const img = $('lbImg');
+  img.src = f.plik; img.width = f.w; img.height = f.h;
+  img.alt = `${name(p)}, ${L_.photoN(lb.i + 1, A.length).toLowerCase()}`;
+  $('lbCap').innerHTML = `<span class="badge small">${esc(p.nr)}</span><span>${esc(name(p))}</span>${many ? `<span class="n">${lb.i + 1} / ${A.length}</span>` : ''}`;
+  $('lbP').hidden = $('lbN').hidden = !many;
+  $('lbX').setAttribute('aria-label', L_.lbClose); $('lbP').setAttribute('aria-label', L_.lbPrev); $('lbN').setAttribute('aria-label', L_.lbNext);
+  if (many) [1, -1].forEach(d => { new Image().src = A[(lb.i + d + A.length) % A.length].plik; });   // neighbours ready before the arrow
+}
+function lbOpen(id, i, from) {
+  lb.id = id; lb.i = i; lb.from = from || null;
+  lbShow(); $('lb').hidden = false; $('lbX').focus();
+}
+function lbClose() {
+  if ($('lb').hidden) return;
+  $('lb').hidden = true; $('lbImg').removeAttribute('src');
+  if (lb.from && document.body.contains(lb.from)) lb.from.focus();
+}
+function lbStep(d) { const n = FOTO[lb.id].length; if (n < 2) return; lb.i = (lb.i + d + n) % n; lbShow(); }
+$('lbX').onclick = lbClose;
+$('lbP').onclick = () => lbStep(-1);
+$('lbN').onclick = () => lbStep(1);
+$('lb').addEventListener('click', e => { if (e.target === $('lb') || e.target === $('lbFig') || e.target.closest('.lb-cap')) lbClose(); });
+document.addEventListener('keydown', e => {
+  if ($('lb').hidden) return;
+  if (e.key === 'Escape') lbClose();
+  else if (e.key === 'ArrowLeft') lbStep(-1);
+  else if (e.key === 'ArrowRight') lbStep(1);
+  else if (e.key === 'Tab') {   // keep focus inside the viewer
+    const f = [...$('lb').querySelectorAll('button')].filter(b => !b.hidden);
+    const k = f.indexOf(document.activeElement);
+    e.preventDefault(); f[(k + (e.shiftKey ? -1 : 1) + f.length) % f.length].focus();
+    return;
+  } else return;
+  e.preventDefault(); e.stopImmediatePropagation();
+}, true);
+let lbX0 = null;
+$('lb').addEventListener('pointerdown', e => { if (e.pointerType !== 'mouse') lbX0 = [e.clientX, e.clientY]; });
+$('lb').addEventListener('pointerup', e => {
+  if (!lbX0) return;
+  const dx = e.clientX - lbX0[0], dy = e.clientY - lbX0[1]; lbX0 = null;
+  if (Math.abs(dx) > 50 && Math.abs(dx) > 1.5 * Math.abs(dy)) { lbStep(dx < 0 ? 1 : -1); lbSwiped = Date.now(); }
+});
+$('lb').addEventListener('pointercancel', () => { lbX0 = null; });
+let lbSwiped = 0;
+$('lb').addEventListener('click', e => { if (Date.now() - lbSwiped < 400) e.stopImmediatePropagation(); }, true);   // a swipe is not a tap beside the photo
+
 function chrome() {
   const L_ = t();
   document.documentElement.lang = lang;
@@ -968,7 +1081,7 @@ function chrome() {
     `<span></span>${cell(B.g)}<span></span>` +
     `${cell(B.l)}<svg class="c" viewBox="-17 -17 34 34" aria-hidden="true"><g stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" fill="none"><path d="M0 -4V-14M-4 -10L0 -14L4 -10"/><path d="M0 4V14M-4 10L0 14L4 10"/><path d="M-4 0H-14M-10 -4L-14 0L-10 4"/><path d="M4 0H14M10 -4L14 0L10 4"/></g></svg>${cell(B.p)}` +
     `<span></span>${cell(B.d)}<span></span>`;
-  D.punkty.forEach(p => { const el = marks[p.id].getElement(); if (el) el.title = `${p.nr} ${name(p)}`; });
+  D.punkty.forEach(p => { const el = marks[p.id].getElement(); if (el) el.title = `${p.nr} ${name(p)}${depth(p) ? ' · ' + depth(p) : ''}`; });
   map.closePopup();
 }
 function setLang(l) {

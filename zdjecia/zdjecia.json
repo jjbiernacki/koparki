@@ -1,0 +1,394 @@
+{
+ "16": [
+  {
+   "plik": "zdjecia/16_1.jpg",
+   "mini": "zdjecia/16_1_m.jpg",
+   "w": 1600,
+   "h": 1200
+  },
+  {
+   "plik": "zdjecia/16_2.jpg",
+   "mini": "zdjecia/16_2_m.jpg",
+   "w": 1600,
+   "h": 1200
+  }
+ ],
+ "17": [
+  {
+   "plik": "zdjecia/17_1.jpg",
+   "mini": "zdjecia/17_1_m.jpg",
+   "w": 1600,
+   "h": 1200
+  },
+  {
+   "plik": "zdjecia/17_2.jpg",
+   "mini": "zdjecia/17_2_m.jpg",
+   "w": 1600,
+   "h": 1200
+  }
+ ],
+ "14": [
+  {
+   "plik": "zdjecia/14_1.jpg",
+   "mini": "zdjecia/14_1_m.jpg",
+   "w": 1600,
+   "h": 1200
+  },
+  {
+   "plik": "zdjecia/14_2.jpg",
+   "mini": "zdjecia/14_2_m.jpg",
+   "w": 1600,
+   "h": 1200
+  }
+ ],
+ "13": [
+  {
+   "plik": "zdjecia/13_1.jpg",
+   "mini": "zdjecia/13_1_m.jpg",
+   "w": 1600,
+   "h": 1200
+  },
+  {
+   "plik": "zdjecia/13_2.jpg",
+   "mini": "zdjecia/13_2_m.jpg",
+   "w": 1600,
+   "h": 1200
+  },
+  {
+   "plik": "zdjecia/13_3.jpg",
+   "mini": "zdjecia/13_3_m.jpg",
+   "w": 1600,
+   "h": 1200
+  },
+  {
+   "plik": "zdjecia/13_4.jpg",
+   "mini": "zdjecia/13_4_m.jpg",
+   "w": 1600,
+   "h": 1200
+  }
+ ],
+ "prz": [
+  {
+   "plik": "zdjecia/prz_1.jpg",
+   "mini": "zdjecia/prz_1_m.jpg",
+   "w": 1600,
+   "h": 1200
+  },
+  {
+   "plik": "zdjecia/prz_2.jpg",
+   "mini": "zdjecia/prz_2_m.jpg",
+   "w": 1600,
+   "h": 1200
+  },
+  {
+   "plik": "zdjecia/prz_3.jpg",
+   "mini": "zdjecia/prz_3_m.jpg",
+   "w": 1600,
+   "h": 1200
+  }
+ ],
+ "mag": [
+  {
+   "plik": "zdjecia/mag_1.jpg",
+   "mini": "zdjecia/mag_1_m.jpg",
+   "w": 1200,
+   "h": 1600
+  },
+  {
+   "plik": "zdjecia/mag_2.jpg",
+   "mini": "zdjecia/mag_2_m.jpg",
+   "w": 1200,
+   "h": 1600
+  }
+ ],
+ "12": [
+  {
+   "plik": "zdjecia/12_1.jpg",
+   "mini": "zdjecia/12_1_m.jpg",
+   "w": 1600,
+   "h": 1200
+  },
+  {
+   "plik": "zdjecia/12_2.jpg",
+   "mini": "zdjecia/12_2_m.jpg",
+   "w": 1600,
+   "h": 1200
+  }
+ ],
+ "11": [
+  {
+   "plik": "zdjecia/11_1.jpg",
+   "mini": "zdjecia/11_1_m.jpg",
+   "w": 1600,
+   "h": 1200
+  },
+  {
+   "plik": "zdjecia/11_2.jpg",
+   "mini": "zdjecia/11_2_m.jpg",
+   "w": 1600,
+   "h": 1200
+  },
+  {
+   "plik": "zdjecia/11_3.jpg",
+   "mini": "zdjecia/11_3_m.jpg",
+   "w": 1600,
+   "h": 1200
+  },
+  {
+   "plik": "zdjecia/11_4.jpg",
+   "mini": "zdjecia/11_4_m.jpg",
+   "w": 1600,
+   "h": 1200
+  },
+  {
+   "plik": "zdjecia/11_5.jpg",
+   "mini": "zdjecia/11_5_m.jpg",
+   "w": 1600,
+   "h": 1200
+  }
+ ],
+ "9": [
+  {
+   "plik": "zdjecia/9_1.jpg",
+   "mini": "zdjecia/9_1_m.jpg",
+   "w": 1600,
+   "h": 1200
+  },
+  {
+   "plik": "zdjecia/9_2.jpg",
+   "mini": "zdjecia/9_2_m.jpg",
+   "w": 1600,
+   "h": 1200
+  },
+  {
+   "plik": "zdjecia/9_3.jpg",
+   "mini": "zdjecia/9_3_m.jpg",
+   "w": 1600,
+   "h": 1200
+  }
+ ],
+ "lina": [
+  {
+   "plik": "zdjecia/lina_1.jpg",
+   "mini": "zdjecia/lina_1_m.jpg",
+   "w": 1200,
+   "h": 1600
+  },
+  {
+   "plik": "zdjecia/lina_2.jpg",
+   "mini": "zdjecia/lina_2_m.jpg",
+   "w": 1600,
+   "h": 1200
+  },
+  {
+   "plik": "zdjecia/lina_3.jpg",
+   "mini": "zdjecia/lina_3_m.jpg",
+   "w": 1600,
+   "h": 1200
+  },
+  {
+   "plik": "zdjecia/lina_4.jpg",
+   "mini": "zdjecia/lina_4_m.jpg",
+   "w": 1600,
+   "h": 1200
+  },
+  {
+   "plik": "zdjecia/lina_5.jpg",
+   "mini": "zdjecia/lina_5_m.jpg",
+   "w": 1600,
+   "h": 1200
+  }
+ ],
+ "dz": [
+  {
+   "plik": "zdjecia/dz_1.jpg",
+   "mini": "zdjecia/dz_1_m.jpg",
+   "w": 1600,
+   "h": 1200
+  },
+  {
+   "plik": "zdjecia/dz_2.jpg",
+   "mini": "zdjecia/dz_2_m.jpg",
+   "w": 1600,
+   "h": 1200
+  },
+  {
+   "plik": "zdjecia/dz_3.jpg",
+   "mini": "zdjecia/dz_3_m.jpg",
+   "w": 1600,
+   "h": 1200
+  }
+ ],
+ "10": [
+  {
+   "plik": "zdjecia/10_1.jpg",
+   "mini": "zdjecia/10_1_m.jpg",
+   "w": 1600,
+   "h": 1200
+  },
+  {
+   "plik": "zdjecia/10_2.jpg",
+   "mini": "zdjecia/10_2_m.jpg",
+   "w": 1600,
+   "h": 1200
+  },
+  {
+   "plik": "zdjecia/10_3.jpg",
+   "mini": "zdjecia/10_3_m.jpg",
+   "w": 1600,
+   "h": 1200
+  }
+ ],
+ "6": [
+  {
+   "plik": "zdjecia/6_1.jpg",
+   "mini": "zdjecia/6_1_m.jpg",
+   "w": 1600,
+   "h": 1200
+  },
+  {
+   "plik": "zdjecia/6_2.jpg",
+   "mini": "zdjecia/6_2_m.jpg",
+   "w": 1600,
+   "h": 1200
+  },
+  {
+   "plik": "zdjecia/6_3.jpg",
+   "mini": "zdjecia/6_3_m.jpg",
+   "w": 1600,
+   "h": 1200
+  }
+ ],
+ "8": [
+  {
+   "plik": "zdjecia/8_1.jpg",
+   "mini": "zdjecia/8_1_m.jpg",
+   "w": 1600,
+   "h": 1200
+  },
+  {
+   "plik": "zdjecia/8_2.jpg",
+   "mini": "zdjecia/8_2_m.jpg",
+   "w": 1600,
+   "h": 1200
+  },
+  {
+   "plik": "zdjecia/8_3.jpg",
+   "mini": "zdjecia/8_3_m.jpg",
+   "w": 1200,
+   "h": 1600
+  }
+ ],
+ "wych": [
+  {
+   "plik": "zdjecia/wych_1.jpg",
+   "mini": "zdjecia/wych_1_m.jpg",
+   "w": 1600,
+   "h": 1200
+  },
+  {
+   "plik": "zdjecia/wych_2.jpg",
+   "mini": "zdjecia/wych_2_m.jpg",
+   "w": 1200,
+   "h": 1600
+  },
+  {
+   "plik": "zdjecia/wych_3.jpg",
+   "mini": "zdjecia/wych_3_m.jpg",
+   "w": 1200,
+   "h": 1600
+  }
+ ],
+ "rower": [
+  {
+   "plik": "zdjecia/rower_1.jpg",
+   "mini": "zdjecia/rower_1_m.jpg",
+   "w": 1600,
+   "h": 1200
+  },
+  {
+   "plik": "zdjecia/rower_2.jpg",
+   "mini": "zdjecia/rower_2_m.jpg",
+   "w": 1600,
+   "h": 1200
+  }
+ ],
+ "obr": [
+  {
+   "plik": "zdjecia/obr_1.jpg",
+   "mini": "zdjecia/obr_1_m.jpg",
+   "w": 1200,
+   "h": 1600
+  }
+ ],
+ "walec": [
+  {
+   "plik": "zdjecia/walec_1.jpg",
+   "mini": "zdjecia/walec_1_m.jpg",
+   "w": 1200,
+   "h": 1600
+  },
+  {
+   "plik": "zdjecia/walec_2.jpg",
+   "mini": "zdjecia/walec_2_m.jpg",
+   "w": 1200,
+   "h": 1600
+  }
+ ],
+ "wind": [
+  {
+   "plik": "zdjecia/wind_1.jpg",
+   "mini": "zdjecia/wind_1_m.jpg",
+   "w": 1200,
+   "h": 1600
+  }
+ ],
+ "kajak": [
+  {
+   "plik": "zdjecia/kajak_1.jpg",
+   "mini": "zdjecia/kajak_1_m.jpg",
+   "w": 1600,
+   "h": 1200
+  },
+  {
+   "plik": "zdjecia/kajak_2.jpg",
+   "mini": "zdjecia/kajak_2_m.jpg",
+   "w": 1600,
+   "h": 1200
+  }
+ ],
+ "tel": [
+  {
+   "plik": "zdjecia/tel_1.jpg",
+   "mini": "zdjecia/tel_1_m.jpg",
+   "w": 1600,
+   "h": 1200
+  }
+ ],
+ "pian": [
+  {
+   "plik": "zdjecia/pian_1.jpg",
+   "mini": "zdjecia/pian_1_m.jpg",
+   "w": 1600,
+   "h": 1200
+  },
+  {
+   "plik": "zdjecia/pian_2.jpg",
+   "mini": "zdjecia/pian_2_m.jpg",
+   "w": 1200,
+   "h": 1600
+  },
+  {
+   "plik": "zdjecia/pian_3.jpg",
+   "mini": "zdjecia/pian_3_m.jpg",
+   "w": 1600,
+   "h": 1200
+  },
+  {
+   "plik": "zdjecia/pian_4.jpg",
+   "mini": "zdjecia/pian_4_m.jpg",
+   "w": 1600,
+   "h": 1200
+  }
+ ]
+}

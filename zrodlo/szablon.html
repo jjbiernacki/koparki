@@ -101,7 +101,17 @@ button { font: inherit; color: inherit; }
 .list button:hover { background: var(--surface-2); }
 .list .t { font-weight: 600; font-size: 15px; line-height: 1.2; display: block; }
 .list .s { display: block; color: var(--muted); font-size: 13px; line-height: 1.3; }
+/* depth next to the name */
+.dep { display: inline-block; margin-left: 7px; padding: 1px 6px; border-radius: 6px; background: var(--surface-2); border: 1px solid var(--line); color: var(--ink); font-family: var(--f-data); font-size: 12px; font-weight: 600; line-height: 1.35; letter-spacing: 0; white-space: nowrap; vertical-align: 1px; }
+.d-title h2 .dep { font-size: 14px; vertical-align: 5px; margin-left: 9px; }
 .list li.sub button { padding-left: 22px; grid-template-columns: 26px 1fr; }
+/* pictograms of the objects (22.11) */
+.ico { display: block; flex: none; }
+.list button:has(.ico) { grid-template-columns: 30px 32px 1fr; }
+.list li.sub button:has(.ico) { grid-template-columns: 26px 32px 1fr; }
+.d-title.has-ico { grid-template-columns: auto auto 1fr; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .ico { background: #f4f4f1; border-radius: 6px; } }
+:root[data-theme="dark"] .ico { background: #f4f4f1; border-radius: 6px; }
 .list-cap { margin: 6px 8px 8px; font-size: 13px; color: var(--muted); }
 .badge {
   display: inline-grid; place-items: center; width: 30px; height: 30px; border-radius: 50%;
@@ -118,6 +128,32 @@ button { font: inherit; color: inherit; }
 .d-title h2 { margin: 0; font-family: var(--f-display); font-weight: 700; font-size: 28px; line-height: 1; text-wrap: balance; }
 .d-title .alt { display: block; color: var(--muted); font-size: 13px; margin-top: 3px; }
 .d-desc { margin: 0; font-size: 16px; }
+/* photos of the attraction: thumbnails in the detail view, viewer on top of everything */
+.gal { list-style: none; margin: 0; padding: 2px; display: flex; flex-wrap: wrap; gap: 8px; }
+.gal li { flex: none; }
+.gal button { display: block; padding: 0; border: 0; border-radius: 8px; overflow: hidden; cursor: zoom-in; background: var(--surface-2); box-shadow: 0 0 0 1px var(--line); }
+.gal img { display: block; height: 78px; width: auto; transition: transform .2s ease; }
+.gal button:hover img { transform: scale(1.04); }
+#lb { position: fixed; inset: 0; z-index: 2000; background: rgba(4, 11, 14, .93); display: grid; grid-template-rows: 1fr auto; touch-action: pan-y pinch-zoom; }
+#lb[hidden] { display: none; }
+.lb-fig { margin: 0; display: grid; place-items: center; min-height: 0; padding: 56px 64px 0; }
+.lb-fig img { max-width: 100%; max-height: calc(100vh - 128px); max-height: calc(100dvh - 128px); object-fit: contain; border-radius: 6px; box-shadow: 0 12px 40px rgba(0,0,0,.6); user-select: none; -webkit-user-drag: none; }
+.lb-cap { color: #e3ecec; text-align: center; padding: 14px 16px calc(18px + env(safe-area-inset-bottom, 0px)); font-size: 15px; display: flex; justify-content: center; align-items: center; gap: 10px; }
+.lb-cap .badge { box-shadow: none; }
+.lb-cap .n { font-family: var(--f-data); font-size: 13px; color: #94a8ac; }
+.lb-b { position: absolute; width: 46px; height: 46px; border-radius: 50%; border: 0; background: rgba(255,255,255,.12); color: #fff; display: grid; place-items: center; cursor: pointer; padding: 0; }
+.lb-b:hover { background: rgba(255,255,255,.24); }
+.lb-b svg { width: 22px; height: 22px; }
+#lbX { top: max(10px, env(safe-area-inset-top, 0px)); right: max(10px, env(safe-area-inset-right, 0px)); }
+#lbP, #lbN { top: calc(50% - 36px); }
+#lbP { left: max(10px, env(safe-area-inset-left, 0px)); }
+#lbN { right: max(10px, env(safe-area-inset-right, 0px)); }
+@media (max-width: 640px) {
+  .lb-fig { padding: 56px 0 0; }
+  .lb-fig img { border-radius: 0; }
+  #lbP, #lbN { top: auto; bottom: calc(8px + env(safe-area-inset-bottom, 0px)); }
+  .lb-cap { padding-left: 64px; padding-right: 64px; }
+}
 .facts { display: grid; gap: 10px; margin: 0; }
 .facts div { display: grid; gap: 2px; }
 .facts dt { font-family: var(--f-data); font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
@@ -326,6 +362,9 @@ button { font: inherit; color: inherit; }
   .sbar-t .badge { width: 34px; height: 34px; font-size: 18px; flex: none; }
   .sbar-t > div { min-width: 0; }
   .sbar-t h2 { margin: 0; font-family: var(--f-display); font-weight: 700; font-size: 22px; line-height: 1.05; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .sbar-t h2:has(.dep) { display: flex; align-items: center; }
+  .sbar-t h2 .nm { min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+  .sbar-t h2 .dep { flex: none; font-size: 13px; vertical-align: 0; }
   .sbar-t small { display: block; color: var(--muted); font-size: 13px; line-height: 1.2; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .ib { width: 40px; height: 40px; flex: none; border: 0; border-radius: 50%; background: var(--surface-2); color: var(--ink); display: grid; place-items: center; cursor: pointer; padding: 0; }
   .ib svg { width: 20px; height: 20px; transition: transform .25s ease; }
@@ -479,9 +518,18 @@ button { font: inherit; color: inherit; }
   </aside>
 </div>
 
+<div id="lb" role="dialog" aria-modal="true" aria-labelledby="lbCap" hidden>
+  <figure class="lb-fig" id="lbFig"><img id="lbImg" alt=""></figure>
+  <div class="lb-cap" id="lbCap"></div>
+  <button class="lb-b" id="lbX"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M5 5l10 10M15 5L5 15" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg></button>
+  <button class="lb-b" id="lbP"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M12.5 4l-6 6 6 6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+  <button class="lb-b" id="lbN"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M7.5 4l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+</div>
+
 <script src="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
 const D = /*DANE*/;
+const FOTO = /*ZDJECIA*/;   // point id -> [{plik, mini, w, h}]
 const IG = 'https://www.instagram.com/deeperbluediving';
 const FB = 'https://www.facebook.com/jjbiernacki';
 const PDF = { pl: { src: 'plan_PL.pdf', name: 'Koparki_plan_nurkowy.pdf' }, en: { src: 'plan_EN.pdf', name: 'Koparki_dive_plan.pdf' } };
@@ -499,6 +547,7 @@ const T = {
     tList: 'Atrakcje', tInfo: 'O mapie', tContact: 'Kontakt',
     listCap: 'Wybierz punkt na liście lub na mapie, aby wyświetlić trasy i azymuty.',
     back: 'Wszystkie atrakcje',
+    photos: 'Zdjęcia spod wody', photoN: (i, n) => `Zdjęcie ${i} z ${n}`, lbClose: 'Zamknij zdjęcie', lbPrev: 'Poprzednie zdjęcie', lbNext: 'Następne zdjęcie',
     alt: 'Nazwa w bazie', coords: 'Współrzędne WGS84', copy: 'Kopiuj', copied: 'Skopiowano',
     routes: 'Trasy z tego punktu', tip: 'Objaśnienie', routesHint: 'Azymuty magnetyczne, zgodne ze wskazaniem kompasu nurkowego, liczone od tego punktu. Wybranie trasy przenosi do punktu docelowego.',
     noRoutes: 'Punkt nie ma własnych tras na planie.',
@@ -545,6 +594,7 @@ const T = {
         <li><b>Azymuty są magnetyczne</b> i odpowiadają wskazaniom kompasu nurkowego.</li>
         <li>Pozycje atrakcji wyznaczone na podstawie położenia boi mogą być nieznacznie przesunięte.</li>
         <li>Głębokości oznaczone gwiazdką zależą od poziomu wody.</li>
+        <li>Przy części atrakcji są zdjęcia spod wody. Wybranie miniatury powiększa zdjęcie; kolejne zdjęcia przełącza się strzałkami.</li>
         <li>Kompas w prawym górnym rogu wskazuje północ magnetyczną. Po jego wybraniu wyświetlają się kursy na brzeg.</li>
       </ul>`,
     contact: `
@@ -563,6 +613,7 @@ const T = {
     tList: 'Sites', tInfo: 'About', tContact: 'Contact',
     listCap: 'Select a site in the list or on the map to show its routes and bearings.',
     back: 'All sites',
+    photos: 'Underwater photos', photoN: (i, n) => `Photo ${i} of ${n}`, lbClose: 'Close photo', lbPrev: 'Previous photo', lbNext: 'Next photo',
     alt: 'Local name', coords: 'WGS84 coordinates', copy: 'Copy', copied: 'Copied',
     routes: 'Routes from here', tip: 'Explanation', routesHint: 'Magnetic bearings from this point, as shown by a dive compass. Selecting a route moves to its destination.',
     noRoutes: 'This point has no routes of its own on the plan.',
@@ -609,6 +660,7 @@ const T = {
         <li><b>Bearings are magnetic</b> and correspond to a dive compass reading.</li>
         <li>Positions of sites determined from buoy locations may be slightly offset.</li>
         <li>Depths marked with an asterisk depend on the water level.</li>
+        <li>Some sites have underwater photos. Selecting a thumbnail enlarges the photo; the arrows switch between photos.</li>
         <li>The compass in the top right corner shows magnetic north. Selecting it displays courses to shore.</li>
       </ul>`,
     contact: `
@@ -630,6 +682,11 @@ const P = {}; D.punkty.forEach(p => P[p.id] = p);
 const byNr = {}; D.punkty.forEach(p => byNr[p.nr] = p);
 const name = p => lang === 'pl' ? p.pl : p.en;
 const desc = p => lang === 'pl' ? p.opis_pl : p.opis_en;
+// depth ("15 m*") opens the description; it is shown next to the name, the rest stays below
+const DEP = /^\s*((?:ok\.\s*|approx\.\s*)?\d+(?:[.,]\d+)?\s*m\*)\s*(?:·\s*)?/;
+const depth = p => { const m = DEP.exec(desc(p) || ''); return m ? m[1] : ''; };
+const descRest = p => (desc(p) || '').replace(DEP, '');
+const depTag = p => depth(p) ? `<span class="dep">${esc(depth(p))}</span>` : '';
 const order = D.punkty.slice().sort((a, b) => (parseInt(a.nr) - parseInt(b.nr)) || a.nr.localeCompare(b.nr));
 function routesOf(id) {
   return D.krawedzie.filter(k => k.a === id || k.b === id).map(k => {
@@ -665,9 +722,12 @@ map.setMaxBounds(L.latLngBounds(LL(-D.szer * 1.5, D.wys * 9), LL(D.szer * 2.5, -
 
 // everything except the point markers: hidden in the route planning mode
 const viewG = L.layerGroup().addTo(map);
-// Wilhelm hull outline
+// outlines: Wilhelm hull (dashed), schematic drawings of the objects (parts + lines), pipe stubs
+const LLs = l => l.map(([x, y]) => LL(x, y));
 D.obrysy.forEach(o => {
-  L.polygon(o.px.map(([x, y]) => LL(x, y)), { color: '#fff', weight: 2.5, opacity: .95, fillColor: '#fff', fillOpacity: .18, dashArray: '6 4', interactive: false }).addTo(viewG);
+  if (o.px) L.polygon(LLs(o.px), { color: '#fff', weight: 2.5, opacity: .95, fillColor: '#fff', fillOpacity: .18, dashArray: '6 4', interactive: false }).addTo(viewG);
+  (o.czesci || []).forEach(c => L.polygon(LLs(c), { color: '#fff', weight: 1.5, opacity: .9, fillColor: '#fff', fillOpacity: .22, interactive: false }).addTo(viewG));
+  (o.linie || []).forEach(l => L.polyline(LLs(l), o.rura ? { color: '#373c42', weight: 2, opacity: .8, interactive: false } : { color: '#fff', weight: 1.5, opacity: .9, interactive: false }).addTo(viewG));
 });
 
 // routes
@@ -842,7 +902,7 @@ function bar() {
   if (view === 'detail' && sel) {
     const p = P[sel];
     const alt = lang === 'en' && p.pl !== p.en ? `<small>${L_.alt}: ${esc(p.pl)}</small>` : '';
-    h = `<span class="badge">${esc(p.nr)}</span><div><h2>${esc(name(p))}</h2>${alt}</div>`;
+    h = `<span class="badge">${esc(p.nr)}</span><div><h2><span class="nm">${esc(name(p))}</span>${depTag(p)}</h2>${alt}</div>`;
   } else if (view === 'info') h = `<div><h2>${L_.tInfo}</h2></div>`;
   else if (view === 'plan') {
     const s = planStats();
@@ -871,7 +931,7 @@ function render() {
       order.map(p => {
         const sub = p.nr === '7b';
         return `<li class="${sub ? 'sub' : ''}"><button data-id="${esc(p.id)}"><span class="badge${sub || p.maly ? ' small' : ''}">${esc(p.nr)}</span>` +
-          `<span><span class="t">${esc(name(p))}</span>${desc(p) ? `<span class="s">${esc(desc(p))}</span>` : ''}</span></button></li>`;
+          `${p.ikona ? `<img class="ico" src="${esc(p.ikona)}" alt="" width="32" height="32">` : ''}<span><span class="t">${esc(name(p))}${depTag(p)}</span>${descRest(p) ? `<span class="s">${esc(descRest(p))}</span>` : ''}</span></button></li>`;
       }).join('') + `</ul></div>`;
     b.querySelectorAll('.list button').forEach(x => x.onclick = () => select(x.dataset.id, { move: 'fit' }));
   } else if (view === 'detail' && sel) {
@@ -880,8 +940,10 @@ function render() {
     const star = /\*/.test(desc(p));
     b.innerHTML = `<div class="view-pad">
       <button class="back" id="back">${arrow(-1, 0)} ${L_.back}</button>
-      <div class="d-title"><span class="badge">${esc(p.nr)}</span><div><h2>${esc(name(p))}</h2>${altName}</div></div>
-      ${desc(p) ? `<p class="d-desc">${esc(desc(p))}</p>` : ''}
+      <div class="d-title${p.ikona ? ' has-ico' : ''}"><span class="badge">${esc(p.nr)}</span>${p.ikona ? `<img class="ico" src="${esc(p.ikona)}" alt="" width="48" height="48">` : ''}<div><h2>${esc(name(p))}${depTag(p)}</h2>${altName}</div></div>
+      ${descRest(p) ? `<p class="d-desc">${esc(descRest(p))}</p>` : ''}
+      ${(FOTO[p.id] || []).length ? `<ul class="gal" aria-label="${L_.photos}">` + FOTO[p.id].map((f, i) =>
+        `<li><button data-i="${i}" aria-label="${esc(L_.photoN(i + 1, FOTO[p.id].length))}"><img src="${esc(f.mini)}" alt="" loading="lazy" width="${Math.round(78 * f.w / f.h)}" height="78"></button></li>`).join('') + `</ul>` : ''}
       <div class="sect-row"><h3 class="sect">${L_.routes}</h3>${R.length ? `<button class="tip" id="tip" aria-expanded="false" aria-controls="tipPop" aria-label="${L_.tip}" title="${esc(L_.routesHint)}">i</button>` : ''}</div>
       ${R.length ? `<p class="tip-pop" id="tipPop" hidden>${L_.routesHint}</p><ul class="routes">` + R.map(r =>
         `<li><button data-id="${esc(r.other.id)}">${arrow(r.dx, r.dy, 'ar')}<span class="az">${az(r.az)}</span><span class="m">${dm(r.m)}</span>` +
@@ -893,6 +955,7 @@ function render() {
       ${star ? `<p class="note">${L_.depthNote}</p>` : ''}
     </div>`;
     $('back').onclick = () => { deselect(); };
+    b.querySelectorAll('.gal button').forEach(x => x.onclick = () => lbOpen(p.id, +x.dataset.i, x));
     if ($('tip')) $('tip').onclick = () => { const pp = $('tipPop'); pp.hidden = !pp.hidden; $('tip').setAttribute('aria-expanded', String(!pp.hidden)); };
     b.querySelectorAll('.routes button').forEach(x => x.onclick = () => select(x.dataset.id, { move: 'fit' }));
     $('cpy').onclick = () => {
@@ -923,6 +986,56 @@ function render() {
 }
 function selectText(el) { const r = document.createRange(); r.selectNodeContents(el); const s = getSelection(); s.removeAllRanges(); s.addRange(r); }
 
+// ---------- photo viewer: centred popup, arrows / keys / swipe, closes on ×, Esc or a click beside the photo ----------
+const lb = { id: null, i: 0, from: null };
+function lbShow() {
+  const L_ = t(), A = FOTO[lb.id], f = A[lb.i], p = P[lb.id], many = A.length > 1;
+  const img = $('lbImg');
+  img.src = f.plik; img.width = f.w; img.height = f.h;
+  img.alt = `${name(p)}, ${L_.photoN(lb.i + 1, A.length).toLowerCase()}`;
+  $('lbCap').innerHTML = `<span class="badge small">${esc(p.nr)}</span><span>${esc(name(p))}</span>${many ? `<span class="n">${lb.i + 1} / ${A.length}</span>` : ''}`;
+  $('lbP').hidden = $('lbN').hidden = !many;
+  $('lbX').setAttribute('aria-label', L_.lbClose); $('lbP').setAttribute('aria-label', L_.lbPrev); $('lbN').setAttribute('aria-label', L_.lbNext);
+  if (many) [1, -1].forEach(d => { new Image().src = A[(lb.i + d + A.length) % A.length].plik; });   // neighbours ready before the arrow
+}
+function lbOpen(id, i, from) {
+  lb.id = id; lb.i = i; lb.from = from || null;
+  lbShow(); $('lb').hidden = false; $('lbX').focus();
+}
+function lbClose() {
+  if ($('lb').hidden) return;
+  $('lb').hidden = true; $('lbImg').removeAttribute('src');
+  if (lb.from && document.body.contains(lb.from)) lb.from.focus();
+}
+function lbStep(d) { const n = FOTO[lb.id].length; if (n < 2) return; lb.i = (lb.i + d + n) % n; lbShow(); }
+$('lbX').onclick = lbClose;
+$('lbP').onclick = () => lbStep(-1);
+$('lbN').onclick = () => lbStep(1);
+$('lb').addEventListener('click', e => { if (e.target === $('lb') || e.target === $('lbFig') || e.target.closest('.lb-cap')) lbClose(); });
+document.addEventListener('keydown', e => {
+  if ($('lb').hidden) return;
+  if (e.key === 'Escape') lbClose();
+  else if (e.key === 'ArrowLeft') lbStep(-1);
+  else if (e.key === 'ArrowRight') lbStep(1);
+  else if (e.key === 'Tab') {   // keep focus inside the viewer
+    const f = [...$('lb').querySelectorAll('button')].filter(b => !b.hidden);
+    const k = f.indexOf(document.activeElement);
+    e.preventDefault(); f[(k + (e.shiftKey ? -1 : 1) + f.length) % f.length].focus();
+    return;
+  } else return;
+  e.preventDefault(); e.stopImmediatePropagation();
+}, true);
+let lbX0 = null;
+$('lb').addEventListener('pointerdown', e => { if (e.pointerType !== 'mouse') lbX0 = [e.clientX, e.clientY]; });
+$('lb').addEventListener('pointerup', e => {
+  if (!lbX0) return;
+  const dx = e.clientX - lbX0[0], dy = e.clientY - lbX0[1]; lbX0 = null;
+  if (Math.abs(dx) > 50 && Math.abs(dx) > 1.5 * Math.abs(dy)) { lbStep(dx < 0 ? 1 : -1); lbSwiped = Date.now(); }
+});
+$('lb').addEventListener('pointercancel', () => { lbX0 = null; });
+let lbSwiped = 0;
+$('lb').addEventListener('click', e => { if (Date.now() - lbSwiped < 400) e.stopImmediatePropagation(); }, true);   // a swipe is not a tap beside the photo
+
 function chrome() {
   const L_ = t();
   document.documentElement.lang = lang;
@@ -945,7 +1058,7 @@ function chrome() {
     `<span></span>${cell(B.g)}<span></span>` +
     `${cell(B.l)}<svg class="c" viewBox="-17 -17 34 34" aria-hidden="true"><g stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" fill="none"><path d="M0 -4V-14M-4 -10L0 -14L4 -10"/><path d="M0 4V14M-4 10L0 14L4 10"/><path d="M-4 0H-14M-10 -4L-14 0L-10 4"/><path d="M4 0H14M10 -4L14 0L10 4"/></g></svg>${cell(B.p)}` +
     `<span></span>${cell(B.d)}<span></span>`;
-  D.punkty.forEach(p => { const el = marks[p.id].getElement(); if (el) el.title = `${p.nr} ${name(p)}`; });
+  D.punkty.forEach(p => { const el = marks[p.id].getElement(); if (el) el.title = `${p.nr} ${name(p)}${depth(p) ? ' · ' + depth(p) : ''}`; });
   map.closePopup();
 }
 function setLang(l) {

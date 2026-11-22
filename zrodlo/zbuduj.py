@@ -9,6 +9,9 @@ Z = os.path.dirname(os.path.abspath(__file__)); S = os.path.dirname(Z)
 s = open(Z + '/szablon.html', encoding='utf-8').read()
 s = s.replace('/*LEAFLET_CSS*/', open(Z + '/leaflet.min.css', encoding='utf-8').read())
 s = s.replace('/*DANE*/', json.dumps(json.load(open(S + '/dane.json', encoding='utf-8')), ensure_ascii=False, separators=(',', ':')))
+# zdjecia atrakcji (galeria w widoku punktu); brak pliku = strona bez zdjec
+F = S + '/zdjecia/zdjecia.json'
+s = s.replace('/*ZDJECIA*/', json.dumps(json.load(open(F, encoding='utf-8')) if os.path.exists(F) else {}, separators=(',', ':')))
 
 # naglowek szablonu: kolejne linie <title>/<meta>/<link> na samym poczatku
 linie = s.split('\n'); i = 0
