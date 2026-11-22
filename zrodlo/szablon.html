@@ -110,8 +110,11 @@ button { font: inherit; color: inherit; }
 .list button:has(.ico) { grid-template-columns: 30px 32px 1fr; }
 .list li.sub button:has(.ico) { grid-template-columns: 26px 32px 1fr; }
 .d-title.has-ico { grid-template-columns: auto auto 1fr; }
-@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .ico { background: #f4f4f1; border-radius: 6px; } }
-:root[data-theme="dark"] .ico { background: #f4f4f1; border-radius: 6px; }
+.ico img { display: block; }
+.ico .ico-d { display: none; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .ico .ico-l { display: none; } :root:not([data-theme="light"]) .ico .ico-d { display: block; } }
+:root[data-theme="dark"] .ico .ico-l { display: none; }
+:root[data-theme="dark"] .ico .ico-d { display: block; }
 .list-cap { margin: 6px 8px 8px; font-size: 13px; color: var(--muted); }
 .badge {
   display: inline-grid; place-items: center; width: 30px; height: 30px; border-radius: 50%;
@@ -556,7 +559,7 @@ const T = {
     alt: 'Nazwa w bazie', coords: 'Współrzędne WGS84', copy: 'Kopiuj', copied: 'Skopiowano',
     routes: 'Trasy z tego punktu', tip: 'Objaśnienie', routesHint: 'Azymuty magnetyczne, zgodne ze wskazaniem kompasu nurkowego, liczone od tego punktu. Wybranie trasy przenosi do punktu docelowego.',
     noRoutes: 'Punkt nie ma własnych tras na planie.',
-    depthNote: '* Głębokość zależy od poziomu wody.',
+    depthNote: 'Głębokość zależy od poziomu wody.',
     lyAz: 'Azymuty', lyDist: 'Odległości', lyHint: 'Pozostałe azymuty widoczne po przybliżeniu.', layers: 'Etykiety na mapie',
     rose: 'N mag.', shoreH: 'Do brzegu', shoreP: 'Kursy na brzeg z dowolnego miejsca zbiornika, ±5°.', base: 'baza',
     zIn: 'Przybliż', zOut: 'Oddal', zFit: 'Cała mapa', handle: 'Rozwiń panel', map: 'Mapa',
@@ -622,7 +625,7 @@ const T = {
     alt: 'Local name', coords: 'WGS84 coordinates', copy: 'Copy', copied: 'Copied',
     routes: 'Routes from here', tip: 'Explanation', routesHint: 'Magnetic bearings from this point, as shown by a dive compass. Selecting a route moves to its destination.',
     noRoutes: 'This point has no routes of its own on the plan.',
-    depthNote: '* Depth depends on the water level.',
+    depthNote: 'Depth depends on the water level.',
     lyAz: 'Bearings', lyDist: 'Distances', lyHint: 'More bearings show when zoomed in.', layers: 'Map labels',
     rose: 'mag. N', shoreH: 'To shore', shoreP: 'Courses to shore from anywhere in the lake, ±5°.', base: 'base',
     zIn: 'Zoom in', zOut: 'Zoom out', zFit: 'Whole map', handle: 'Expand panel', map: 'Map',
@@ -688,7 +691,7 @@ const byNr = {}; D.punkty.forEach(p => byNr[p.nr] = p);
 const name = p => lang === 'pl' ? p.pl : p.en;
 const desc = p => lang === 'pl' ? p.opis_pl : p.opis_en;
 // depth ("15 m*") opens the description; it is shown next to the name, the rest stays below
-const DEP = /^\s*((?:ok\.\s*|approx\.\s*)?\d+(?:[.,]\d+)?\s*m\*)\s*(?:·\s*)?/;
+const DEP = /^\s*((?:ok\.\s*|approx\.\s*)?\d+(?:[.,]\d+)?\s*m\*?)(?![\w])\s*(?:·\s*)?/;   // 22.11: depth without asterisk
 const depth = p => { const m = DEP.exec(desc(p) || ''); return m ? m[1] : ''; };
 const descRest = p => (desc(p) || '').replace(DEP, '');
 const depTag = p => depth(p) ? `<span class="dep">${esc(depth(p))}</span>` : '';
@@ -938,16 +941,16 @@ function render() {
       order.map(p => {
         const sub = p.nr === '7b';
         return `<li class="${sub ? 'sub' : ''}"><button data-id="${esc(p.id)}"><span class="badge${sub || p.maly ? ' small' : ''}">${esc(p.nr)}</span>` +
-          `${p.ikona ? `<img class="ico" src="${esc(p.ikona)}" alt="" width="32" height="32">` : ''}<span><span class="t">${esc(name(p))}${depTag(p)}</span>${descRest(p) ? `<span class="s">${esc(descRest(p))}</span>` : ''}</span></button></li>`;
+          `${icoImg(p, 32)}<span><span class="t">${esc(name(p))}${depTag(p)}</span>${descRest(p) ? `<span class="s">${esc(descRest(p))}</span>` : ''}</span></button></li>`;
       }).join('') + `</ul></div>`;
     b.querySelectorAll('.list button').forEach(x => x.onclick = () => select(x.dataset.id, { move: 'fit' }));
   } else if (view === 'detail' && sel) {
     const p = P[sel], R = routesOf(sel);
     const altName = lang === 'en' && p.pl !== p.en ? `<span class="alt">${L_.alt}: ${esc(p.pl)}</span>` : '';
-    const star = /\*/.test(desc(p));
+    const star = !!depth(p);   // 22.11: depth note under every point with a depth (no asterisks any more)
     b.innerHTML = `<div class="view-pad">
       <button class="back" id="back">${arrow(-1, 0)} ${L_.back}</button>
-      <div class="d-title${p.ikona ? ' has-ico' : ''}"><span class="badge">${esc(p.nr)}</span>${p.ikona ? `<img class="ico" src="${esc(p.ikona)}" alt="" width="48" height="48">` : ''}<div><h2>${esc(name(p))}${depTag(p)}</h2>${altName}</div></div>
+      <div class="d-title${p.ikona ? ' has-ico' : ''}"><span class="badge">${esc(p.nr)}</span>${icoImg(p, 48)}<div><h2>${esc(name(p))}${depTag(p)}</h2>${altName}</div></div>
       ${descRest(p) ? `<p class="d-desc">${esc(descRest(p))}</p>` : ''}
       ${(FOTO[p.id] || []).length ? `<ul class="gal" aria-label="${L_.photos}">` + FOTO[p.id].map((f, i) =>
         `<li><button data-i="${i}" aria-label="${esc(L_.photoN(i + 1, FOTO[p.id].length))}"><img src="${esc(f.mini)}" alt="" loading="lazy" width="${Math.round(78 * f.w / f.h)}" height="78"></button></li>`).join('') + `</ul>` : ''}
@@ -1325,8 +1328,9 @@ let legLines = [];
 const legAz = (a, b) => (((Math.atan2(b.x - a.x, -(b.y - a.y)) * 180 / Math.PI - D.polnoc_mag) % 360) + 360) % 360;
 const legM = (a, b) => Math.hypot(b.x - a.x, b.y - a.y) * D.gsd;
 // depth: the number with an asterisk in the Polish description ("15 m*"); null = unknown
-const depthApx = p => /^\s*ok\./.test(p.opis_pl || '') ? (lang === 'en' ? 'approx. ' : 'ok. ') : '';   // 22.11: depth estimated, not measured
-const depthOf = p => { const m = /(\d+(?:[.,]\d+)?)\s*m\*/.exec(p.opis_pl || ''); return m ? parseFloat(m[1].replace(',', '.')) : null; };
+// pictogram: light and dark variant (ikony/{id}.png, {id}_c.png); CSS shows the one for the theme (22.11)
+const icoImg = (p, s) => p.ikona ? `<span class="ico"><img class="ico-l" src="${esc(p.ikona)}" alt="" width="${s}" height="${s}"><img class="ico-d" src="${esc(p.ikona.replace('.png', '_c.png'))}" alt="" width="${s}" height="${s}"></span>` : '';
+const depthOf = p => { const m = /^\s*(?:ok\.\s*)?(\d+(?:[.,]\d+)?)\s*m\*?(?![\w])/.exec(p.opis_pl || ''); return m ? parseFloat(m[1].replace(',', '.')) : null; };
 const pairKey = (a, b) => a < b ? a + '|' + b : b + '|' + a;
 
 function planLegs() {
@@ -1342,7 +1346,7 @@ function planLegs() {
 function planStats() {
   const legs = planLegs(), uniq = [...new Set(route)], ds = uniq.map(id => depthOf(P[id])).filter(v => v !== null);
   const mx = ds.length ? Math.max(...ds) : null;
-  return { legs, m: legs.reduce((s, g) => s + g.m, 0), known: ds.length, total: uniq.length, max: mx, depth: mx === null ? '' : n(mx) + ' m*' };
+  return { legs, m: legs.reduce((s, g) => s + g.m, 0), known: ds.length, total: uniq.length, max: mx, depth: mx === null ? '' : n(mx) + ' m' };
 }
 function canAdd(id) {
   if (route.length >= MAXPTS) return 'errMax';
@@ -1467,7 +1471,7 @@ function renderPlan(b, L_) {
     }
     const tag = i === 0 ? L_.start : (i === last ? L_.finish : '');
     rows += `<li class="pt"><button data-id="${esc(id)}"><span class="badge${p.maly || p.nr === '7b' ? ' small' : ''}">${esc(p.nr)}</span>` +
-      `<span><span class="t">${esc(name(p))}</span>${tag ? `<span class="s">${tag}</span>` : ''}</span><span class="dp">${d === null ? '' : depthApx(p) + n(d) + ' m*'}</span></button></li>`;
+      `<span><span class="t">${esc(name(p))}</span>${tag ? `<span class="s">${tag}</span>` : ''}</span><span class="dp">${d === null ? '' : n(d) + ' m'}</span></button></li>`;
   });
   b.innerHTML = `<div class="view-pad">
     <dl class="plan-sum">
@@ -1694,7 +1698,7 @@ async function drawRoutePage(L_) {
       g.textAlign = 'left'; g.fillStyle = INK; font(600, fs, FB);
       g.fillText(fit(name(p), R[1] - mm(14) - R[0] - 2 * r - mm(1.5)), R[0] + 2 * r + mm(1.5), mid);
       g.textAlign = 'right'; font(600, fs * .9, FM);
-      g.fillStyle = MUT; if (d !== null) g.fillText(depthApx(p) + n(d) + ' m*', R[1] - mm(1.5), mid);
+      g.fillStyle = MUT; if (d !== null) g.fillText(n(d) + ' m', R[1] - mm(1.5), mid);
       if (lg) { g.fillStyle = RED; g.fillText(az(lg.az), R[2] - mm(1.5), mid); g.fillStyle = INK; g.fillText(dm(lg.m), R[3] - mm(1.5), mid); }
       g.fillStyle = INK; g.fillText(dm(cumAt[i]), R[4], mid);
       g.textAlign = 'left'; g.textBaseline = 'alphabetic';
