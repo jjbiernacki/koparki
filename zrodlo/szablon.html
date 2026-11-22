@@ -1,5 +1,5 @@
-<title>Koparki · mapa nurkowa</title>
-<meta name="description" content="Interaktywna mapa nurkowa zalanego wyrobiska Koparki: atrakcje, trasy z azymutami magnetycznymi, plan do druku.">
+<title>Mapa nurkowa Koparki (Jaworzno) – atrakcje, trasy, plan PDF</title>
+<meta name="description" content="tytuł i opis strony ustawia zbuduj.py (TYTUL, OPIS)">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Saira+Condensed:wght@600;700&family=Source+Sans+3:wght@400;600;700&family=IBM+Plex+Mono:wght@500;600&display=swap">
@@ -116,6 +116,11 @@ button { font: inherit; color: inherit; }
 :root[data-theme="dark"] .ico .ico-l { display: none; }
 :root[data-theme="dark"] .ico .ico-d { display: block; }
 .list-cap { margin: 6px 8px 8px; font-size: 13px; color: var(--muted); }
+.plan-fig { margin: 14px 8px 6px; display: grid; gap: 6px; }
+.plan-fig a:has(img) { display: block; border-radius: 8px; overflow: hidden; box-shadow: 0 0 0 1px var(--line); }
+.plan-fig img { display: block; width: 100%; height: auto; }
+.plan-fig figcaption { font-size: 13px; color: var(--muted); }
+.plan-fig figcaption a { color: var(--link); font-weight: 600; }
 .badge {
   display: inline-grid; place-items: center; width: 30px; height: 30px; border-radius: 50%;
   background: var(--pin); color: var(--pin-ink); font-family: var(--f-display); font-weight: 700; font-size: 16px; line-height: 1;
@@ -540,7 +545,8 @@ button { font: inherit; color: inherit; }
 <script src="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
 const D = /*DANE*/;
-const FOTO = /*ZDJECIA*/;   // point id -> [{plik, mini, w, h}]
+const FOTO = /*ZDJECIA*/;
+const PLANIMG = /*PLAN_OBRAZ*/;   // plan do druku jako obraz: {PL|EN: {obraz, podglad, pdf, w_podglad, h_podglad}}   // point id -> [{plik, mini, w, h}]
 const IG = 'https://www.instagram.com/deeperbluediving';
 const FB = 'https://www.facebook.com/jjbiernacki';
 const PDF = { pl: { src: 'plan_PL.pdf', name: 'Koparki_plan_nurkowy.pdf' }, en: { src: 'plan_EN.pdf', name: 'Koparki_dive_plan.pdf' } };
@@ -558,6 +564,8 @@ const T = {
     tList: 'Atrakcje', tInfo: 'O mapie', tContact: 'Kontakt',
     listCap: 'Wybierz punkt na liście lub na mapie, aby wyświetlić trasy i azymuty.',
     back: 'Wszystkie atrakcje',
+    planAlt: 'Mapa nurkowa zbiornika Koparki – plan z atrakcjami, głębokościami, trasami i azymutami', planCap: 'Mapa nurkowa zbiornika Koparki', planJpg: 'obraz JPG',
+    photoAlt: (n, i) => `${n} – zdjęcie spod wody ${i}, zbiornik Koparki`,
     photos: 'Zdjęcia spod wody', photoN: (i, n) => `Zdjęcie ${i} z ${n}`, lbClose: 'Zamknij zdjęcie', lbPrev: 'Poprzednie zdjęcie', lbNext: 'Następne zdjęcie',
     alt: 'Nazwa w bazie', coords: 'Współrzędne WGS84', copy: 'Kopiuj', copied: 'Skopiowano',
     routes: 'Trasy z tego punktu', tip: 'Objaśnienie', routesHint: 'Azymuty magnetyczne, zgodne ze wskazaniem kompasu nurkowego, liczone od tego punktu. Wybranie trasy przenosi do punktu docelowego.',
@@ -624,6 +632,8 @@ const T = {
     tList: 'Sites', tInfo: 'About', tContact: 'Contact',
     listCap: 'Select a site in the list or on the map to show its routes and bearings.',
     back: 'All sites',
+    planAlt: 'Koparki dive map – plan of the quarry with dive sites, depths, routes and bearings', planCap: 'Koparki dive map', planJpg: 'JPG image',
+    photoAlt: (n, i) => `${n} – underwater photo ${i}, Koparki quarry`,
     photos: 'Underwater photos', photoN: (i, n) => `Photo ${i} of ${n}`, lbClose: 'Close photo', lbPrev: 'Previous photo', lbNext: 'Next photo',
     alt: 'Local name', coords: 'WGS84 coordinates', copy: 'Copy', copied: 'Copied',
     routes: 'Routes from here', tip: 'Explanation', routesHint: 'Magnetic bearings from this point, as shown by a dive compass. Selecting a route moves to its destination.',
@@ -697,6 +707,9 @@ const desc = p => lang === 'pl' ? p.opis_pl : p.opis_en;
 const DEP = /^\s*((?:ok\.\s*|approx\.\s*)?\d+(?:[.,]\d+)?\s*m\*?)(?![\w])\s*(?:·\s*)?/;   // 22.11: depth without asterisk
 const depth = p => { const m = DEP.exec(desc(p) || ''); return m ? m[1] : ''; };
 const descRest = p => (desc(p) || '').replace(DEP, '');
+// plan do druku jako obraz pod lista atrakcji (ten sam plik co w wyszukiwarce grafik)
+const planFig = L_ => { const o = PLANIMG[lang === 'pl' ? 'PL' : 'EN']; return o ? `<figure class="plan-fig"><a href="${o.obraz}"><img src="${o.podglad}" alt="${esc(L_.planAlt)}" width="${o.w_podglad}" height="${o.h_podglad}" loading="lazy"></a>` +
+  `<figcaption>${L_.planCap}: <a href="${o.obraz}">${L_.planJpg}</a> · <a href="${o.pdf}">PDF A4</a></figcaption></figure>` : ''; };
 const depTag = p => depth(p) ? `<span class="dep">${esc(depth(p))}</span>` : '';
 const order = D.punkty.slice().sort((a, b) => (parseInt(a.nr) - parseInt(b.nr)) || a.nr.localeCompare(b.nr));
 function routesOf(id) {
@@ -945,7 +958,7 @@ function render() {
         const sub = p.nr === '7b';
         return `<li class="${sub ? 'sub' : ''}"><button data-id="${esc(p.id)}"><span class="badge${sub || p.maly ? ' small' : ''}">${esc(p.nr)}</span>` +
           `${icoImg(p, 32)}<span><span class="t">${esc(name(p))}${depTag(p)}</span>${descRest(p) ? `<span class="s">${esc(descRest(p))}</span>` : ''}</span></button></li>`;
-      }).join('') + `</ul></div>`;
+      }).join('') + `</ul>${planFig(L_)}</div>`;
     b.querySelectorAll('.list button').forEach(x => x.onclick = () => select(x.dataset.id, { move: 'fit' }));
   } else if (view === 'detail' && sel) {
     const p = P[sel], R = routesOf(sel);
@@ -956,7 +969,7 @@ function render() {
       <div class="d-title${p.ikona ? ' has-ico' : ''}"><span class="badge">${esc(p.nr)}</span>${icoImg(p, 48)}<div><h2>${esc(name(p))}${depTag(p)}</h2>${altName}</div></div>
       ${descRest(p) ? `<p class="d-desc">${esc(descRest(p))}</p>` : ''}
       ${(FOTO[p.id] || []).length ? `<ul class="gal" aria-label="${L_.photos}">` + FOTO[p.id].map((f, i) =>
-        `<li><button data-i="${i}" aria-label="${esc(L_.photoN(i + 1, FOTO[p.id].length))}"><img src="${esc(f.mini)}" alt="" loading="lazy" width="${Math.round(78 * f.w / f.h)}" height="78"></button></li>`).join('') + `</ul>` : ''}
+        `<li><button data-i="${i}" aria-label="${esc(L_.photoN(i + 1, FOTO[p.id].length))}"><img src="${esc(f.mini)}" alt="${esc(L_.photoAlt(name(p), i + 1))}" loading="lazy" width="${Math.round(78 * f.w / f.h)}" height="78"></button></li>`).join('') + `</ul>` : ''}
       <div class="sect-row"><h3 class="sect">${L_.routes}</h3>${R.length ? `<button class="tip" id="tip" aria-expanded="false" aria-controls="tipPop" aria-label="${L_.tip}" title="${esc(L_.routesHint)}">i</button>` : ''}</div>
       ${R.length ? `<p class="tip-pop" id="tipPop" hidden>${L_.routesHint}</p><ul class="routes">` + R.map(r =>
         `<li><button data-id="${esc(r.other.id)}">${arrow(r.dx, r.dy, 'ar')}<span class="az">${az(r.az)}</span><span class="m">${dm(r.m)}</span>` +

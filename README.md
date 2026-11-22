@@ -1,6 +1,6 @@
 # Koparki — mapa nurkowa
 
-Interaktywna mapa nurkowa zalanego wyrobiska Koparki w okolicach Trzebini i Jaworzna.
+Interaktywna mapa nurkowa zalanego wyrobiska Koparki w Jaworznie.
 
 **Strona: https://jjbiernacki.github.io/koparki/**
 
@@ -10,7 +10,7 @@ i odległościami oraz kierunki do brzegu. Do każdego miejsca jest krótki opis
 Plan można pobrać jako PDF do druku (A4 poziomo). Strona jest po polsku
 i po angielsku.
 
-*Interactive dive map of the flooded Koparki quarry near Trzebinia, Poland,
+*Interactive dive map of the flooded Koparki quarry in Jaworzno, Poland,
 with dive sites, routes with magnetic bearings and distances, and a printable
 plan. Polish and English.*
 
