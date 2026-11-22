@@ -568,13 +568,13 @@ const T = {
     planIntro: 'Wybierz na mapie punkt startowy. Każdy kolejny wybrany punkt dołącza do trasy.',
     planTips: [
       'Trasa może prowadzić między dowolnymi punktami, także poza trasami planu. Azymuty i odległości są liczone automatycznie.',
-      'Trasa może mieć do 25 punktów. Do punktu można wracać, a tę samą linię można przepłynąć najwyżej trzy razy.',
+      'Trasa może mieć do 30 punktów. Do punktu można wracać, a tę samą linię można przepłynąć najwyżej trzy razy.',
       'Strzałki na liniach pokazują kierunek płynięcia.'
     ],
     sumDist: 'Odległość', sumPts: 'Punkty', sumDepth: 'Maks. głęb.',
     start: 'start', finish: 'koniec', twice: k => `${k}. raz`,
     undo: 'Cofnij', clear: 'Wyczyść', clearSure: 'Wyczyścić trasę?', link: 'Kopiuj link', linkOk: 'Skopiowano link',
-    errMax: 'Trasa może mieć najwyżej 25 punktów.', errSame: 'Ten punkt jest już ostatnim punktem trasy.',
+    errMax: 'Trasa może mieć najwyżej 30 punktów.', errSame: 'Ten punkt jest już ostatnim punktem trasy.',
     errTwice: 'Trasa przebiega już tą linią trzy razy.',
     planNote: 'Azymuty magnetyczne liczone od punktu początkowego każdego odcinka, odległości w linii prostej.',
     depthNone: '—',
@@ -592,7 +592,7 @@ const T = {
       <p>Strona działa w dwóch trybach, przełączanych przyciskami nad mapą:</p>
       <ul>
         <li><b>Mapa</b>: atrakcje oraz trasy planu z azymutami magnetycznymi i odległościami. Wybranie punktu na mapie lub na liście pokazuje trasy z tego punktu.</li>
-        <li><b>Planowanie trasy</b> (przycisk „Planuj trasę”): własna trasa złożona z kolejno wybranych punktów, do 25 punktów, także poza trasami planu. Azymuty i odległości odcinków, łączna odległość i maksymalna głębokość są liczone automatycznie. Trasę można zapisać jako PDF A4 lub przekazać linkiem.</li>
+        <li><b>Planowanie trasy</b> (przycisk „Planuj trasę”): własna trasa złożona z kolejno wybranych punktów, do 30 punktów, także poza trasami planu. Azymuty i odległości odcinków, łączna odległość i maksymalna głębokość są liczone automatycznie. Trasę można zapisać jako PDF A4 lub przekazać linkiem.</li>
       </ul>
       <p>Podkład stanowi ortofotomapa z drona z 13.09.2026. Punkty, trasy i azymuty są zgodne z planem do druku.</p>
       <ul>
@@ -634,13 +634,13 @@ const T = {
     planIntro: 'Choose a starting point on the map. Each point chosen next is added to the route.',
     planTips: [
       'The route can run between any points, not only along the routes of the plan. Bearings and distances are calculated automatically.',
-      'A route can have up to 25 points. Points can be revisited, and the same line can be swum at most three times.',
+      'A route can have up to 30 points. Points can be revisited, and the same line can be swum at most three times.',
       'Arrows on the lines show the direction of travel.'
     ],
     sumDist: 'Distance', sumPts: 'Points', sumDepth: 'Max depth',
     start: 'start', finish: 'finish', twice: k => k === 2 ? '2nd time' : '3rd time',
     undo: 'Undo', clear: 'Clear', clearSure: 'Clear the route?', link: 'Copy link', linkOk: 'Link copied',
-    errMax: 'A route can have at most 25 points.', errSame: 'This point is already the last point of the route.',
+    errMax: 'A route can have at most 30 points.', errSame: 'This point is already the last point of the route.',
     errTwice: 'The route already follows this line three times.',
     planNote: 'Magnetic bearings from the starting point of each leg; straight-line distances.',
     depthNone: '—',
@@ -658,7 +658,7 @@ const T = {
       <p>The site has two modes, switched with the buttons above the map:</p>
       <ul>
         <li><b>Map</b>: dive sites and the routes of the plan with magnetic bearings and distances. Selecting a point on the map or in the list shows the routes from that point.</li>
-        <li><b>Dive planning</b> (the “Plan a dive” button): your own route made of points chosen one after another, up to 25 points, also outside the routes of the plan. Leg bearings and distances, the total distance and the maximum depth are calculated automatically. The route can be saved as an A4 PDF or shared as a link.</li>
+        <li><b>Dive planning</b> (the “Plan a dive” button): your own route made of points chosen one after another, up to 30 points, also outside the routes of the plan. Leg bearings and distances, the total distance and the maximum depth are calculated automatically. The route can be saved as an A4 PDF or shared as a link.</li>
       </ul>
       <p>The base layer is a drone orthophoto from 13 Sep 2026. Points, routes and bearings match the print plan.</p>
       <ul>
@@ -1318,7 +1318,7 @@ $('pdfBtn').onclick = () => mode === 'plan' ? routePdf() : savePdf();
 // any two points. Magnetic bearing = screen direction of the leg measured clockwise
 // from the screen's magnetic north (D.polnoc_mag); distance = pixels × D.gsd.
 // Checked against the 25 routes of the plan: bearings within 0.17°, distances within 0.2 m.
-const MAXPTS = 25, MAXPASS = 3;
+const MAXPTS = 30, MAXPASS = 3;   // 22.11: do 30 punktow (bylo 25)
 let route = [];
 const planG = L.layerGroup();
 let legLines = [];
