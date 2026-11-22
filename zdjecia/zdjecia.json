@@ -67,6 +67,26 @@
    "h": 1200
   }
  ],
+ "5": [
+  {
+   "plik": "zdjecia/5_1.jpg",
+   "mini": "zdjecia/5_1_m.jpg",
+   "w": 1600,
+   "h": 1200
+  },
+  {
+   "plik": "zdjecia/5_2.jpg",
+   "mini": "zdjecia/5_2_m.jpg",
+   "w": 1600,
+   "h": 1200
+  },
+  {
+   "plik": "zdjecia/5_3.jpg",
+   "mini": "zdjecia/5_3_m.jpg",
+   "w": 1600,
+   "h": 1200
+  }
+ ],
  "prz": [
   {
    "plik": "zdjecia/prz_1.jpg",
