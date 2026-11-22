@@ -187,6 +187,12 @@
    "mini": "zdjecia/12_2_m.jpg",
    "w": 1600,
    "h": 1200
+  },
+  {
+   "plik": "zdjecia/12_3.jpg",
+   "mini": "zdjecia/12_3_m.jpg",
+   "w": 1600,
+   "h": 1200
   }
  ],
  "11": [
@@ -231,6 +237,18 @@
   {
    "plik": "zdjecia/9_3.jpg",
    "mini": "zdjecia/9_3_m.jpg",
+   "w": 1600,
+   "h": 1200
+  },
+  {
+   "plik": "zdjecia/9_4.jpg",
+   "mini": "zdjecia/9_4_m.jpg",
+   "w": 1600,
+   "h": 1200
+  },
+  {
+   "plik": "zdjecia/9_5.jpg",
+   "mini": "zdjecia/9_5_m.jpg",
    "w": 1600,
    "h": 1200
   }
@@ -341,6 +359,12 @@
   {
    "plik": "zdjecia/6_3.jpg",
    "mini": "zdjecia/6_3_m.jpg",
+   "w": 1600,
+   "h": 1200
+  },
+  {
+   "plik": "zdjecia/6_4.jpg",
+   "mini": "zdjecia/6_4_m.jpg",
    "w": 1600,
    "h": 1200
   }

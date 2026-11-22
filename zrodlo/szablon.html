@@ -282,6 +282,13 @@ button { font: inherit; color: inherit; }
 .lv-mid .lbl svg { width: 11px; height: 11px; }
 .lv-far .lbl { height: 17px; padding: 0 4px; font-size: 10px; border-width: 1.2px; border-radius: 5px; }
 .lv-far .lbl svg { width: 10px; height: 10px; }
+/* phone: every level smaller, text never below 10 px (layoutLabels measures with the same sizes, see lod) */
+.lbl-m .lbl { height: 18px; padding: 0 5px; font-size: 11px; }
+.lbl-m .lbl svg { width: 11px; height: 11px; }
+.lbl-m.lv-mid .lbl { height: 17px; padding: 0 4px; font-size: 10px; border-width: 1.2px; border-radius: 5px; }
+.lbl-m.lv-mid .lbl svg { width: 10px; height: 10px; }
+.lbl-m.lv-far .lbl { height: 16px; padding: 0 3px; font-size: 10px; border-width: 1.2px; border-radius: 4px; gap: 2px; }
+.lbl-m.lv-far .lbl svg { width: 9px; height: 9px; }
 .leaflet-container { font-family: var(--f-body); background: var(--water); -webkit-tap-highlight-color: transparent; }
 .leaflet-popup-content-wrapper, .leaflet-popup-tip { background: var(--surface); color: var(--ink); box-shadow: var(--shadow); }
 .leaflet-popup-content { margin: 10px 14px; font-size: 14px; line-height: 1.4; }
@@ -1166,6 +1173,11 @@ const cv = document.createElement('canvas').getContext('2d');
 // mid: distances too, medium labels; near: everything at full size.
 function lod() {
   const z = map.getZoom();
+  if (mq.matches) {   // phone: labels smaller (text at least 10 px), the screen is too small for the full size
+    if (z < 1.75) return { cls: 'lv-far', fs: 10, h: 16, pad: 3, ic: 9, dist: false };
+    if (z < 3)    return { cls: 'lv-mid', fs: 10, h: 17, pad: 4, ic: 10, dist: true };
+    return               { cls: 'lv-near', fs: 11, h: 18, pad: 5, ic: 11, dist: true };
+  }
   if (z < 1.75) return { cls: 'lv-far', fs: 10, h: 17, pad: 4, ic: 10, dist: false };
   if (z < 3)    return { cls: 'lv-mid', fs: 11, h: 19, pad: 5, ic: 11, dist: true };
   return               { cls: 'lv-near', fs: 12, h: 21, pad: 6, ic: 12, dist: true };
@@ -1184,6 +1196,7 @@ function layoutLabels() {
   if (!map._loaded || mode === 'plan') return;   // before the first fitBounds there is no view yet
   const v = lod(), H = v.h, GAP = 3, c = map.getContainer();
   ['lv-far', 'lv-mid', 'lv-near'].forEach(k => c.classList.toggle(k, k === v.cls));
+  c.classList.toggle('lbl-m', mq.matches);
   const lp = {}; Object.keys(P).forEach(id => lp[id] = map.latLngToLayerPoint(LL(P[id].x, P[id].y)));
   const boxes = Object.keys(P).map(id => { const c = lp[id], r = pinR(id); return [c.x - r, c.y - r, c.x + r, c.y + r]; });
   const free = b => !boxes.some(q => b[0] < q[2] + GAP && q[0] < b[2] + GAP && b[1] < q[3] + GAP && q[1] < b[3] + GAP);
@@ -1256,8 +1269,17 @@ function select(id, opt) {
   openSheet();
   const p = P[id], ll = LL(p.x, p.y), pad = panelPad();
   if (opt && opt.move === 'fit') {
-    const pts = [ll].concat(routesOf(id).map(r => LL(r.other.x, r.other.y)));
-    map.flyToBounds(L.latLngBounds(pts), { paddingTopLeft: pad.tl, paddingBottomRight: pad.br, maxZoom: ZN - 1, duration: .6 });
+    const pts = [ll].concat(routesOf(id).map(r => LL(r.other.x, r.other.y))), b = L.latLngBounds(pts);
+    if (mq.matches && !mqSide.matches) {
+      // Phone held upright: only the strip above the sheet is free, and fitting every
+      // route end into it packs the labels too tightly. Half a step closer, with the
+      // point in the middle of the free strip; far route ends may leave the screen,
+      // but the bearings start at the point and stay visible.
+      const sz = map.getSize(), fz = map.getBoundsZoom(b, false, L.point(pad.tl[0] + pad.br[0], pad.tl[1] + pad.br[1]));
+      const z = Math.min(ZN - 1, fz + 0.5);
+      const fc = L.point((pad.tl[0] + sz.x - pad.br[0]) / 2, (pad.tl[1] + sz.y - pad.br[1]) / 2);
+      map.flyTo(map.unproject(map.project(ll, z).subtract(fc.subtract(sz.divideBy(2))), z), z, { duration: .6 });
+    } else map.flyToBounds(b, { paddingTopLeft: pad.tl, paddingBottomRight: pad.br, maxZoom: ZN - 1, duration: .6 });
   } else setTimeout(revealSel, 280);
 }
 // Keep the map where it is, but bring the selected point out from under the panel.

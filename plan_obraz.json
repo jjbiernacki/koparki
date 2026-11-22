@@ -1,7 +1,7 @@
 {
  "PL": {
   "pdf": "plan_PL.pdf",
-  "sha256": "b09214eba5d5820359bc915e7ceb97923a57c1e444fc74c678dad2ff0fe5a4fb",
+  "sha256": "2d39397d1d81f7b70fa34727d323307566c463df7b293ce207c507ff4edede46",
   "obraz": "koparki-mapa-nurkowa.jpg",
   "podglad": "koparki-mapa-nurkowa-podglad.jpg",
   "w": 3000,
@@ -11,7 +11,7 @@
  },
  "EN": {
   "pdf": "plan_EN.pdf",
-  "sha256": "b77fedbaa62f6c2a68f1da310e05051c12ed316803cb4566898b03a5f0f748d2",
+  "sha256": "94e211fabb948509e8d06bbb1b993679196f5932e2f5355a358807c1336eabad",
   "obraz": "koparki-dive-map.jpg",
   "podglad": "koparki-dive-map-podglad.jpg",
   "w": 3000,
