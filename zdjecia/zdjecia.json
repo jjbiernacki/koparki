@@ -371,18 +371,24 @@
   {
    "plik": "zdjecia/pian_2.jpg",
    "mini": "zdjecia/pian_2_m.jpg",
-   "w": 1200,
-   "h": 1600
-  },
-  {
-   "plik": "zdjecia/pian_3.jpg",
-   "mini": "zdjecia/pian_3_m.jpg",
    "w": 1600,
    "h": 1200
   },
   {
+   "plik": "zdjecia/pian_3.jpg",
+   "mini": "zdjecia/pian_3_m.jpg",
+   "w": 1200,
+   "h": 1600
+  },
+  {
    "plik": "zdjecia/pian_4.jpg",
    "mini": "zdjecia/pian_4_m.jpg",
+   "w": 1600,
+   "h": 1200
+  },
+  {
+   "plik": "zdjecia/pian_5.jpg",
+   "mini": "zdjecia/pian_5_m.jpg",
    "w": 1600,
    "h": 1200
   }
