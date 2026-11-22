@@ -307,6 +307,11 @@ button { font: inherit; color: inherit; }
 }
 #app.plan.empty .pin { animation: pinPulse 2.4s ease-out infinite; }
 .leaflet-marker-icon.inr .pin { box-shadow: 0 0 0 3px #ffcf33, 0 1px 5px rgba(0,0,0,.6); }
+/* route planning (22.11): points not yet in the route smaller and grey, so the drawings stay visible */
+#app.plan .leaflet-marker-icon:not(.inr) .pin { transform: scale(.7); background: #7b848a; border-color: #e4e7e9; }
+#app.plan .z-lo .leaflet-marker-icon:not(.inr) .pin { transform: scale(.52); }
+#app.plan .z-xlo .leaflet-marker-icon:not(.inr) .pin { transform: scale(.45); }
+#app.plan .leaflet-marker-icon:not(.inr):hover .pin { background: var(--pin); }
 .leaflet-marker-icon.cur .pin { transform: scale(1.3); }
 .z-lo .leaflet-marker-icon.cur .pin { transform: scale(1.05); }
 .z-xlo .leaflet-marker-icon.inr .pin.small { display: grid; }
@@ -722,12 +727,14 @@ map.setMaxBounds(L.latLngBounds(LL(-D.szer * 1.5, D.wys * 9), LL(D.szer * 2.5, -
 
 // everything except the point markers: hidden in the route planning mode
 const viewG = L.layerGroup().addTo(map);
-// outlines: Wilhelm hull (dashed), schematic drawings of the objects (parts + lines), pipe stubs
+// outlines: Wilhelm hull (dashed), schematic drawings of the objects (parts + lines), pipe stubs;
+// own layer, shown also in the route planning mode (22.11)
+const drawG = L.layerGroup().addTo(map);
 const LLs = l => l.map(([x, y]) => LL(x, y));
 D.obrysy.forEach(o => {
-  if (o.px) L.polygon(LLs(o.px), { color: '#fff', weight: 2.5, opacity: .95, fillColor: '#fff', fillOpacity: .18, dashArray: '6 4', interactive: false }).addTo(viewG);
-  (o.czesci || []).forEach(c => L.polygon(LLs(c), { color: '#fff', weight: 1.5, opacity: .9, fillColor: '#fff', fillOpacity: .22, interactive: false }).addTo(viewG));
-  (o.linie || []).forEach(l => L.polyline(LLs(l), o.rura ? { color: '#373c42', weight: 2, opacity: .8, interactive: false } : { color: '#fff', weight: 1.5, opacity: .9, interactive: false }).addTo(viewG));
+  if (o.px) L.polygon(LLs(o.px), { color: '#fff', weight: 2.5, opacity: .95, fillColor: '#fff', fillOpacity: .18, dashArray: '6 4', interactive: false }).addTo(drawG);
+  (o.czesci || []).forEach(c => L.polygon(LLs(c), { color: '#fff', weight: 1.5, opacity: .9, fillColor: '#fff', fillOpacity: .22, interactive: false }).addTo(drawG));
+  (o.linie || []).forEach(l => L.polyline(LLs(l), o.rura ? { color: '#373c42', weight: 2, opacity: .8, interactive: false } : { color: '#fff', weight: 1.5, opacity: .9, interactive: false }).addTo(drawG));
 });
 
 // routes
@@ -1318,6 +1325,7 @@ let legLines = [];
 const legAz = (a, b) => (((Math.atan2(b.x - a.x, -(b.y - a.y)) * 180 / Math.PI - D.polnoc_mag) % 360) + 360) % 360;
 const legM = (a, b) => Math.hypot(b.x - a.x, b.y - a.y) * D.gsd;
 // depth: the number with an asterisk in the Polish description ("15 m*"); null = unknown
+const depthApx = p => /^\s*ok\./.test(p.opis_pl || '') ? (lang === 'en' ? 'approx. ' : 'ok. ') : '';   // 22.11: depth estimated, not measured
 const depthOf = p => { const m = /(\d+(?:[.,]\d+)?)\s*m\*/.exec(p.opis_pl || ''); return m ? parseFloat(m[1].replace(',', '.')) : null; };
 const pairKey = (a, b) => a < b ? a + '|' + b : b + '|' + a;
 
@@ -1459,7 +1467,7 @@ function renderPlan(b, L_) {
     }
     const tag = i === 0 ? L_.start : (i === last ? L_.finish : '');
     rows += `<li class="pt"><button data-id="${esc(id)}"><span class="badge${p.maly || p.nr === '7b' ? ' small' : ''}">${esc(p.nr)}</span>` +
-      `<span><span class="t">${esc(name(p))}</span>${tag ? `<span class="s">${tag}</span>` : ''}</span><span class="dp">${d === null ? '' : n(d) + ' m*'}</span></button></li>`;
+      `<span><span class="t">${esc(name(p))}</span>${tag ? `<span class="s">${tag}</span>` : ''}</span><span class="dp">${d === null ? '' : depthApx(p) + n(d) + ' m*'}</span></button></li>`;
   });
   b.innerHTML = `<div class="view-pad">
     <dl class="plan-sum">
@@ -1686,7 +1694,7 @@ async function drawRoutePage(L_) {
       g.textAlign = 'left'; g.fillStyle = INK; font(600, fs, FB);
       g.fillText(fit(name(p), R[1] - mm(14) - R[0] - 2 * r - mm(1.5)), R[0] + 2 * r + mm(1.5), mid);
       g.textAlign = 'right'; font(600, fs * .9, FM);
-      g.fillStyle = MUT; if (d !== null) g.fillText(n(d) + ' m*', R[1] - mm(1.5), mid);
+      g.fillStyle = MUT; if (d !== null) g.fillText(depthApx(p) + n(d) + ' m*', R[1] - mm(1.5), mid);
       if (lg) { g.fillStyle = RED; g.fillText(az(lg.az), R[2] - mm(1.5), mid); g.fillStyle = INK; g.fillText(dm(lg.m), R[3] - mm(1.5), mid); }
       g.fillStyle = INK; g.fillText(dm(cumAt[i]), R[4], mid);
       g.textAlign = 'left'; g.textBaseline = 'alphabetic';
